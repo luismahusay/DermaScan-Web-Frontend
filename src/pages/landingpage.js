@@ -8,7 +8,7 @@ function LandingPage() {
   return (
     <Container fluid className="vh-100">
       <Row className="h-100">
-        {/* Left side with image */}
+        {/* Left image side */}
         <Col
           md={6}
           className="d-none d-md-block p-0"
@@ -19,49 +19,62 @@ function LandingPage() {
           }}
         />
 
-        {/* Right side */}
-        <Col xs={12} md={6}
+        {/* Right side - Responsive */}
+        <Col
+          xs={12}
+          md={6}
           className="d-flex justify-content-center align-items-center bg-white"
         >
           <Card
-            className="p-4 rounded-4 text-center shadow-lg border-0"
+            className="p-4 rounded-4 text-center shadow-lg border-0 w-100 mx-3"
             style={{
               backgroundColor: '#2196F3',
-              height: '350px',
-              width: '500px',
+              maxWidth: '500px',
+              width: '100%',
+              height: 'auto',
             }}
           >
-            <h3 className="fw-bold text-white mt-5 mb-3 fs-4">Choose account</h3>
+            <h3 className="fw-bold text-white mb-4 fs-4 mt-2">Choose account</h3>
 
-            <Row className="px-2 justify-content-center">
-              <Col xs={5} className="d-flex flex-column align-items-center">
+            <Row className="justify-content-center">
+              <Col
+                xs={6}
+                sm={5}
+                className="d-flex flex-column align-items-center mb-3"
+              >
                 <div
                   className="bg-primary rounded-4 d-flex justify-content-center align-items-center p-2"
-                  style={{ width: '150px', height: '120px' }}
+                  style={{ width: '100%', maxWidth: '150px', height: '120px' }}
                   role="button"
                   onClick={() => navigate('/admin')}
                 >
-                  <img src="/icons/admin.png" alt="Admin"
-                    style={{ width: '80px', height: '80px' }}
+                  <img
+                    src="/icons/admin.png"
+                    alt="Admin"
+                    style={{ width: '70px', height: '70px' }}
                   />
                 </div>
-                <span className="fw-bold text-white mt-1">Admin</span>
+                <span className="fw-bold text-white mt-2">Admin</span>
               </Col>
 
-              <Col xs={5} className="d-flex flex-column align-items-center">
+              <Col
+                xs={6}
+                sm={5}
+                className="d-flex flex-column align-items-center mb-3"
+              >
                 <div
                   className="bg-primary rounded-4 d-flex justify-content-center align-items-center p-2"
-                  style={{ width: '150px', height: '120px' }}
+                  style={{ width: '100%', maxWidth: '150px', height: '120px' }}
                   role="button"
                   onClick={() => navigate('/dermatologist')}
                 >
                   <img
                     src="/icons/dermatologist.png"
                     alt="Dermatologist"
-                    style={{ width: '80px', height: '80px' }}
+                    style={{ width: '70px', height: '70px' }}
                   />
                 </div>
-                <span className="fw-bold text-white mt-1">Dermatologist</span>
+                <span className="fw-bold text-white mt-2">Dermatologist</span>
               </Col>
             </Row>
           </Card>
