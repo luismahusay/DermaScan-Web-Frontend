@@ -223,7 +223,7 @@ function AdminDashboard() {
           <Row>
             {/* Left: Recent Product Submissions Table */}
             <Col xs={12} lg={8} className="mb-4">
-              <Card className="shadow-sm mb-4">
+              <Card className="shadow-sm mb-4 recent-product-card">
                 <Card.Body>
                   <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
                     <div className="fw-semibold">Recent Product Submissions</div>

@@ -138,12 +138,15 @@
     height: 11px;
   }
 }
-.stat-card {
+.stat-card,
+.recent-product-card,
+.subscription-plan-card {
   border-radius: 18px !important;
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07);
   background: #fff;
   position: relative;
   min-height: 140px;
+  border: 2px solid #0057FF;
 }
 .stat-card-icon {
   width: 38px;
