@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import SubscriptionPlanCard from './SubscriptionPlanCard';
+import UserManagement from './UserManagement';
 import { Container, Row, Col, Card, Table, Badge, InputGroup, FormControl, Nav, Navbar, Offcanvas, Button } from 'react-bootstrap';
 import '../styles/admin_dashboard.css';
 
@@ -60,6 +61,7 @@ const statusVariant = {
 function AdminDashboard() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [activeScreen, setActiveScreen] = useState('dashboard');
   const profileRef = useRef(null);
   const handleSidebarToggle = () => setShowSidebar(!showSidebar);
   const handleProfileClick = () => setShowProfileDropdown((prev) => !prev);
@@ -68,6 +70,11 @@ function AdminDashboard() {
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setShowProfileDropdown(false);
     }
+  };
+  // Sidebar click handler
+  const handleMenuClick = (screen) => {
+    setActiveScreen(screen);
+    setShowSidebar(false); // close mobile sidebar if open
   };
 
   return (
@@ -173,8 +180,8 @@ function AdminDashboard() {
       {/* Sidebar for desktop */}
       <div className="d-none d-md-block admin-sidebar">
         <Nav className="flex-column">
-          <div className="admin-menu-item active"><img src="/icons/dashboard.png" alt="Dashboard" className="sidebar-icon" /> Dashboard</div>
-          <div className="admin-menu-item"><img src="/icons/user management icon.png" alt="User Management" className="sidebar-icon" /> User Management</div>
+          <div className={`admin-menu-item${activeScreen === 'dashboard' ? ' active' : ''}`} onClick={() => handleMenuClick('dashboard')}><img src="/icons/dashboard.png" alt="Dashboard" className="sidebar-icon" /> Dashboard</div>
+          <div className={`admin-menu-item${activeScreen === 'user' ? ' active' : ''}`} onClick={() => handleMenuClick('user')}><img src="/icons/user management icon.png" alt="User Management" className="sidebar-icon" /> User Management</div>
           <div className="admin-menu-item"><img src="/icons/product management icon.png" alt="Product Management" className="sidebar-icon" /> Product Management</div>
           <div className="admin-menu-item"><img src="/icons/activitylogs icon.png" alt="Activity Logs" className="sidebar-icon" /> Activity Logs</div>
           <div className="admin-menu-item"><img src="/icons/booking reviews icon.png" alt="Bookings Reviews" className="sidebar-icon" /> Bookings Reviews</div>
@@ -188,79 +195,83 @@ function AdminDashboard() {
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Nav className="flex-column">
-            <div className="admin-menu-item active" onClick={handleSidebarToggle}><img src="/icons/dashboard.png" alt="Dashboard" className="sidebar-icon" /> Dashboard</div>
-            <div className="admin-menu-item" onClick={handleSidebarToggle}><img src="/icons/user management icon.png" alt="User Management" className="sidebar-icon" /> User Management</div>
-            <div className="admin-menu-item" onClick={handleSidebarToggle}><img src="/icons/product management icon.png" alt="Product Management" className="sidebar-icon" /> Product Management</div>
-            <div className="admin-menu-item" onClick={handleSidebarToggle}><img src="/icons/activitylogs icon.png" alt="Activity Logs" className="sidebar-icon" /> Activity Logs</div>
-            <div className="admin-menu-item" onClick={handleSidebarToggle}><img src="/icons/booking reviews icon.png" alt="Bookings Reviews" className="sidebar-icon" /> Bookings Reviews</div>
+            <div className={`admin-menu-item${activeScreen === 'dashboard' ? ' active' : ''}`} onClick={() => handleMenuClick('dashboard')}><img src="/icons/dashboard.png" alt="Dashboard" className="sidebar-icon" /> Dashboard</div>
+            <div className={`admin-menu-item${activeScreen === 'user' ? ' active' : ''}`} onClick={() => handleMenuClick('user')}><img src="/icons/user management icon.png" alt="User Management" className="sidebar-icon" /> User Management</div>
+            <div className="admin-menu-item"><img src="/icons/product management icon.png" alt="Product Management" className="sidebar-icon" /> Product Management</div>
+            <div className="admin-menu-item"><img src="/icons/activitylogs icon.png" alt="Activity Logs" className="sidebar-icon" /> Activity Logs</div>
+            <div className="admin-menu-item"><img src="/icons/booking reviews icon.png" alt="Bookings Reviews" className="sidebar-icon" /> Bookings Reviews</div>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
 
       {/* Main Content */}
       <div className="main-content">
-        <Container
-          fluid
-          className="pt-4 px-2 px-md-4 responsive-main-container"
-        >
-          <h3 className="mb-4 fw-bold text-center text-md-start">Welcome back, Admin.</h3>
-          {/* Stat Cards */}
-          <Row className="mb-4 g-3">
-            {statCards.map((card, idx) => (
-              <Col key={idx} xs={12} sm={12} md={12} lg={3} className="mb-2">
-                <Card className="shadow-sm rounded-4 h-100 stat-card">
-                  <Card.Body className="position-relative p-3">
-                    <img src={card.icon} alt={card.iconAlt} className="stat-card-icon position-absolute top-0 end-0 m-3" />
-                    <div className="text-muted" style={{ fontSize: 13 }}>{card.label}</div>
-                    <div className="fw-bold fs-2 my-2">{card.value}</div>
-                    <div style={{ fontSize: 13, color: card.trendColor }}>{card.trend}</div>
+        {activeScreen === 'dashboard' ? (
+          <Container
+            fluid
+            className="pt-4 px-2 px-md-4 responsive-main-container"
+          >
+            <h3 className="mb-4 fw-bold text-center text-md-start">Welcome back, Admin.</h3>
+            {/* Stat Cards */}
+            <Row className="mb-4 g-3">
+              {statCards.map((card, idx) => (
+                <Col key={idx} xs={12} sm={12} md={12} lg={3} className="mb-2">
+                  <Card className="shadow-sm rounded-4 h-100 stat-card">
+                    <Card.Body className="position-relative p-3">
+                      <img src={card.icon} alt={card.iconAlt} className="stat-card-icon position-absolute top-0 end-0 m-3" />
+                      <div className="text-muted" style={{ fontSize: 13 }}>{card.label}</div>
+                      <div className="fw-bold fs-2 my-2">{card.value}</div>
+                      <div style={{ fontSize: 13, color: card.trendColor }}>{card.trend}</div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+
+            <Row>
+              {/* Left: Recent Product Submissions Table */}
+              <Col xs={12} lg={8} className="mb-4">
+                <Card className="shadow-sm mb-4 recent-product-card">
+                  <Card.Body>
+                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
+                      <div className="fw-semibold">Recent Product Submissions</div>
+                      <a href="#" className="small">See more...</a>
+                    </div>
+                    <Table hover responsive size="sm" className="mb-0">
+                      <thead>
+                        <tr>
+                          <th>Product Name</th>
+                          <th>Submitted by</th>
+                          <th>Date Submitted</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {tableRows.slice(0, 6).map((row, idx) => (
+                          <tr key={idx}>
+                            <td>{row.name}</td>
+                            <td>{row.by}</td>
+                            <td>{row.date}</td>
+                            <td><Badge bg={statusVariant[row.status]}>{row.status}</Badge></td>
+                            <td><a href="#">View</a></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
                   </Card.Body>
                 </Card>
               </Col>
-            ))}
-          </Row>
 
-          <Row>
-            {/* Left: Recent Product Submissions Table */}
-            <Col xs={12} lg={8} className="mb-4">
-              <Card className="shadow-sm mb-4 recent-product-card">
-                <Card.Body>
-                  <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
-                    <div className="fw-semibold">Recent Product Submissions</div>
-                    <a href="#" className="small">See more...</a>
-                  </div>
-                  <Table hover responsive size="sm" className="mb-0">
-                    <thead>
-                      <tr>
-                        <th>Product Name</th>
-                        <th>Submitted by</th>
-                        <th>Date Submitted</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {tableRows.slice(0, 6).map((row, idx) => (
-                        <tr key={idx}>
-                          <td>{row.name}</td>
-                          <td>{row.by}</td>
-                          <td>{row.date}</td>
-                          <td><Badge bg={statusVariant[row.status]}>{row.status}</Badge></td>
-                          <td><a href="#">View</a></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Right: Subscription Plan Card */}
-            <Col xs={12} lg={3}>
-              <SubscriptionPlanCard />
-            </Col>
-          </Row>
-        </Container>
+              {/* Right: Subscription Plan Card */}
+              <Col xs={12} lg={3}>
+                <SubscriptionPlanCard />
+              </Col>
+            </Row>
+          </Container>
+        ) : activeScreen === 'user' ? (
+          <UserManagement />
+        ) : null}
       </div>
     </div>
   );
