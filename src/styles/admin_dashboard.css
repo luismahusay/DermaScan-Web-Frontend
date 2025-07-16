@@ -1,3 +1,6 @@
+ .subscription-plan-card {
+    padding: 1rem;
+  }
 
 @media (min-width: 992px) and (max-width: 1200px) {
   .main-content .row {
@@ -10,13 +13,6 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-  }
-  .main-content .row > .col-lg-8 > .card,
-  .main-content .row > .col-lg-3 > .subscription-plan-card {
-    flex: 1 1 auto;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
   }
   .subscription-plan-card {
     min-width: 0 !important;
@@ -60,7 +56,7 @@
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 2px 12px 0 rgba(60,72,100,0.08);
-  padding: 1.5rem 1.5rem 1.2rem 1.5rem;
+  padding: none;
   display: flex;
   flex-direction: column;
   align-items: center;

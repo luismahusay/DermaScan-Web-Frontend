@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import SubscriptionPlanCard from './SubscriptionPlanCard';
 import UserManagement from './UserManagement';
+import ProductManagement from './admin_product_management';
 import { Container, Row, Col, Card, Table, Badge, InputGroup, FormControl, Nav, Navbar, Offcanvas, Button } from 'react-bootstrap';
 import '../styles/admin_dashboard.css';
 
@@ -78,7 +79,7 @@ function AdminDashboard() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F7F9FB' }}>
+    <div className="p-1" style={{ minHeight: '100vh', background: '#F7F9FB' }}>
       {/* Header */}
       <Navbar bg="white" expand="lg" fixed="top" className="border-bottom border-4 border-primary shadow-sm admin-navbar" style={{ height: HEADER_HEIGHT, zIndex: 1100 }}>
         <Container fluid className="d-flex justify-content-between align-items-center" style={{ height: HEADER_HEIGHT }}>
@@ -120,53 +121,21 @@ function AdminDashboard() {
                 <img src="/icons/profile.png" alt="Profile" style={{ width: 40, height: 40 }} />
               </button>
               {showProfileDropdown && (
-                <div className="profile-dropdown-menu" tabIndex={-1} style={{
-                  position: 'absolute',
-                  top: 48,
-                  right: 0,
-                  minWidth: 170,
-                  background: '#fff',
-                  borderRadius: 12,
-                  boxShadow: '0 4px 16px 0 rgba(60,72,100,0.13)',
-                  zIndex: 2000,
-                  padding: '0.5rem 0',
-                  border: '1px solid #f0f0f0',
-                }}>
-                  <button className="profile-dropdown-item" style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    width: '100%',
-                    background: 'none',
-                    border: 'none',
-                    padding: '10px 18px',
-                    fontSize: 15,
-                    color: '#23272e',
-                    cursor: 'pointer',
-                    outline: 'none',
-                    transition: 'background 0.2s, color 0.2s',
-                  }}
+                <div className="profile-dropdown-menu position-absolute top-100 end-0 min-vw-25 bg-white rounded-3 shadow-lg border" tabIndex={-1}>
+                  <button
+                    className="profile-dropdown-item d-flex align-items-center w-100 bg-transparent border-0 px-2 py-2 text-dark text-nowrap"
+                    style={{ transition: 'background 0.2s, color 0.2s' }}
                     onClick={() => { setShowProfileDropdown(false); /* handle profile click */ }}
                   >
-                    <img src="/icons/my profile.png" alt="My Profile" style={{ width: 20, height: 20, marginRight: 12 }} />
+                    <img src="/icons/my profile.png" alt="My Profile" className="me-1" width="20" height="20" />
                     My Profile
                   </button>
-                  <div style={{ height: 1, background: '#f0f0f0', margin: '0 12px' }} />
-                  <button className="profile-dropdown-item" style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    width: '100%',
-                    background: 'none',
-                    border: 'none',
-                    padding: '10px 18px',
-                    fontSize: 15,
-                    color: '#23272e',
-                    cursor: 'pointer',
-                    outline: 'none',
-                    transition: 'background 0.2s, color 0.2s',
-                  }}
+                  <hr className="my-1 mx-2 border border-1 border-secondary opacity-25" />
+                  <button
+                    className="profile-dropdown-item d-flex align-items-center w-100 bg-transparent border-0 px-2 py-2 fs-6 text-dark text-nowrap"
                     onClick={() => { setShowProfileDropdown(false); /* handle logout click */ }}
                   >
-                    <img src="/icons/logout.png" alt="Log Out" style={{ width: 20, height: 20, marginRight: 12 }} />
+                    <img src="/icons/logout.png" alt="Log Out" className="me-1" width="20" height="20" />
                     Log Out
                   </button>
                 </div>
@@ -182,9 +151,9 @@ function AdminDashboard() {
         <Nav className="flex-column">
           <div className={`admin-menu-item${activeScreen === 'dashboard' ? ' active' : ''}`} onClick={() => handleMenuClick('dashboard')}><img src="/icons/dashboard.png" alt="Dashboard" className="sidebar-icon" /> Dashboard</div>
           <div className={`admin-menu-item${activeScreen === 'user' ? ' active' : ''}`} onClick={() => handleMenuClick('user')}><img src="/icons/user management icon.png" alt="User Management" className="sidebar-icon" /> User Management</div>
-          <div className="admin-menu-item"><img src="/icons/product management icon.png" alt="Product Management" className="sidebar-icon" /> Product Management</div>
-          <div className="admin-menu-item"><img src="/icons/activitylogs icon.png" alt="Activity Logs" className="sidebar-icon" /> Activity Logs</div>
-          <div className="admin-menu-item"><img src="/icons/booking reviews icon.png" alt="Bookings Reviews" className="sidebar-icon" /> Bookings Reviews</div>
+          <div className={`admin-menu-item${activeScreen === 'product' ? ' active' : ''}`} onClick={() => handleMenuClick('product')}><img src="/icons/product management icon.png" alt="Product Management" className="sidebar-icon" /> Product Management</div>
+          <div className={`admin-menu-item${activeScreen === 'activity' ? ' active' : ''}`} onClick={() => handleMenuClick('activity')}><img src="/icons/activitylogs icon.png" alt="Activity Logs" className="sidebar-icon" /> Activity Logs</div>
+          <div className={`admin-menu-item${activeScreen === 'booking' ? ' active' : ''}`} onClick={() => handleMenuClick('booking')}><img src="/icons/booking reviews icon.png" alt="Bookings Reviews" className="sidebar-icon" /> Bookings Reviews</div>
         </Nav>
       </div>
 
@@ -197,9 +166,9 @@ function AdminDashboard() {
           <Nav className="flex-column">
             <div className={`admin-menu-item${activeScreen === 'dashboard' ? ' active' : ''}`} onClick={() => handleMenuClick('dashboard')}><img src="/icons/dashboard.png" alt="Dashboard" className="sidebar-icon" /> Dashboard</div>
             <div className={`admin-menu-item${activeScreen === 'user' ? ' active' : ''}`} onClick={() => handleMenuClick('user')}><img src="/icons/user management icon.png" alt="User Management" className="sidebar-icon" /> User Management</div>
-            <div className="admin-menu-item"><img src="/icons/product management icon.png" alt="Product Management" className="sidebar-icon" /> Product Management</div>
-            <div className="admin-menu-item"><img src="/icons/activitylogs icon.png" alt="Activity Logs" className="sidebar-icon" /> Activity Logs</div>
-            <div className="admin-menu-item"><img src="/icons/booking reviews icon.png" alt="Bookings Reviews" className="sidebar-icon" /> Bookings Reviews</div>
+            <div className={`admin-menu-item${activeScreen === 'product' ? ' active' : ''}`} onClick={() => handleMenuClick('product')}><img src="/icons/product management icon.png" alt="Product Management" className="sidebar-icon" /> Product Management</div>
+            <div className={`admin-menu-item${activeScreen === 'activity' ? ' active' : ''}`} onClick={() => handleMenuClick('activity')}><img src="/icons/activitylogs icon.png" alt="Activity Logs" className="sidebar-icon" /> Activity Logs</div>
+            <div className={`admin-menu-item${activeScreen === 'booking' ? ' active' : ''}`} onClick={() => handleMenuClick('booking')}><img src="/icons/booking reviews icon.png" alt="Bookings Reviews" className="sidebar-icon" /> Bookings Reviews</div>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
@@ -207,10 +176,7 @@ function AdminDashboard() {
       {/* Main Content */}
       <div className="main-content">
         {activeScreen === 'dashboard' ? (
-          <Container
-            fluid
-            className="pt-4 px-2 px-md-4 responsive-main-container"
-          >
+          <Container fluid className="pt-4 responsive-main-container">
             <h3 className="mb-4 fw-bold text-center text-md-start">Welcome back, Admin.</h3>
             {/* Stat Cards */}
             <Row className="mb-4 g-3">
@@ -248,7 +214,7 @@ function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {tableRows.slice(0, 6).map((row, idx) => (
+                        {tableRows.slice(0, 7).map((row, idx) => (
                           <tr key={idx}>
                             <td>{row.name}</td>
                             <td>{row.by}</td>
@@ -271,6 +237,8 @@ function AdminDashboard() {
           </Container>
         ) : activeScreen === 'user' ? (
           <UserManagement />
+        ) : activeScreen === 'product' ? (
+          <ProductManagement/>
         ) : null}
       </div>
     </div>

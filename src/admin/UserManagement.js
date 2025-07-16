@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
-import { Container, Row, Col, Card, Table, Badge, InputGroup, FormControl, Button, ButtonGroup, Dropdown, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Badge, InputGroup, FormControl, Button, Dropdown, DropdownButton, Pagination } from 'react-bootstrap';
 import '../styles/user_management.css';
 
 const mockPatients = Array.from({ length: 24 }, (_, i) => ({
@@ -103,13 +103,6 @@ const UserManagement = () => {
   const totalPages = Math.ceil(sorted.length / entries);
   const paginated = sorted.slice((page - 1) * entries, page * entries);
 
-  // KPI Data
-  const patientKPI = [
-    { label: 'Total Revenue', value: '₱1000', change: '-20%', up: false },
-    { label: 'Free', value: 123, change: '+36%', up: true },
-    { label: 'Monthly', value: 45, change: '-10%', up: false },
-    { label: 'Yearly', value: 12, change: '+5%', up: true },
-  ];
   const dermKPI = [
     { label: 'Total Dermatologists', value: 123, change: '+36%', up: true },
     { label: 'Approved', value: 100, change: '+10%', up: true },
@@ -159,82 +152,83 @@ return (
           </Col>
         </Row>
         {/* Filter Bar */}
-        <Row className="align-items-start mb-3 flex-nowrap user-mgmt-filter-row">
-          <Col xs="auto" className="mb-2 mb-md-0 d-flex align-items-start">
-            <Dropdown onSelect={handleEntries}>
-              <Dropdown.Toggle variant="outline-secondary" size="sm" className="me-2 user-mgmt-dropdown-toggle">
-                Show {entries} entries
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                {[10, 15, 20, 25].map(num => (
-                  <Dropdown.Item key={num} eventKey={num}>{num}</Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
-          </Col>
-          <Col xs="auto" className="d-flex align-items-start">
-            <InputGroup size="sm" className="user-mgmt-search-group">
-              <InputGroup.Text
-                className="user-mgmt-search-icon-square"
-                style={{ cursor: isMobile ? 'pointer' : 'default' }}
-                onClick={() => {
-                  if (isMobile) setShowMobileSearch(true);
-                }}
+        <div className="d-flex flex-wrap align-items-center mb-3 gap-4 user-mgmt-filter-row">
+          <div className="d-flex align-items-center gap-2">
+            <span>Show</span>
+            <DropdownButton
+              id="dropdown-entries"
+              title={entries}
+              variant="outline-secondary"
+              size="sm"
+              onSelect={val => { setEntries(Number(val)); setPage(1); }}
+            >
+              {[10, 25, 50, 100].map(num => (
+                <Dropdown.Item key={num} eventKey={num}>{num}</Dropdown.Item>
+              ))}
+            </DropdownButton>
+            <span>entries</span>
+          </div>
+          <InputGroup size="sm" className="user-mgmt-search-group" style={{ maxWidth: 250 }}>
+            <InputGroup.Text
+              className="user-mgmt-search-icon-square"
+              style={{ cursor: isMobile ? 'pointer' : 'default' }}
+              onClick={() => {
+                if (isMobile) setShowMobileSearch(true);
+              }}
+            >
+              <img src="/icons/search.png" alt="Search" className="user-mgmt-search-icon" />
+            </InputGroup.Text>
+            {!isMobile && (
+              <FormControl
+                placeholder="Search..."
+                value={search}
+                onChange={e => { setSearch(e.target.value); setPage(1); }}
+              />
+            )}
+          </InputGroup>
+          {/* Mobile search overlay */}
+          {isMobile && showMobileSearch && (
+            <div
+              className="mobile-search-overlay"
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                background: 'rgba(255,255,255,0.98)',
+                zIndex: 3000,
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                paddingTop: 60,
+              }}
+              onClick={() => setShowMobileSearch(false)}
+            >
+              <form
+                style={{ width: '90%', maxWidth: 400, position: 'relative' }}
+                onSubmit={e => { e.preventDefault(); setShowMobileSearch(false); }}
+                onClick={e => e.stopPropagation()}
               >
-                <img src="/icons/search.png" alt="Search" className="user-mgmt-search-icon" />
-              </InputGroup.Text>
-              {!isMobile && (
                 <FormControl
+                  ref={searchInputRef}
                   placeholder="Search..."
                   value={search}
                   onChange={e => { setSearch(e.target.value); setPage(1); }}
+                  style={{ fontSize: 18, padding: '12px 16px', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
                 />
-              )}
-            </InputGroup>
-            {/* Mobile search overlay */}
-            {isMobile && showMobileSearch && (
-              <div
-                className="mobile-search-overlay"
-                style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  width: '100vw',
-                  height: '100vh',
-                  background: 'rgba(255,255,255,0.98)',
-                  zIndex: 3000,
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  paddingTop: 60,
-                }}
-                onClick={() => setShowMobileSearch(false)}
-              >
-                <form
-                  style={{ width: '90%', maxWidth: 400, position: 'relative' }}
-                  onSubmit={e => { e.preventDefault(); setShowMobileSearch(false); }}
-                  onClick={e => e.stopPropagation()}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  style={{ position: 'absolute', right: 8, top: 8, zIndex: 1 }}
+                  onClick={() => setShowMobileSearch(false)}
                 >
-                  <FormControl
-                    ref={searchInputRef}
-                    placeholder="Search..."
-                    value={search}
-                    onChange={e => { setSearch(e.target.value); setPage(1); }}
-                    style={{ fontSize: 18, padding: '12px 16px', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
-                  />
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    style={{ position: 'absolute', right: 8, top: 8, zIndex: 1 }}
-                    onClick={() => setShowMobileSearch(false)}
-                  >
-                    Close
-                  </Button>
-                </form>
-              </div>
-            )}
-          </Col>
-        </Row>
+                  Close
+                </Button>
+              </form>
+            </div>
+          )}
+        </div>
         <Row>
           {/* Table Section */}
           <Col xs={12} lg={8} className="mb-2">
@@ -319,6 +313,7 @@ return (
             <div className="kpi-panel d-flex flex-column align-items-stretch user-kpi-panel-col">
               {activeTab === 'patient' ? (
                 <>
+                {/* total revenue */}
                   <Card className="kpi-card subscription-card mb-3 mobile-kpi-spacing">
                     <Card.Body className="p-3 position-relative">
                       <div className="d-flex align-items-center justify-content-between mb-1">

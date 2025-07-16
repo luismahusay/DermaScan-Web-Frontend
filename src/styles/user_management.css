@@ -1,8 +1,4 @@
-@media (max-width: 767.98px) {
-  .mobile-kpi-spacing {
-    margin-bottom: 20px !important;
-  }
-}
+
 /* Always show tab button text */
 .user-mgmt-tab-btn span {
   display: inline !important;
@@ -15,6 +11,9 @@
   .kpi-panel {
     margin-top: 16px !important;
     margin-bottom: 16px !important;
+  }
+  .mobile-kpi-spacing {
+    margin-bottom: 20px !important;
   }
 }
 /* Ensure consistent KPI panel width for dermatologist view at large screens */
@@ -139,19 +138,21 @@ user-mgmt-filter-row {
   gap: 20px;
   padding-top: 0 !important;
 }
+/* Unify User Management title size with Product Management */
 .user-mgmt-title {
-  font-size: 25px !important;
+  font-size: 28px !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
-  color: #23272e;
-  font-weight: 700;
+  color: #23272e !important; 
   letter-spacing: -0.5px;
 }
+/* User Management Page Styles */
 /* User Management Page Styles */
 .user-management-main {
   background: #F7F9FB;
   min-height: 100vh;
-  padding-top: 0 !important;
+  padding: 10px;
+  padding-top: 5px !important;
 }
 .user-mgmt-container {
   max-width: 1400px;
@@ -266,7 +267,7 @@ user-mgmt-filter-row {
 }
 @media (max-width: 767.98px) {
   .user-management-main {
-    padding-top: 80px;
+    padding-top: 5px !important;
   }
   .user-mgmt-tabs .tab-btn {
     min-width: 100px;

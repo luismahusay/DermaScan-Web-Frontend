@@ -21,7 +21,7 @@ const renderCustomizedLabel = ({ cx, cy }) => {
 
 const SubscriptionPlanCard = () => {
   return (
-    <div className="subscription-plan-card">
+    <div className="subscription-plan-card aligned-card">
       <div className="subscription-plan-title">Subscription Plan</div>
       <div className="donut-chart-container">
         <ResponsiveContainer width="100%" height={200}>
