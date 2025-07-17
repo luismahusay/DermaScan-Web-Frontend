@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SubscriptionPlanCard from './SubscriptionPlanCard';
 import UserManagement from './UserManagement';
 import ProductManagement from './admin_product_management';
@@ -64,6 +65,7 @@ function AdminDashboard() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [activeScreen, setActiveScreen] = useState('dashboard');
   const profileRef = useRef(null);
+  const navigate = useNavigate();
   const handleSidebarToggle = () => setShowSidebar(!showSidebar);
   const handleProfileClick = () => setShowProfileDropdown((prev) => !prev);
   const handleProfileBlur = (e) => {
@@ -81,7 +83,7 @@ function AdminDashboard() {
   return (
     <div className="p-1" style={{ minHeight: '100vh', background: '#F7F9FB' }}>
       {/* Header */}
-      <Navbar bg="white" expand="lg" fixed="top" className="border-bottom border-4 border-primary shadow-sm admin-navbar" style={{ height: HEADER_HEIGHT, zIndex: 1100 }}>
+      <Navbar bg="white" expand="lg" fixed="top" className="border-bottom border-1 border-primary shadow-sm admin-navbar" style={{ height: HEADER_HEIGHT, zIndex: 1100 }}>
         <Container fluid className="d-flex justify-content-between align-items-center" style={{ height: HEADER_HEIGHT }}>
           {/* Left: Sidebar toggle and logo (mobile: toggle+centered logo, desktop: left-aligned) */}
           <div className="d-flex align-items-center flex-grow-1 flex-md-grow-0 justify-content-center justify-content-md-start position-relative" style={{ height: '100%' }}>
@@ -121,31 +123,32 @@ function AdminDashboard() {
                 <img src="/icons/profile.png" alt="Profile" style={{ width: 40, height: 40 }} />
               </button>
               {showProfileDropdown && (
-                <div className="profile-dropdown-menu position-absolute top-100 end-0 min-vw-25 bg-white rounded-3 shadow-lg border" tabIndex={-1}>
+                <div className="profile-dropdown-menu position-absolute top-100 end-0 bg-white rounded-3 shadow-lg border" style={{width: 150, padding: 10 }} tabIndex={-1}>
                   <button
                     className="profile-dropdown-item d-flex align-items-center w-100 bg-transparent border-0 px-2 py-2 text-dark text-nowrap"
                     style={{ transition: 'background 0.2s, color 0.2s' }}
                     onClick={() => { setShowProfileDropdown(false); /* handle profile click */ }}
                   >
-                    <img src="/icons/my profile.png" alt="My Profile" className="me-1" width="20" height="20" />
+                    <img src="/icons/my profile.png" alt="My Profile" className="me-3" width="20" height="20" />
                     My Profile
                   </button>
                   <hr className="my-1 mx-2 border border-1 border-secondary opacity-25" />
                   <button
                     className="profile-dropdown-item d-flex align-items-center w-100 bg-transparent border-0 px-2 py-2 fs-6 text-dark text-nowrap"
-                    onClick={() => { setShowProfileDropdown(false); /* handle logout click */ }}
+                    onClick={() => {
+                      setShowProfileDropdown(false);
+                      navigate('/');
+                    }}
                   >
-                    <img src="/icons/logout.png" alt="Log Out" className="me-1" width="20" height="20" />
+                    <img src="/icons/logout.png" alt="Log Out" className="me-3" width="20" height="20" />
                     Log Out
                   </button>
                 </div>
               )}
             </div>
           </div>
-
         </Container>
       </Navbar>
-
       {/* Sidebar for desktop */}
       <div className="d-none d-md-block admin-sidebar">
         <Nav className="flex-column">
