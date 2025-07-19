@@ -1,6 +1,9 @@
  .subscription-plan-card {
     padding: 1rem;
   }
+.admin-profile-modal{
+  margin-top: 100px !important;
+}
 
 @media (min-width: 992px) and (max-width: 1200px) {
   .main-content .row {

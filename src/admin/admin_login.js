@@ -1,8 +1,11 @@
+import React, { useState } from 'react';
+import { BsEyeFill, BsEyeSlash } from 'react-icons/bs';
 import { Container, Row, Col, Form, InputGroup, Button} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 function LandingPage() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = React.useState(false);
 
   return (
     <Container fluid className="vh-100">
@@ -41,19 +44,14 @@ function LandingPage() {
                   <Form.Control
                     type="email"
                     placeholder="Email"
-                    className="rounded-0 border-bottom border-2 mb-3"
-                    style={{ 
-                        borderTop: 'none', 
-                        borderLeft: 'none', 
-                        borderRight: 'none',
-                        padding: '10px 15px 10px'
-                    }}
+                    className="rounded-0 border-bottom border-2 mb-3 pt-2 pb-2 ps-3 pe-3 border-top-0 border-start-0 border-end-0"
                   />
                   <InputGroup.Text className="bg-white border-0 border-bottom border-2 mb-3">
                     <img
                       src="/icons/person.svg"
                       alt="User Icon"
-                      style={{ width: '2rem', height: '2rem' }}
+                      className="w-100 h-auto"
+                      width="32" height="32"
                     />
                   </InputGroup.Text>
                 </InputGroup>
@@ -63,24 +61,19 @@ function LandingPage() {
               <Form.Group controlId="formPassword" className="mb-4">
                 <InputGroup>
                   <Form.Control
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Password"
-                    className="rounded-0 border-bottom border-2"
-                    style={{ 
-                        borderTop: 'none', 
-                        borderLeft: 'none', 
-                        borderRight: 'none',
-                        padding: '10px 15px 10px' 
-                    }}
+                    className="rounded-0 border-bottom border-2 mb-3 pt-2 pb-2 ps-3 pe-3 border-top-0 border-start-0 border-end-0"
                   />
-                  <InputGroup.Text className="bg-white border-0 border-bottom border-2">
-                    <img
-                      src="/icons/password.png" 
-                      alt="Password Icon"
-                      style={{ width: '1.7rem', 
-                        height: '1.7rem' 
-                    }}
-                    />
+                  <InputGroup.Text className="bg-white border-0 border-bottom border-2 mb-3">
+                    <span
+                      className="text-secondary"
+                      style={{ cursor: 'pointer', fontSize: '2rem' }}
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <BsEyeSlash /> : <BsEyeFill />}
+                    </span>
                   </InputGroup.Text>
                 </InputGroup>
               </Form.Group>
@@ -89,13 +82,7 @@ function LandingPage() {
               <div className="d-grid">
                 <Button
                   type="submit"
-                  className="rounded-1"
-                  style={{ 
-                    backgroundColor: '#0057FF', 
-                    border: 'none',
-                    padding: '10px 0',
-                    fontSize: '1rem'
-                }}
+                  className="rounded-1 bg-primary border-0 py-2 px-0 fs-5 fw-bold text-white"
                 >
                   LOGIN
                 </Button>

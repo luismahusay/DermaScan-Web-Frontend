@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import SubscriptionPlanCard from './SubscriptionPlanCard';
 import UserManagement from './UserManagement';
 import ProductManagement from './admin_product_management';
-import { Container, Row, Col, Card, Table, Badge, InputGroup, FormControl, Nav, Navbar, Offcanvas, Button } from 'react-bootstrap';
+import ActivityLogs from './admin_activity_logs';
+import BookingReviews from './admin_booking_reviews';
+import { Container, Form, Row, Col, Card, Table, Badge, InputGroup, FormControl, Nav, Navbar, Offcanvas, Button } from 'react-bootstrap';
 import '../styles/admin_dashboard.css';
+import { Modal } from 'react-bootstrap';
+import { BsKey, BsShield } from 'react-icons/bs';
 
 const HEADER_HEIGHT = 90;
 const statCards = [
@@ -61,23 +65,45 @@ const statusVariant = {
 
 
 function AdminDashboard() {
+  // All state declarations
   const [showSidebar, setShowSidebar] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [activeScreen, setActiveScreen] = useState('dashboard');
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileImage, setProfileImage] = useState("/icons/profile.png");
+
+  // All refs
   const profileRef = useRef(null);
+  const fileInputRef = useRef(null);
+  
+  // Navigation hook
   const navigate = useNavigate();
+
+  // All handlers
   const handleSidebarToggle = () => setShowSidebar(!showSidebar);
+  
   const handleProfileClick = () => setShowProfileDropdown((prev) => !prev);
+  
   const handleProfileBlur = (e) => {
-    // Close dropdown if focus leaves the dropdown and icon
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setShowProfileDropdown(false);
     }
   };
-  // Sidebar click handler
+
   const handleMenuClick = (screen) => {
     setActiveScreen(screen);
-    setShowSidebar(false); // close mobile sidebar if open
+    setShowSidebar(false);
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfileImage(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -127,7 +153,10 @@ function AdminDashboard() {
                   <button
                     className="profile-dropdown-item d-flex align-items-center w-100 bg-transparent border-0 px-2 py-2 text-dark text-nowrap"
                     style={{ transition: 'background 0.2s, color 0.2s' }}
-                    onClick={() => { setShowProfileDropdown(false); /* handle profile click */ }}
+                    onClick={() => { 
+                      setShowProfileDropdown(false);
+                      setShowProfileModal(true);
+                    }}
                   >
                     <img src="/icons/my profile.png" alt="My Profile" className="me-3" width="20" height="20" />
                     My Profile
@@ -242,9 +271,135 @@ function AdminDashboard() {
           <UserManagement />
         ) : activeScreen === 'product' ? (
           <ProductManagement/>
+        ) : activeScreen === 'activity' ? (
+          <ActivityLogs />
+        ) : activeScreen === 'booking' ? (
+          <BookingReviews />
         ) : null}
       </div>
+
+      {/* Admin Profile Modal */}
+      <Modal 
+        show={showProfileModal} 
+        onHide={() => setShowProfileModal(false)}
+        size="lg"
+        centered
+        dialogClassName="admin-profile-modal"
+      >
+        {/* Header */}
+        <div 
+          className="bg-primary px-4 pt-4 pb-4 d-flex justify-content-center align-items-center position-relative rounded-top"
+          style={{ background: '#1E5EFF' }}
+        >
+          <h4 className="text-white fw-bold mb-0">Admin Profile</h4>
+        </div>
+        <Modal.Body className="px-4 py-4">
+          {/* Avatar Section */}
+          <div className="text-center mt-4 mb-4">
+            <div className="position-relative d-inline-block border border-1 border-primary rounded-circle">
+              <img
+                src={profileImage}
+                alt="Profile"
+                className="rounded-circle"
+                width="120"
+                height="120"
+              />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                accept="image/*"
+                className="d-none"
+              />
+              <button
+                className="position-absolute bottom-0 end-0 border-0 p-0 translate-middle-x translate-middle-y bg-transparent"
+                onClick={() => fileInputRef.current.click()}
+              >
+                <img 
+                  src="/icons/camera_icon.png" 
+                  alt="Change photo"
+                  width="24"
+                  height="24"
+                />
+              </button>
+            </div>
+          </div>
+          {/* Profile Information */}
+          <div className="bg-light rounded-4 p-4 mb-4" style={{ background: '#f1f9f8' }}>
+            <Form>
+              <Form.Group className="mb-3 row align-items-center">
+                <Form.Label className="col-3 fw-medium mb-0">Full Name:</Form.Label>
+                <div className="col-5">
+                  <Form.Control
+                    type="text"
+                    name="fullName"
+                    value={'John Doe'}
+                    onChange={() => {}}
+                    className="rounded-3"
+                  />
+                </div>
+              </Form.Group>
+
+              <Form.Group className="mb-3 row align-items-center">
+                <Form.Label className="col-3 fw-medium mb-0">Email Address:</Form.Label>
+                <div className="col-5">
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    value={'admin@dermascan.com'}
+                    onChange={() => {}}
+                    className="rounded-3"
+                  />
+                </div>
+              </Form.Group>
+
+              <div className="row mb-3 align-items-center">
+                <div className="col-3 fw-medium">Role:</div>
+                <div className="col-5 text-secondary">Admin</div>
+              </div>
+
+              <div className="row align-items-center">
+                <div className="col-3 fw-medium">Last Login:</div>
+                <div className="col-5 text-secondary">June 5, 2025 – 13:45 PM</div>
+              </div>
+            </Form>
+          </div>
+
+          {/* Security Section */}
+          <div className="mb-4">
+            <h6 className="fw-bold mb-3">
+              <span role="img" aria-label="security">🔒</span> Security
+            </h6>
+            
+            <div className="bg-white rounded-4 shadow-sm p-3 mb-3">
+              <button className="btn w-100 text-start border-0 d-flex align-items-center gap-2">
+                <BsKey size={20} />
+                <span className="fw-medium">Change Password</span>
+              </button>
+            </div>
+
+            <div className="bg-white rounded-4 shadow-sm p-3 d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center gap-2">
+                <BsShield size={20} />
+                <span className="fw-medium">Two-Factor Authentication (2FA)</span>
+              </div>
+              <span className="text-danger">Disabled</span>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="d-flex justify-content-end">
+            <Button 
+              variant="primary"
+              className="px-4 rounded-3 fw-bold"
+            >
+              Save Changes
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }
+
 export default AdminDashboard;
