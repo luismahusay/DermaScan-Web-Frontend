@@ -66,7 +66,7 @@ function LandingPage() {
                   className="bg-primary rounded-4 d-flex justify-content-center align-items-center p-2"
                   style={{ width: '100%', maxWidth: '150px', height: '120px' }}
                   role="button"
-                  onClick={() => navigate('/dermatologist')}
+                  onClick={() => navigate('/dermatologist/dashboard')}
                 >
                   <img
                     src="/icons/dermatologist.png"
