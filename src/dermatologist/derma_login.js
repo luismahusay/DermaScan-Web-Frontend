@@ -26,39 +26,37 @@ function DermaLogin() {
           className="d-none d-md-block p-0"
           style={{
             backgroundImage: `url("/icons/background.jpg")`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         />
 
         {/* Right side - Login form */}
         <Col
-            xs={12}
-            md={6}
-            className="d-flex justify-content-center align-items-center bg-white"
-            >
-            <div
+          xs={12}
+          md={6}
+          className="d-flex justify-content-center align-items-center bg-white"
+        >
+          <div
             className="text-center px-4"
-            style={{ width: '100%', maxWidth: '400px', marginTop: '-200px' }}
+            style={{ width: "100%", maxWidth: "400px", marginTop: "-200px" }}
+          >
+            {/* Logo Section */}
+            <div
+              className="d-flex flex-column align-items-center"
+              style={{ marginBottom: "100px" }}
             >
-                {/* Logo Section */}
-                <div
-                className="d-flex flex-column align-items-center"
-                style={{ marginBottom: '100px' }}
-                >
-                <img
-                    src="/icons/biggerlogodermascan.png"
-                    alt="Logo"
-                    style={{ width: '300px', marginBottom: '10px' }}
-                />
-                <img
-                    src="/icons/DermaScan.png"
-                    alt="DERMAScan Text"
-                    style={{ width: '180px' }}
-                />
-                </div>
-
-
+              <img
+                src="/icons/biggerlogodermascan.png"
+                alt="Logo"
+                style={{ width: "300px", marginBottom: "10px" }}
+              />
+              <img
+                src="/icons/DermaScan.png"
+                alt="DERMAScan Text"
+                style={{ width: "180px" }}
+              />
+            </div>
 
             <Form className="text-start">
               {/* Email Field */}
@@ -69,15 +67,15 @@ function DermaLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: 'none' }}
+                  style={{ boxShadow: "none" }}
                 />
                 <FaUser
                   className="position-absolute"
                   style={{
-                    top: '50%',
-                    right: '10px',
-                    transform: 'translateY(-50%)',
-                    color: '#666',
+                    top: "50%",
+                    right: "10px",
+                    transform: "translateY(-50%)",
+                    color: "#666",
                   }}
                 />
               </div>
@@ -85,23 +83,23 @@ function DermaLogin() {
               {/* Password Field */}
               <div className="mb-2 position-relative">
                 <Form.Control
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: 'none' }}
+                  style={{ boxShadow: "none" }}
                 />
                 {showPassword ? (
                   <FaEyeSlash
                     className="position-absolute"
                     onClick={toggleShowPassword}
                     style={{
-                      top: '50%',
-                      right: '10px',
-                      transform: 'translateY(-50%)',
-                      cursor: 'pointer',
-                      color: '#666',
+                      top: "50%",
+                      right: "10px",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                      color: "#666",
                     }}
                   />
                 ) : (
@@ -109,11 +107,11 @@ function DermaLogin() {
                     className="position-absolute"
                     onClick={toggleShowPassword}
                     style={{
-                      top: '50%',
-                      right: '10px',
-                      transform: 'translateY(-50%)',
-                      cursor: 'pointer',
-                      color: '#666',
+                      top: "50%",
+                      right: "10px",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                      color: "#666",
                     }}
                   />
                 )}
@@ -123,36 +121,46 @@ function DermaLogin() {
                 <Button
                   variant="link"
                   className="p-0 text-decoration-none text-primary"
-                  onClick={() => navigate('/forgot-password')}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = "forgotpassword"; // Change to your actual file names
+                  }}
                 >
                   Forgot Password?
                 </Button>
               </div>
 
               <Button
-                onClick={handleLogin}
-                style={{
-                    width: '100%',
-                    backgroundColor: '#2962FF',
-                    border: 'none',
-                    borderRadius: '4px',
-                    padding: '18px 0',
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase',
-                    fontSize: '15px',
-                    marginTop: '40px', // ← this creates the space you want
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleLogin();
+                  window.location.href = "dashboard";
                 }}
-                >
+                style={{
+                  width: "100%",
+                  backgroundColor: "#2962FF",
+                  border: "none",
+                  borderRadius: "4px",
+                  padding: "18px 0",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "15px",
+                  marginTop: "40px", // ← this creates the space you want
+                }}
+              >
                 LOGIN
-                </Button>
+              </Button>
             </Form>
 
             <div className="mt-3">
-              Don’t have an account?{' '}
+              Don’t have an account?{" "}
               <Button
                 variant="link"
                 className="p-0 text-decoration-none text-primary"
-                onClick={() => navigate('/signup')}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "register";
+                }}
               >
                 Sign up
               </Button>

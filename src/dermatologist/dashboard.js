@@ -21,7 +21,7 @@ import {
   AreaChart,
 } from "recharts";
 
-const DermaScanDashboard = () => {
+const DermaDashboard = () => {
   const [active, setActive] = useState("dashboard"); // default to dashboard
   const [hovered, setHovered] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
@@ -80,6 +80,17 @@ const DermaScanDashboard = () => {
   return (
     <>
       <style jsx>{`
+        @media (min-width: 768px) {
+          .main-content {
+            margin-left: 50px !important; /* Override the 220px */
+            width: calc(
+              100vw - 250px
+            ) !important; /* Account for 250px sidebar */
+          }
+        }
+        .admin-sidebar {
+          width: 250px !important; /* Match your React component */
+        }
         .sidebar {
           min-height: 100vh;
           background-color: #f8f9fa;
@@ -496,7 +507,10 @@ const DermaScanDashboard = () => {
                 className={`sidebar-item ${
                   active === "dashboard" ? "active" : ""
                 }`}
-                onClick={() => setActive("dashboard")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "dashboard"; // Change to your actual file names
+                }}
                 onMouseEnter={() => setHovered("dashboard")}
                 onMouseLeave={() => setHovered("")}
               >
@@ -519,7 +533,10 @@ const DermaScanDashboard = () => {
                 className={`sidebar-item ${
                   active === "products" ? "active" : ""
                 }`}
-                onClick={() => setActive("products")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "productmanagement"; // Change to your actual file names
+                }}
                 onMouseEnter={() => setHovered("products")}
                 onMouseLeave={() => setHovered("")}
               >
@@ -538,7 +555,10 @@ const DermaScanDashboard = () => {
                 className={`sidebar-item ${
                   active === "bookings" ? "active" : ""
                 }`}
-                onClick={() => setActive("bookings")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "bookings"; // Change to your actual file names
+                }}
                 onMouseEnter={() => setHovered("bookings")}
                 onMouseLeave={() => setHovered("")}
               >
@@ -595,7 +615,10 @@ const DermaScanDashboard = () => {
           </div>
 
           {/* Main Content */}
-          <div className="flex-grow-1 main-content">
+          <div
+            className="flex-grow-1 main-content"
+            style={{ marginTop: "-70px", marginLeft: "-50px" }}
+          >
             <Container fluid>
               {/* Stats Cards */}
               <Row className="mb-2">
@@ -808,4 +831,4 @@ const DermaScanDashboard = () => {
   );
 };
 
-export default DermaScanDashboard;
+export default DermaDashboard;

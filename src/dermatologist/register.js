@@ -233,7 +233,11 @@ function PersonalInformationForm() {
             <Button
               variant="link"
               className="p-0 text-decoration-none text-primary"
-              onClick={handleSignIn}
+              onClick={(e) => {
+                e.preventDefault();
+                handleSignIn();
+                window.location.href = "derma_login";
+              }}
               style={{ fontSize: "14px", fontWeight: "500" }}
             >
               Login
