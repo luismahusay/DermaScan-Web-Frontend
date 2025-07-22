@@ -208,65 +208,80 @@ function AdminDashboard() {
       {/* Main Content */}
       <div className="main-content">
         {activeScreen === 'dashboard' ? (
-          <Container fluid className="pt-4 responsive-main-container">
-            <h3 className="mb-4 fw-bold text-center text-md-start">Welcome back, Admin.</h3>
-            {/* Stat Cards */}
-            <Row className="mb-4 g-3">
-              {statCards.map((card, idx) => (
-                <Col key={idx} xs={12} sm={12} md={12} lg={3} className="mb-2">
-                  <Card className="shadow-sm rounded-4 h-100 stat-card">
-                    <Card.Body className="position-relative p-3">
-                      <img src={card.icon} alt={card.iconAlt} className="stat-card-icon position-absolute top-0 end-0 m-3" />
-                      <div className="text-muted" style={{ fontSize: 13 }}>{card.label}</div>
-                      <div className="fw-bold fs-2 my-2">{card.value}</div>
-                      <div style={{ fontSize: 13, color: card.trendColor }}>{card.trend}</div>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-
-            <Row>
-              {/* Left: Recent Product Submissions Table */}
-              <Col xs={12} lg={8} className="mb-4">
-                <Card className="shadow-sm mb-4 recent-product-card">
-                  <Card.Body>
-                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
-                      <div className="fw-semibold">Recent Product Submissions</div>
-                      <a href="#" className="small">See more...</a>
-                    </div>
-                    <Table hover responsive size="sm" className="mb-0">
-                      <thead>
-                        <tr>
-                          <th>Product Name</th>
-                          <th>Submitted by</th>
-                          <th>Date Submitted</th>
-                          <th>Status</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {tableRows.slice(0, 7).map((row, idx) => (
-                          <tr key={idx}>
-                            <td>{row.name}</td>
-                            <td>{row.by}</td>
-                            <td>{row.date}</td>
-                            <td><Badge bg={statusVariant[row.status]}>{row.status}</Badge></td>
-                            <td><a href="#">View</a></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </Card.Body>
-                </Card>
-              </Col>
-
-              {/* Right: Subscription Plan Card */}
-              <Col xs={12} lg={3}>
-                <SubscriptionPlanCard />
-              </Col>
-            </Row>
-          </Container>
+          <Row className="responsive-main-content px-md-4">
+            <Col xs={12}>
+              {activeScreen === 'dashboard' ? (
+                <>
+                  <h3 className="mb-4 fw-bold text-center text-md-start">Welcome back, Admin.</h3>
+                  {/* Stat Cards */}
+                  <Row className="mb-4 g-3">
+                    {statCards.map((card, idx) => (
+                      <Col key={idx} xs={12} sm={6} md={6} lg={3}>
+                        <Card className="shadow-sm rounded-4 h-100 stat-card">
+                          <Card.Body className="position-relative p-3">
+                            <img src={card.icon} alt={card.iconAlt} className="stat-card-icon position-absolute top-0 end-0 m-3" />
+                            <div className="text-muted" style={{ fontSize: 13 }}>{card.label}</div>
+                            <div className="fw-bold fs-2 my-2">{card.value}</div>
+                            <div style={{ fontSize: 13, color: card.trendColor }}>{card.trend}</div>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
+        
+                  {/* Content Row */}
+                  <Row>
+                    {/* Left: Table */}
+                    <Col xs={12} lg={8} className="mb-4">
+                      <Card className="shadow-sm mb-4 recent-product-card">
+                        <Card.Body>
+                          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
+                            <div className="fw-semibold">Recent Product Submissions</div>
+                            <a href="#" className="small">See more...</a>
+                          </div>
+                          <Table hover responsive size="sm" className="mb-0">
+                            <thead>
+                              <tr>
+                                <th>Product Name</th>
+                                <th>Submitted by</th>
+                                <th>Date Submitted</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {tableRows.slice(0, 7).map((row, idx) => (
+                                <tr key={idx}>
+                                  <td>{row.name}</td>
+                                  <td>{row.by}</td>
+                                  <td>{row.date}</td>
+                                  <td><Badge bg={statusVariant[row.status]}>{row.status}</Badge></td>
+                                  <td><a href="#">View</a></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </Table>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+        
+                    {/* Right: Subscription Plan */}
+                    <Col xs={12} lg={4}>
+                      <SubscriptionPlanCard />
+                    </Col>
+                  </Row>
+                </>
+              ) : activeScreen === 'user' ? (
+                <UserManagement />
+              ) : activeScreen === 'product' ? (
+                <ProductManagement />
+              ) : activeScreen === 'activity' ? (
+                <ActivityLogs />
+              ) : activeScreen === 'booking' ? (
+                <BookingReviews />
+              ) : null}
+            </Col>
+          </Row>       
         ) : activeScreen === 'user' ? (
           <UserManagement />
         ) : activeScreen === 'product' ? (

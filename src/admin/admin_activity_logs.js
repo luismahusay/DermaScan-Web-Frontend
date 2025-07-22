@@ -45,7 +45,7 @@ function AdminActivityLogs() {
     setFilterEmail('');
   };
   return (
-    <div className="container-fluid py-3 px-4">
+    <div className="container-fluid ps-4">
       {/* Header Section */}
       <div className="d-flex flex-row justify-content-between align-items-center mb-4">
         <div className="d-flex flex-column">
