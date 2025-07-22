@@ -1,0 +1,530 @@
+
+/* Always show tab button text */
+.user-mgmt-tab-btn span {
+  display: inline !important;
+  visibility: visible !important;
+}
+@media (max-width: 767.98px) {
+  .user-mgmt-tab-icon {
+    display: none !important;
+  }
+  .kpi-panel {
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
+  }
+  .mobile-kpi-spacing {
+    margin-bottom: 20px !important;
+  }
+}
+/* Ensure consistent KPI panel width for dermatologist view at large screens */
+@media (min-width: 1440px) {
+  .user-kpi-panel-col {
+    max-width: 320px;
+    flex: 0 0 320px;
+  }
+  .kpi-panel {
+    width: 100%;
+  }
+}
+.kpi-divider-vertical {
+  width: 4px;
+  min-width: 4px;
+  background: #0057FF;
+  border-radius: 2px;
+  height: auto;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  align-self: stretch;
+}
+.user-mgmt-search-group .user-mgmt-search-icon-square {
+  background: #f5f6fa;
+  border: 1px solid #ced4da;
+  border-left: none;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  height: 32px;
+}
+
+.user-mgmt-search-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+.user-mgmt-tabs {
+  display: flex;
+  gap: 1.3rem;
+}
+
+.user-mgmt-tab-btn {
+  border-radius: 6px !important;
+  width: 130px;
+  min-width: 130px;
+  max-width: 130px;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 6px 0;
+}
+
+.user-mgmt-tab-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.user-mgmt-revenue-card {
+  min-width: 220px !important;
+  max-width: 260px !important;
+  box-sizing: border-box;
+}
+
+.user-mgmt-revenue-icon {
+  height: 30px;
+  width: 40px;
+}
+
+/* Filter Bar */
+user-mgmt-filter-row {
+  gap: 20px;
+}
+
+.user-mgmt-kpi-value {
+  font-size: 28px;
+  color: #23272e;
+}
+
+.user-mgmt-kpi-change {
+  font-size: 15px;
+}
+
+.user-mgmt-kpi-subtext {
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.user-mgmt-dropdown-toggle {
+  min-width: 150px;
+}
+
+.user-mgmt-search-group {
+  max-width: 250px;
+  width: 100%;
+}
+.revenue-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(0,87,255,0.10);
+  min-width: 220px;
+  max-width: 260px;
+  margin-left: auto;
+}
+.revenue-icon-btn {
+  background: #0057FF;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,87,255,0.10);
+  padding: 0;
+  transition: background 0.2s;
+}
+.revenue-icon-btn:hover {
+  background: #003eaa;
+}
+.user-mgmt-header-row {
+  gap: 20px;
+  padding-top: 0 !important;
+}
+/* Unify User Management title size with Product Management */
+.user-mgmt-title {
+  font-size: 28px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  color: #23272e !important; 
+  letter-spacing: -0.5px;
+}
+/* User Management Page Styles */
+/* User Management Page Styles */
+.user-management-main {
+  background: #F7F9FB;
+  min-height: 100vh;
+  padding: 10px;
+  padding-top: 5px !important;
+}
+.user-mgmt-container {
+  max-width: 1400px;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+.user-mgmt-tabs .tab-btn {
+  border-radius: 24px 24px 24px 24px;
+  min-width: 110px !important;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.2s, color 0.2s;
+}
+.user-mgmt-tabs .tab-btn.active,
+.user-mgmt-tabs .tab-btn:focus {
+  background: #0057FF;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,87,255,0.08);
+}
+.user-table-card {
+  border-radius: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin-top: 0 !important;
+}
+.user-table th, .user-table td {
+  vertical-align: middle;
+  font-size: 9px;
+}
+.user-table th.sortable-col {
+  cursor: pointer;
+  user-select: none;
+}
+.user-table .sort-arrow {
+  font-size: 12px;
+  color: #0057FF;
+}
+.table-row-alt {
+  background: #f3f7ff;
+}
+
+
+.status-badge {
+  font-size: 8px;
+  padding: 6px;
+  border-radius: 6px;
+  width: 3rem;
+}
+.view-details-link {
+  color: #0057FF;
+  font-weight: 500;
+  font-size: 8px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.view-details-link:hover {
+  color: #003eaa;
+  text-decoration: underline;
+}
+
+.search-icon{
+    width: 10px;
+    margin-right: 6px;
+}
+.kpi-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0 !important;
+  align-items: flex-start;
+}
+.kpi-card {
+    border-radius: 7px;
+    box-shadow: 0 2px 8px rgba(0,87,255,0.08);
+}
+.kpi-label {
+  font-size: 15px;
+  color: #6c757d;
+  font-weight: 500;
+}
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #23272e;
+}
+.kpi-change {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+.subscription-card {
+  min-width: 250px !important;
+  max-width: 250px !important;
+}
+.kpi-subscribtions{
+    font-size: 12px;
+    color: #6c757d;
+}
+@media (max-width: 991.98px) {
+  .kpi-panel {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .kpi-card, .subscription-card {
+    min-width: 140px;
+    margin-bottom: 0 !important;
+  }
+}
+@media (max-width: 767.98px) {
+  .user-management-main {
+    padding-top: 5px !important;
+  }
+  .user-mgmt-tabs .tab-btn {
+    min-width: 100px;
+    font-size: 0.95rem;
+  }
+  .kpi-panel {
+    flex-direction: column;
+  }
+}
+.user-mgmt-title {
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Subscription Cards Custom Styles */
+.success{
+    font-size: 14px;
+}
+.label{
+    font-size: 18px;
+    color: #28a745;
+}
+.subscription-header {
+  font-size: 20px;
+  font-weight: bold;
+  color: #23272e !important;
+}
+.subscription-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #212529;
+}
+.subscription-growth {
+  font-size: 14px;
+}
+.subscription-growth .text-success {
+  color: #28a745 !important;
+}
+.subscription-growth .text-danger {
+  color: #dc3545 !important;
+}
+/* Dermatologist Modal Two-Column Divider */
+.derm-modal-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  width: 100%;
+}
+.derm-modal-col {
+  flex: 1 1 0;
+  padding: 0 32px 0 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.derm-modal-col-right {
+  padding-top: 20px;
+  padding-left: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.derm-modal-divider {
+  width: 0;
+  min-width: 0;
+  border-left: 2px solid #e0e0e0;
+  margin: 0 0 0 0;
+  height: auto;
+  align-self: stretch;
+}
+@media (max-width: 900px) {
+  .derm-modal-row {
+    flex-direction: column;
+  }
+  .derm-modal-divider {
+    display: none;
+  }
+  .derm-modal-col, .derm-modal-col-right {
+    padding: 0;
+  }
+}
+.user-details-modal-card-with-header {
+  background: #1E5EFF;
+}
+.user-details-modal-header-bg {
+  background: #1E5EFF;
+  padding: 24px 0 20px 0;
+  text-align: center;
+  border-radius: 24px 24px 0 0;
+  position: relative;
+}
+.user-details-modal-title.always-visible {
+  color: white;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.5px;
+  display: block;
+  text-align: center;
+  z-index: 1;
+}
+.user-details-modal-body {
+  background: white;
+  padding: 32px 32px 24px 32px;
+  position: relative;
+  border-radius: 0 0 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.user-details-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #222;
+  cursor: pointer;
+  z-index: 2;
+}
+/* Patient Details Modal Styles */
+.user-details-modal-backdrop {
+  background: rgba(30, 94, 255, 0.10) !important;
+  backdrop-filter: blur(2px);
+}
+.user-details-modal-content {
+  background: none !important;
+  border: none;
+  box-shadow: none;
+}
+.user-details-modal-card {
+  border-radius: 24px;
+  overflow: hidden !important;
+  margin-top: 70px!important;
+  box-shadow: 0 8px 32px rgba(30,94,255,0.18);
+}
+.user-details-modal-header {
+  background: #1E5EFF;
+  padding: 24px 0 20px 0;
+  text-align: center;
+}
+.user-details-modal-title {
+  color: white;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.5px;
+}
+.user-details-modal-body {
+  background: white;
+  padding: 32px 32px 24px 32px;
+  position: relative;
+  border-radius: 0 0 24px 24px;
+}
+.user-details-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #222;
+  cursor: pointer;
+  z-index: 2;
+}
+.user-details-modal-overview {
+  margin-bottom: 28px;
+}
+.user-details-modal-overview > div {
+  font-size: 16px;
+  color: #222;
+  margin-bottom: 6px;
+  font-weight: 400;
+}
+.user-details-modal-overview > div b {
+  font-weight: 700;
+}
+.user-details-modal-section {
+  margin-bottom: 18px;
+}
+.user-details-modal-section-title {
+  font-weight: bold !important;
+  font-size: 17px !important;
+  margin-bottom: 2px;
+}
+.user-details-modal-section-hr {
+  margin: auto;
+  border: 0;
+  border-top: 2px solid #2b2323;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  max-width: none;
+  margin-bottom: 20px;
+}
+.user-details-modal-section > div {
+  font-size: 16px;
+  color: #222;
+  margin-bottom: 6px;
+  font-weight: 400;
+}
+.user-details-modal-section > div b {
+  font-weight: 700;
+}
+.user-details-modal-profile-pic-section {
+  margin-bottom: 24px;
+  text-align: left;
+  width: 100%;
+}
+.user-details-modal-profile-pic-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.user-details-modal-profile-pic-bg {
+  background: #f6eaff;
+  border-radius: 50%;
+  padding: 8px;
+  display: inline-block;
+}
+.user-details-modal-profile-pic {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e0d7ff;
+  background: #fff;
+}
+.user-details-modal-profile-pic-link {
+  margin-top: 10px;
+}
+.user-details-modal-profile-pic-link a {
+  color: #1E5EFF;
+  text-decoration: underline;
+  font-weight: 500;
+  font-size: 15px;
+}
+.user-details-modal-footer {
+  text-align: left;
+  margin-top: 18px;
+  width: 100%;
+}
+.btn-ReApp{
+  min-width: 100px;
+  max-width: 100px;
+  padding: 10px ;
+  font-weight: 600;
+  font-size: 16px;
+  margin-right: 20px;
+}
+.user-details-modal-deactivate-btn {
+  border-radius: 24px;
+  padding: 10px 32px;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(255,0,0,0.08);
+}

@@ -1,0 +1,135 @@
+
+
+/* modal styles*/
+.bg-mint {
+  background-color: #E6FAF5 !important;
+}
+.mt-modal-large-gap .modal-dialog {
+  margin-top: 6rem !important;
+}
+
+.add-product-modal-bg{
+  margin-top: 5rem !important;
+}
+
+
+@media (max-width: 767.98px) {
+  .add-product-modal-bg {
+    margin-top: 6rem !important;
+  }
+}
+
+
+/* Product Table Styles */
+.product-table {
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0,87,255,0.08);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.product-table th,
+.product-table td {
+  border: none !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+.product-table thead th {
+  background: #f3f7ff;
+  font-size: 13px !important;
+  font-weight: 600;
+  color: #23272e;
+}
+.product-table tbody tr.table-row-alt {
+  background: #f8fafd;
+}
+.product-table tbody tr {
+  transition: background 0.2s;
+}
+.product-table tbody tr:hover {
+  background: #eaf1ff;
+}
+.product-table tbody td {
+  font-size: 13px !important;
+  color: #23272e;
+}
+.product-table tbody td {
+  font-size: 11px !important;
+}
+
+/* Table action icon button hover effect */
+.action-icon-btn:hover svg {
+  color: #fff !important;
+  filter: drop-shadow(0 0 6px #0d6efd) drop-shadow(0 0 2px #0d6efd);
+  transition: color 0.2s, filter 0.2s;
+}
+/* Make product table header font smaller */
+.product-table thead th {
+  font-size: 10px !important;
+  font-weight: 600;
+}
+/* Header styles */
+.user-mgmt-header-row {
+  margin-bottom: 24px;
+}
+.user-mgmt-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1A237E;
+  letter-spacing: 0.5px;
+}
+
+/* Filter bar styles */
+.user-mgmt-filter-row {
+  margin-bottom: 18px;
+}
+.user-mgmt-dropdown-toggle {
+  min-width: 120px;
+}
+.user-mgmt-search-group {
+  min-width: 200px;
+}
+.user-mgmt-search-icon-square {
+  background: #f6f7fb;
+  border-radius: 8px 0 0 8px;
+  border: none;
+  padding: 0 10px;
+}
+.user-mgmt-search-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Side nav styles */
+.admin-side-nav-col {
+  padding-right: 0;
+  min-width: 180px;
+}
+.admin-side-nav {
+  background: #f6f7fb;
+  border-radius: 12px;
+  padding: 24px 0 24px 0;
+  min-height: 400px;
+  margin-bottom: 24px;
+}
+.admin-side-nav-list {
+  list-style: none;
+  padding: 0 0 0 24px;
+  margin: 0;
+}
+.admin-side-nav-item {
+  font-size: 1.1rem;
+  color: #1A237E;
+  padding: 10px 0;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  transition: background 0.2s, border-color 0.2s;
+}
+.admin-side-nav-item.active,
+.admin-side-nav-item:hover {
+  background: #e0e7ff;
+  border-left: 4px solid #1A237E;
+  color: #0d133d;
+}

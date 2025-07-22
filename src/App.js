@@ -11,6 +11,10 @@ import SecurityRegister from './dermatologist/security';
 import EmailVerification from './dermatologist/emailverification';
 import ForgotPassword from './dermatologist/forgotpassword';
 import ForgotPassword2 from './dermatologist/forgotpassword2';
+import AdminDashboard from './admin/admin_dashboard'; 
+import DermaProductManagement from './dermatologist/productmanagement';
+import DermaBookings from './dermatologist/bookings';
+
 function App() {
   return (
     <Router>
@@ -26,6 +30,10 @@ function App() {
         <Route path="/dermatologist/emailverification" element={<EmailVerification />} />
         <Route path="/dermatologist/forgotpassword" element={<ForgotPassword />} />
         <Route path="/dermatologist/forgotpassword2" element={<ForgotPassword2 />} />
+        <Route path="/dermatologist" element={<DermaPage/>} />
+        <Route path="/admin/admin_dashboard" element={<AdminDashboard />} />
+        <Route path="/dermatologist/productmanagement" element={<DermaProductManagement />} />
+        <Route path="/dermatologist/bookings" element={<DermaBookings />} />
       </Routes>
     </Router>
   );
