@@ -14,6 +14,8 @@ import ForgotPassword2 from './dermatologist/forgotpassword2';
 import AdminDashboard from './admin/admin_dashboard'; 
 import DermaProductManagement from './dermatologist/productmanagement';
 import DermaBookings from './dermatologist/bookings';
+import DermaPatients from './dermatologist/acceptedpatients';
+import DermaSubscription from './dermatologist/subscription';
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
         <Route path="/admin/admin_dashboard" element={<AdminDashboard />} />
         <Route path="/dermatologist/productmanagement" element={<DermaProductManagement />} />
         <Route path="/dermatologist/bookings" element={<DermaBookings />} />
+        <Route path="/dermatologist/acceptedpatients" element={<DermaPatients />} />
+        <Route path="/dermatologist/subscription" element={<DermaSubscription />} />
       </Routes>
     </Router>
   );

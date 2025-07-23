@@ -1558,6 +1558,7 @@ const DermaProductManagement = () => {
                 }`}
                 onClick={(e) => {
                   e.preventDefault();
+                  setActive("dashboard");
                   window.location.href = "dashboard"; // Change to your actual file names
                 }}
                 onMouseEnter={() => setHovered("dashboard")}
@@ -1584,6 +1585,7 @@ const DermaProductManagement = () => {
                 }`}
                 onClick={(e) => {
                   e.preventDefault();
+                  setActive("products");
                   window.location.href = "productmanagement"; // Change to your actual file names
                 }}
                 onMouseEnter={() => setHovered("products")}
@@ -1608,6 +1610,7 @@ const DermaProductManagement = () => {
                 }`}
                 onClick={(e) => {
                   e.preventDefault();
+                  setActive("bookings");
                   window.location.href = "bookings"; // Change to your actual file names
                 }}
                 onMouseEnter={() => setHovered("bookings")}
@@ -1629,7 +1632,11 @@ const DermaProductManagement = () => {
                 className={`sidebar-item ${
                   active === "patients" ? "active" : ""
                 }`}
-                onClick={() => setActive("patients")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActive("patients");
+                  window.location.href = "acceptedpatients"; // Change to your actual file names
+                }}
                 onMouseEnter={() => setHovered("patients")}
                 onMouseLeave={() => setHovered("")}
               >
@@ -1648,7 +1655,11 @@ const DermaProductManagement = () => {
                 className={`sidebar-item ${
                   active === "subscription" ? "active" : ""
                 }`}
-                onClick={() => setActive("subscription")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActive("subscription");
+                  window.location.href = "subscription"; // Change to your actual file names
+                }}
                 onMouseEnter={() => setHovered("subscription")}
                 onMouseLeave={() => setHovered("")}
               >

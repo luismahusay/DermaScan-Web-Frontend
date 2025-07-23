@@ -21,8 +21,8 @@ import {
   AreaChart,
 } from "recharts";
 
-const DermaDashboard = () => {
-  const [active, setActive] = useState("dashboard"); // default to dashboard
+const DermaSubscription = () => {
+  const [active, setActive] = useState("subscription"); // default to dashboard
   const [hovered, setHovered] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -396,6 +396,155 @@ const DermaDashboard = () => {
           background-color: #dc3545;
           border-radius: 50%;
         }
+        .subscription-card {
+          width: 100% !important;
+          max-width: none !important;
+          background: white;
+          border: 1px solid #e0e7ff;
+          border-radius: 16px;
+          padding: 40px 30px;
+          text-align: center;
+          min-height: calc(100vh - 200px);
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          transition: transform 0.3s ease;
+        }
+        .subscription-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 40px 20px;
+        }
+        .subscription-features {
+          flex-grow: 1;
+          margin-bottom: 32px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center; /* Center the features vertically */
+        }
+
+        .subscription-card:hover {
+          transform: translateY(-5px);
+        }
+
+        .subscription-card-featured {
+          background: #4f46e5;
+          color: white;
+          transform: scale(1.05);
+          border: none;
+        }
+
+        .subscription-icon {
+          width: 60px;
+          height: 60px;
+          border: 2px solid #6b7280;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 24px;
+          font-size: 24px;
+          font-weight: bold;
+          color: #6b7280;
+        }
+
+        .subscription-icon-featured {
+          border-color: white;
+          color: white;
+        }
+
+        .subscription-price {
+          font-size: 3rem;
+          font-weight: bold;
+          color: #1f2937;
+          margin-bottom: 8px;
+        }
+
+        .subscription-price-featured {
+          color: white;
+        }
+
+        .subscription-plan-name {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #6b7280;
+          margin-bottom: 32px;
+          letter-spacing: 0.5px;
+        }
+
+        .subscription-plan-featured {
+          color: #e0e7ff;
+        }
+
+        .subscription-features {
+          flex-grow: 1;
+          margin-bottom: 32px;
+        }
+
+        .subscription-feature {
+          display: flex;
+          align-items: flex-start;
+          margin-bottom: 16px;
+          text-align: left;
+        }
+
+        .subscription-feature-featured {
+          color: white;
+        }
+
+        .subscription-check {
+          color: #10b981;
+          margin-right: 12px;
+          margin-top: 2px;
+          font-size: 14px;
+        }
+
+        .subscription-check-featured {
+          color: #a7f3d0;
+        }
+
+        .subscription-feature span {
+          font-size: 14px;
+          line-height: 1.4;
+        }
+
+        .subscription-btn {
+          background: #4f46e5;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          padding: 15px 32px;
+          font-weight: 600;
+          font-size: 14px;
+          letter-spacing: 0.5px;
+          cursor: pointer;
+          transition: background 0.3s ease;
+          width: 80%;
+          margin: 0 auto; /* This centers the button */
+          display: block; /* Ensures margin auto works */
+        }
+
+        .subscription-btn:hover {
+          background: #4338ca;
+        }
+
+        .subscription-btn-featured {
+          background: white;
+          color: #4f46e5;
+        }
+
+        .subscription-btn-featured:hover {
+          background: #f8fafc;
+        }
+
+        .subscription-btn-free {
+          background: #4f46e5;
+          color: white;
+        }
+
+        .subscription-btn-free:hover {
+          background: #4338ca;
+        }
       `}</style>
 
       <div className="d-flex flex-column vh-100">
@@ -517,7 +666,11 @@ const DermaDashboard = () => {
               >
                 <img
                   src={`/icons/dashboardicon-${
-                    hovered === "products" ? "white" : "blue"
+                    hovered === "dashboard"
+                      ? "white"
+                      : active === "dashboard"
+                      ? "blue"
+                      : "blue"
                   }.png`}
                   alt="Dashboard"
                   className="sidebar-icon"
@@ -623,210 +776,104 @@ const DermaDashboard = () => {
 
           {/* Main Content */}
           <div
-            className="flex-grow-1 main-content"
-            style={{ marginTop: "-70px", marginLeft: "-50px" }}
+            className="flex-grow-1 main-content d-flex flex-column"
+            style={{
+              marginTop: "-70px",
+              marginLeft: "-50px",
+              minHeight: "100vh",
+            }}
           >
             <Container fluid>
-              {/* Stats Cards */}
-              <Row className="mb-2">
-                <Col>
-                  <h5
-                    style={{
-                      color: "#000", // Black text color
-                      fontSize: "3rem", // Bigger font size (adjust as needed)
-                      fontWeight: "bold",
-                      display: "inline-block",
-                      marginBottom: "16px", // Optional spacing below
-                    }}
-                  >
-                    Dashboard
-                  </h5>
-                </Col>
-              </Row>
-              <Row className="mb-4">
-                <Col md={3} className="mb-3">
-                  <div className="stat-card">
-                    <div className="d-flex justify-content-between align-items-start">
-                      <div>
-                        <div className="stat-label">Today's Booking</div>
-                        <div className="stat-number">0</div>
-                        <div className="stat-change">
-                          <i className="fas fa-arrow-up me-1"></i>
-                          +% than last week
-                        </div>
+              {/* Page Title */}
+
+              {/* Subscription Plans */}
+              <Row
+                className="justify-content-center gx-4"
+                style={{
+                  maxWidth: "15000px",
+                  margin: "0 auto",
+                  padding: "0px 40px",
+                }}
+              >
+                {/* Free Plan */}
+                <Col lg={4} md={6} sm={12} className="mb-4">
+                  <div className="subscription-card">
+                    <div className="subscription-icon">
+                      <span>$</span>
+                    </div>
+                    <div className="subscription-price">₱ 0.00</div>
+                    <div className="subscription-plan-name">FREE PLAN</div>
+
+                    <div className="subscription-features">
+                      <div className="subscription-feature">
+                        <i className="fas fa-check subscription-check"></i>
+                        <span>Add up to 5 skincare products</span>
                       </div>
-                      <div className="stat-icon">
-                        <img
-                          src="/icons/userstatsicon.png"
-                          alt="Stat Icon"
-                          style={{ width: "24px", height: "24px" }}
-                        />
+                      <div className="subscription-feature">
+                        <i className="fas fa-check subscription-check"></i>
+                        <span>Accept up to 5 patient bookings</span>
                       </div>
                     </div>
+
+                    <button className="subscription-btn subscription-btn-free">
+                      SUBSCRIBE
+                    </button>
                   </div>
                 </Col>
 
-                <Col md={3} className="mb-3">
-                  <div className="stat-card">
-                    <div className="d-flex justify-content-between align-items-start">
-                      <div>
-                        <div className="stat-label">This month booking</div>
-                        <div className="stat-number">0</div>
-                        <div className="stat-change">
-                          <i className="fas fa-arrow-up me-1"></i>
-                          +% than last week
-                        </div>
-                      </div>
-                      <div className="stat-icon">
-                        <img
-                          src="/icons/userstatsicon.png"
-                          alt="Stat Icon"
-                          style={{ width: "24px", height: "24px" }}
-                        />
-                      </div>
+                {/* Monthly Plan */}
+                <Col lg={4} md={6} sm={12} className="mb-4">
+                  <div className="subscription-card subscription-card-featured">
+                    <div className="subscription-icon subscription-icon-featured">
+                      <span>$</span>
                     </div>
-                  </div>
-                </Col>
-              </Row>
+                    <div className="subscription-price subscription-price-featured">
+                      ₱ 120.00
+                    </div>
+                    <div className="subscription-plan-name subscription-plan-featured">
+                      MONTHLY PLAN
+                    </div>
 
-              {/* Chart and Tables Row */}
-              <Row className="mb-4">
-                {/* Chart */}
-                <Col md={6}>
-                  <div className="chart-container">
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                      <h5 className="mb-0">Cancelled Bookings</h5>
-                      <small className="text-muted">Last 6 months</small>
+                    <div className="subscription-features">
+                      <div className="subscription-feature subscription-feature-featured">
+                        <i className="fas fa-check subscription-check subscription-check-featured"></i>
+                        <span>Unlimited upload for skincare products</span>
+                      </div>
+                      <div className="subscription-feature subscription-feature-featured">
+                        <i className="fas fa-check subscription-check subscription-check-featured"></i>
+                        <span>Unlimited in accepting patient bookings</span>
+                      </div>
                     </div>
-                    <div className="mb-2">
-                      <small className="text-muted">Monthly overview</small>
-                    </div>
-                    <div style={{ height: "300px" }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={chartData}>
-                          <XAxis
-                            dataKey="month"
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fill: "#6c757d", fontSize: 12 }}
-                          />
-                          <YAxis
-                            domain={[0, 8]}
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fill: "#6c757d", fontSize: 12 }}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="value"
-                            stroke="#ff6b9d"
-                            fill="rgba(255, 107, 157, 0.1)"
-                            strokeWidth={2}
-                            dot={{ fill: "#ff6b9d", strokeWidth: 2, r: 4 }}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
+
+                    <button className="subscription-btn subscription-btn-featured">
+                      SUBSCRIBE
+                    </button>
                   </div>
                 </Col>
 
-                {/* Tables */}
-
-                <Col md={6} style={{ marginTop: "-210px" }}>
-                  {/* Pending Booking Requests */}
-                  <div className="table-card">
-                    <div className="table-header">
-                      <div className="red-dot"></div>
-                      Pending Booking Request
+                {/* Yearly Plan */}
+                <Col lg={4} md={6} sm={12} className="mb-4">
+                  <div className="subscription-card">
+                    <div className="subscription-icon">
+                      <span>$</span>
                     </div>
-                    <Table responsive size="sm">
-                      <thead>
-                        <tr style={{ fontSize: "0.85rem", color: "#6c757d" }}>
-                          <th>Patient Name</th>
-                          <th>Booking Type</th>
-                          <th>Date</th>
-                          <th>Status</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {bookingData.map((booking, index) => (
-                          <tr key={index}>
-                            <td>{booking.patient}</td>
-                            <td>
-                              <span
-                                className={`booking-type ${
-                                  booking.type === "Online"
-                                    ? "booking-online"
-                                    : "booking-walkin"
-                                }`}
-                              >
-                                {booking.type}
-                              </span>
-                            </td>
-                            <td>{booking.time}</td>
-                            <td>
-                              <span className="status-badge">
-                                {booking.status}
-                              </span>
-                            </td>
-                            <td>
-                              <a href="#" className="view-link">
-                                View Booking...
-                              </a>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </div>
+                    <div className="subscription-price">₱ 1,400.00</div>
+                    <div className="subscription-plan-name">YEARLY PLAN</div>
 
-                  {/* Product Summary */}
-                  <div className="table-card">
-                    <div className="table-header">
-                      <div className="red-dot"></div>
-                      Product Summary
+                    <div className="subscription-features">
+                      <div className="subscription-feature">
+                        <i className="fas fa-check subscription-check"></i>
+                        <span>Unlimited upload for skincare products</span>
+                      </div>
+                      <div className="subscription-feature">
+                        <i className="fas fa-check subscription-check"></i>
+                        <span>Unlimited in accepting patient bookings</span>
+                      </div>
                     </div>
-                    <Table responsive size="sm">
-                      <thead>
-                        <tr style={{ fontSize: "0.85rem", color: "#6c757d" }}>
-                          <th>Patient Name</th>
-                          <th>Booking Type</th>
-                          <th>Time</th>
-                          <th>Status</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {productData.map((product, index) => (
-                          <tr key={index}>
-                            <td>{product.patient}</td>
-                            <td>
-                              <span
-                                className={`booking-type ${
-                                  product.type === "Online"
-                                    ? "booking-online"
-                                    : "booking-walkin"
-                                }`}
-                              >
-                                {product.type}
-                              </span>
-                            </td>
-                            <td>{product.time}</td>
-                            <td>
-                              <span className="status-badge">
-                                {product.status}
-                              </span>
-                            </td>
-                            <td>
-                              <a href="#" className="view-link">
-                                View Product...
-                              </a>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
+
+                    <button className="subscription-btn subscription-btn-free">
+                      SUBSCRIBE
+                    </button>
                   </div>
                 </Col>
               </Row>
@@ -838,4 +885,4 @@ const DermaDashboard = () => {
   );
 };
 
-export default DermaDashboard;
+export default DermaSubscription;
