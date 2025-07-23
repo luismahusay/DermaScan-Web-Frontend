@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { FaShieldAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import "../styles/derma_security.css";
 
 function SecurityRegister() {
   const navigate = useNavigate();
@@ -13,15 +14,11 @@ function SecurityRegister() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = () => {
-    console.log("Registering with:", {
-      password,
-      confirmPassword,
-      twoFactorEnabled,
-    });
+    navigate("/dermatologist/emailverification");
   };
 
   const handleLogin = () => {
-    navigate("/login");
+    navigate("/dermatologist/derma_login");
   };
 
   return (
@@ -39,159 +36,75 @@ function SecurityRegister() {
         />
 
         {/* Right form section */}
-        <Col
-          xs={12}
-          md={5}
-          className="d-flex flex-column bg-white p-0"
-          style={{
-            width: "60%", // Custom width
-            maxWidth: "800px", // Optional limit
-            overflowY: "auto",
-          }}
-        >
+        <Col xs={12} md={5} className="form-section d-flex flex-column p-0">
           {/* Blue Header */}
-          <div
-            className="text-white text-center w-100"
-            style={{
-              backgroundColor: "#2962FF",
-              fontSize: "28px",
-              fontWeight: "bold",
-              padding: "20px 0",
-              borderBottomLeftRadius: "20px",
-              borderBottomRightRadius: "20px",
-              minHeight: "150px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <h3
-              className="mb-0"
-              style={{ fontWeight: "bold", fontSize: "50px" }}
-            >
-              Set up Security
-            </h3>
+          <div className="header-section">
+            <h3>Set up Security</h3>
           </div>
-
-          {/* Form Content */}
-          <div
-            className="px-4 d-flex flex-column align-items-center"
-            style={{ width: "100%", maxWidth: "400px", margin: "40px auto 0" }}
-          >
-            {/* Smaller logo under it */}
-            <div className="text-center" style={{ marginBottom: "60px" }}>
+          <div className="form-container">
+            <div className="text-center mb-5">
               <img
                 src="/icons/DermaScan.png"
                 alt="DERMAScan Text"
-                style={{ width: "200px" }}
+                className="form-logo"
               />
             </div>
+
             <Form className="w-100">
               {/* Password Field */}
-              <Form.Group className="mb-5 position-relative">
+              <Form.Group className="mb-4 position-relative">
                 <Form.Control
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{
-                    boxShadow: "none",
-                    borderBottomColor: "#ddd",
-                    padding: "12px 0",
-                  }}
+                  className="input-field pe-5"
                 />
                 {showPassword ? (
                   <FaEyeSlash
                     onClick={() => setShowPassword(false)}
-                    className="position-absolute"
-                    style={{
-                      top: "50%",
-                      right: "10px",
-                      transform: "translateY(-50%)",
-                      cursor: "pointer",
-                      color: "#666",
-                    }}
+                    className="eye-icon"
                   />
                 ) : (
                   <FaEye
                     onClick={() => setShowPassword(true)}
-                    className="position-absolute"
-                    style={{
-                      top: "50%",
-                      right: "10px",
-                      transform: "translateY(-50%)",
-                      cursor: "pointer",
-                      color: "#666",
-                    }}
+                    className="eye-icon"
                   />
                 )}
               </Form.Group>
 
               {/* Confirm Password Field */}
-              <Form.Group className="mb-5 position-relative">
+              <Form.Group className="mb-4 position-relative">
                 <Form.Control
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{
-                    boxShadow: "none",
-                    borderBottomColor: "#ddd",
-                    padding: "12px 0",
-                  }}
+                  className="input-field pe-5"
                 />
                 {showConfirmPassword ? (
                   <FaEyeSlash
                     onClick={() => setShowConfirmPassword(false)}
-                    className="position-absolute"
-                    style={{
-                      top: "50%",
-                      right: "10px",
-                      transform: "translateY(-50%)",
-                      cursor: "pointer",
-                      color: "#666",
-                    }}
+                    className="eye-icon"
                   />
                 ) : (
                   <FaEye
                     onClick={() => setShowConfirmPassword(true)}
-                    className="position-absolute"
-                    style={{
-                      top: "50%",
-                      right: "10px",
-                      transform: "translateY(-50%)",
-                      cursor: "pointer",
-                      color: "#666",
-                    }}
+                    className="eye-icon"
                   />
                 )}
               </Form.Group>
 
               {/* 2FA Toggle */}
               <div className="mb-4">
-                <p
-                  className="mb-2 text-muted"
-                  style={{ fontSize: "14px", fontWeight: "bold" }}
-                >
-                  For 2 layer security:
-                </p>
+                <p className="twofa-label">For 2 layer security:</p>
                 <div
-                  className="d-flex align-items-center p-3 border rounded"
-                  style={{
-                    backgroundColor: "#f8f9fa",
-                    borderColor: "#dee2e6",
-                    cursor: "pointer",
-                  }}
+                  className="twofa-box"
                   onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
                 >
-                  <FaShieldAlt
-                    className="me-3"
-                    style={{ color: "#2962FF", fontSize: "20px" }}
-                  />
+                  <FaShieldAlt className="me-3 text-primary" />
                   <div className="flex-grow-1">
-                    <span style={{ fontSize: "14px", fontWeight: "500" }}>
+                    <span className="twofa-text">
                       Enable Two-Factor Authentication (2FA)
                     </span>
                   </div>
@@ -205,35 +118,18 @@ function SecurityRegister() {
               </div>
 
               {/* Register Button */}
-              <Button
-                onClick={handleRegister}
-                style={{
-                  width: "100%",
-                  backgroundColor: "#2962FF",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "15px 0",
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  fontSize: "16px",
-                  marginTop: "30px",
-                }}
-              >
+              <Button onClick={handleRegister} className="register-btn">
                 REGISTER
               </Button>
             </Form>
 
             {/* Login Link */}
-            <div className="mt-4 text-center">
+            <div className="mt-3 text-center d-flex justify-content-center align-items-center gap-2">
               <span className="text-muted">Already have an account? </span>
               <Button
                 variant="link"
-                className="p-0 text-decoration-none"
+                className="p-0 text-decoration-none login-link"
                 onClick={handleLogin}
-                style={{
-                  color: "#2962FF",
-                  fontWeight: "500",
-                }}
               >
                 Login
               </Button>
@@ -244,5 +140,4 @@ function SecurityRegister() {
     </Container>
   );
 }
-
 export default SecurityRegister;

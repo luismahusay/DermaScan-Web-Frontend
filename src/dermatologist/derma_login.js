@@ -101,7 +101,7 @@ function DermaLogin() {
               </div>
             </Form>
             {/* Sign up link */}
-            <div className="mt-4 text-center">
+            <div className="mt-4 text-center d-flex align-items-center justify-content-center gap-2">
               <span style={{ color: '#666', fontSize: '0.98rem' }}>
                 Don’t have an account?{' '}
               </span>

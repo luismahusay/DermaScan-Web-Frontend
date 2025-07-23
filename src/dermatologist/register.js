@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import "./register.css";
+import "../styles/derma_register.css";
 
 function PersonalInformationForm() {
   const navigate = useNavigate();
 
+
+  const handleNext = () => {
+    navigate('/dermatologist/verification');
+  };
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -25,74 +29,43 @@ function PersonalInformationForm() {
     }));
   };
 
-  const handleNext = () => {
-    // TODO: Add form validation and next step logic
-    console.log("Form data:", formData);
+  const handleSignIn = () => {
+    navigate('/dermatologist/derma_login');
   };
 
-  const handleSignIn = () => {
-    navigate("/login");
-  };
 
   return (
     <Container
       fluid
-      className="register-bg d-flex justify-content-center align-items-center p-0"
+      className="register-bg d-flex justify-content-center align-items-center"
       style={{
-        backgroundImage: `url("/icons/background.jpg")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
+        backgroundImage: `url(${process.env.PUBLIC_URL + '/icons/background.jpg'})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        backgroundRepeat: 'no-repeat',
+        minHeight: '100vh',
       }}
     >
-      {/* Centered white form container */}
-      <div className="register-form-container">
-
-        {/* Blue header */}
-        <div
-          className="text-center text-white register-header"
-          style={{
-            backgroundColor: "#2962FF",
-            borderBottomLeftRadius: "20px",
-            borderBottomRightRadius: "20px",
-            minHeight: "150px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <h3 className="mb-0" style={{ fontWeight: "bold", fontSize: "50px" }}>
-            Personal Information
-          </h3>
+      <div className="responsive-register-form-container ">
+        <div className="register-header text-center text-white">
+          <h3 className="mb-0">Personal Information</h3>
         </div>
 
-        {/* Form content */}
-        <div
-          className="p-5 h-70 d-flex flex-column justify-content-center"
-          style={{ marginTop: "-30px" }}
-        >
-          {/* Logo Section */}
+        <div className="register-form-content">
           <div className="text-center">
-            <img
-              src="/icons/DermaScan.png"
-              alt="DERMAScan Text"
-              className="register-logo"
-              style={{ width: "200px", marginBottom: "100px" }}
-            />
+            <img src="/icons/DermaScan.png" alt="DERMAScan" className="register-logo" />
           </div>
 
           <Form>
-            {/* First row - First Name and Last Name */}
-            <Row className="mb-5 justify-content-center">
-              <Col md={4} className="me-5">
+            <Row className="mb-4 justify-content-center">
+              <Col md={4} className="me-md-5 mb-3 mb-md-0">
                 <Form.Control
                   type="text"
                   placeholder="First Name"
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: "none" }}
+                  className="form-input"
                 />
               </Col>
               <Col md={4}>
@@ -102,23 +75,20 @@ function PersonalInformationForm() {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: "none" }}
+                  className="form-input"
                 />
               </Col>
             </Row>
 
-            {/* Second row - Middle Name and Suffix */}
-            <Row className="mb-5 justify-content-center">
-              <Col md={4} className="me-5">
+            <Row className="mb-4 justify-content-center">
+              <Col md={4} className="me-md-5 mb-3 mb-md-0">
                 <Form.Control
                   type="text"
                   placeholder="Middle Name"
                   name="middleName"
                   value={formData.middleName}
                   onChange={handleInputChange}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: "none" }}
+                  className="form-input"
                 />
               </Col>
               <Col md={4}>
@@ -128,23 +98,20 @@ function PersonalInformationForm() {
                   name="suffix"
                   value={formData.suffix}
                   onChange={handleInputChange}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: "none" }}
+                  className="form-input"
                 />
               </Col>
             </Row>
 
-            {/* Third row - Email and Phone */}
-            <Row className="mb-5 justify-content-center">
-              <Col md={4} className="me-5">
+            <Row className="mb-4 justify-content-center">
+              <Col md={4} className="me-md-5 mb-3 mb-md-0">
                 <Form.Control
                   type="email"
                   placeholder="Email Address"
                   name="emailAddress"
                   value={formData.emailAddress}
                   onChange={handleInputChange}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: "none" }}
+                  className="form-input"
                 />
               </Col>
               <Col md={4}>
@@ -154,23 +121,20 @@ function PersonalInformationForm() {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: "none" }}
+                  className="form-input"
                 />
               </Col>
             </Row>
 
-            {/* Fourth row - Address and Gender */}
             <Row className="mb-5 justify-content-center">
-              <Col md={4} className="me-5">
+              <Col md={4} className="me-md-5 mb-3 mb-md-0">
                 <Form.Control
                   type="text"
                   placeholder="Address"
                   name="address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: "none" }}
+                  className="form-input"
                 />
               </Col>
               <Col md={4}>
@@ -178,12 +142,7 @@ function PersonalInformationForm() {
                   name="gender"
                   value={formData.gender}
                   onChange={handleInputChange}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{
-                    backgroundColor: "transparent",
-                    boxShadow: "none",
-                    color: formData.gender ? "#000" : "#6c757d",
-                  }}
+                  className={`form-input ${!formData.gender && 'placeholder-text'}`}
                 >
                   <option value="">Gender</option>
                   <option value="male">Male</option>
@@ -194,43 +153,21 @@ function PersonalInformationForm() {
               </Col>
             </Row>
 
-            {/* Next Button */}
-            <div className="text-center">
-              <Button
-                onClick={handleNext}
-                style={{
-                  width: "60%",
-                  maxWidth: "300px",
-                  backgroundColor: "#2962FF",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "16px 0",
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  fontSize: "16px",
-                  marginTop: "20px",
-                  boxShadow: "0 4px 8px rgba(41, 98, 255, 0.3)",
-                }}
-              >
+            <div className="text-center fw-semibold">
+              <Button onClick={handleNext} className="next-button">
                 NEXT
               </Button>
             </div>
           </Form>
 
-          {/* Sign in link */}
-          <div className="mt-4 text-center">
-            <span style={{ color: "#666", fontSize: "14px" }}>
+          <div className="mt-2 text-center d-flex justify-content-center align-items-center">
+            <span className="signin-label">
               Already have an account?{" "}
             </span>
             <Button
               variant="link"
-              className="p-0 text-decoration-none text-primary"
-              onClick={(e) => {
-                e.preventDefault();
-                handleSignIn();
-                window.location.href = "derma_login";
-              }}
-              style={{ fontSize: "14px", fontWeight: "500" }}
+              className="login-button"
+              onClick={handleSignIn}
             >
               Login
             </Button>
@@ -240,5 +177,4 @@ function PersonalInformationForm() {
     </Container>
   );
 }
-
 export default PersonalInformationForm;
