@@ -14,8 +14,8 @@ import {
   Modal,
 } from "react-bootstrap";
 
-const DermaBookings = () => {
-  const [active, setActive] = useState("bookings"); // Set to bookings
+const DermaPatients = () => {
+  const [active, setActive] = useState("patients"); // Set to bookings
   const [hovered, setHovered] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [activeTab, setActiveTab] = useState("Walk-In"); // Track active tab
@@ -25,86 +25,96 @@ const DermaBookings = () => {
   const [currentPatient, setCurrentPatient] = useState(null);
   const [modalPage, setModalPage] = useState(1);
   // Sample booking data
-  const bookingData = [
+  const patientData = [
     {
-      id: "#20462",
-      firstName: "Matt",
-      lastName: "Dickerson",
-      middleName: "A",
-      dateBooked: "2024-11-12",
-      time: "--",
+      id: "123",
+      firstName: "John",
+      lastName: "Prats Great",
+      middleName: "June 3, 2025 - 10:29 AM PHT", // This seems to be a timestamp in your image
+      dateBooked: "Al recommendation failed", // Status/Notes
+      time: "Online", // Booking type
+      bookingType: "Online",
     },
     {
-      id: "#20462",
-      firstName: "Matt",
-      lastName: "Dickerson",
-      middleName: "A",
-      dateBooked: "2024-11-12",
-      time: "--",
+      id: "123",
+      firstName: "John",
+      lastName: "Prats Great",
+      middleName: "June 3, 2025 - 10:29 AM PHT", // This seems to be a timestamp in your image
+      dateBooked: "Al recommendation failed", // Status/Notes
+      time: "Online", // Booking type
+      bookingType: "Online",
     },
     {
-      id: "#20462",
-      firstName: "Matt",
-      lastName: "Dickerson",
-      middleName: "A",
-      dateBooked: "2024-11-12",
-      time: "--",
+      id: "123",
+      firstName: "John",
+      lastName: "Prats Great",
+      middleName: "June 3, 2025 - 10:29 AM PHT", // This seems to be a timestamp in your image
+      dateBooked: "Al recommendation failed", // Status/Notes
+      time: "Online", // Booking type
+      bookingType: "Online",
     },
     {
-      id: "#20462",
-      firstName: "Matt",
-      lastName: "Dickerson",
-      middleName: "A",
-      dateBooked: "2024-11-12",
-      time: "--",
+      id: "123",
+      firstName: "John",
+      lastName: "Prats Great",
+      middleName: "June 3, 2025 - 10:29 AM PHT", // This seems to be a timestamp in your image
+      dateBooked: "Al recommendation failed", // Status/Notes
+      time: "Online", // Booking type
+      bookingType: "Online",
     },
     {
-      id: "#20462",
-      firstName: "Matt",
-      lastName: "Dickerson",
-      middleName: "A",
-      dateBooked: "2024-11-12",
-      time: "--",
+      id: "123",
+      firstName: "John",
+      lastName: "Prats Great",
+      middleName: "June 3, 2025 - 10:29 AM PHT", // This seems to be a timestamp in your image
+      dateBooked: "Al recommendation failed", // Status/Notes
+      time: "Online", // Booking type
+      bookingType: "Online",
     },
     {
-      id: "#20462",
-      firstName: "Matt",
-      lastName: "Dickerson",
-      middleName: "A",
-      dateBooked: "2024-11-12",
-      time: "--",
+      id: "123",
+      firstName: "John",
+      lastName: "Prats Great",
+      middleName: "June 3, 2025 - 10:29 AM PHT", // This seems to be a timestamp in your image
+      dateBooked: "Al recommendation failed", // Status/Notes
+      time: "Online", // Booking type
+      bookingType: "Online",
     },
     {
-      id: "#20462",
-      firstName: "Matt",
-      lastName: "Dickerson",
-      middleName: "A",
-      dateBooked: "2024-11-12",
-      time: "--",
+      id: "123",
+      firstName: "John",
+      lastName: "Prats Great",
+      middleName: "June 3, 2025 - 10:29 AM PHT", // This seems to be a timestamp in your image
+      dateBooked: "Al recommendation failed", // Status/Notes
+      time: "Online", // Booking type
+      bookingType: "Online",
     },
     {
-      id: "#20462",
-      firstName: "Matt",
-      lastName: "Dickerson",
-      middleName: "A",
-      dateBooked: "2024-11-12",
-      time: "--",
+      id: "123",
+      firstName: "John",
+      lastName: "Prats Great",
+      middleName: "June 3, 2025 - 10:29 AM PHT", // This seems to be a timestamp in your image
+      dateBooked: "Al recommendation failed", // Status/Notes
+      time: "Online", // Booking type
+      bookingType: "Online",
     },
     {
-      id: "#20462",
-      firstName: "Matt",
-      lastName: "Dickerson",
-      middleName: "A",
-      dateBooked: "2024-11-12",
-      time: "--",
+      id: "123",
+      firstName: "John",
+      lastName: "Prats Great",
+      middleName: "June 3, 2025 - 10:29 AM PHT", // This seems to be a timestamp in your image
+      dateBooked: "Al recommendation failed", // Status/Notes
+      time: "Online", // Booking type
+      bookingType: "Online",
     },
     {
-      id: "#20462",
-      firstName: "Matt",
-      lastName: "Dickerson",
-      middleName: "A",
-      dateBooked: "2024-11-12",
-      time: "--",
+      id: "123",
+      firstName: "John",
+      lastName: "Prats Great",
+      middleName: "June 3, 2025 - 10:29 AM PHT", // This seems to be a timestamp in your image
+      dateBooked: "Al recommendation failed", // Status/Notes
+      time: "Online", // Booking type
+      bookingType: "Online",
     },
   ];
 
@@ -413,7 +423,7 @@ const DermaBookings = () => {
           font-size: 14px;
           width: 200px;
         }
-        .filters-button {
+        .filter-type-btn {
           background: #f8f9fa;
           border: 1px solid #ddd;
           border-radius: 4px;
@@ -423,6 +433,11 @@ const DermaBookings = () => {
           gap: 8px;
           cursor: pointer;
           font-size: 14px;
+          color: #333;
+        }
+
+        .filter-type-btn:hover {
+          background: #e9ecef;
         }
         .bookings-table {
           width: 100%;
@@ -1275,7 +1290,9 @@ const DermaBookings = () => {
               >
                 <img
                   src={`/icons/patientsicon-${
-                    hovered === "patients" ? "white" : "blue"
+                    hovered === "patients" || active === "patients"
+                      ? "white"
+                      : "blue"
                   }.png`}
                   alt="Patients"
                   className="sidebar-icon"
@@ -1316,116 +1333,87 @@ const DermaBookings = () => {
           >
             <Container fluid>
               <div className="bookings-container">
-                <div className="bookings-header">
-                  <h1 className="bookings-title">Pending Patients</h1>
-                </div>
-
-                {/* Tabs */}
-                <div className="tab-buttons">
-                  <button
-                    className={`tab-button ${
-                      activeTab === "Walk-In" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveTab("Walk-In")}
-                  >
-                    Walk-In
-                  </button>
-                  <button
-                    className={`tab-button ${
-                      activeTab === "Online" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveTab("Online")}
-                  >
-                    Online
+                <div
+                  className="bookings-header"
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <div>
+                    <h1 className="bookings-title">Accepted Booked Patients</h1>
+                    <p
+                      style={{
+                        color: "#666",
+                        margin: "5px 0 0 0",
+                        fontSize: "14px",
+                      }}
+                    >
+                      List of On-Going Booking Patients
+                    </p>
+                  </div>
+                  {/* Filter Type button moved to right corner */}
+                  <button className="filter-type-btn">
+                    <img
+                      src="/icons/filtericon.png"
+                      alt="Filter"
+                      style={{
+                        width: "15px",
+                        height: "11px",
+                        marginRight: "6px",
+                      }}
+                    />
+                    Filter Type
                   </button>
                 </div>
 
                 {/* Table Controls */}
                 <div className="table-controls">
-                  <div className="entries-control">
-                    <span>Show</span>
-                    <select
-                      className="entries-select"
-                      value={entries}
-                      onChange={(e) => setEntries(Number(e.target.value))}
-                    >
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                    </select>
-                    <span>entries</span>
-                  </div>
-
                   <div className="search-control">
-                    <input
-                      type="text"
-                      className="search-input"
-                      placeholder="Search..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <div
-                      className="d-flex align-items-center"
-                      style={{ color: "#000000", cursor: "pointer" }}
-                    >
-                      <img
-                        src="/icons/filtericon.png"
-                        alt="Filter"
-                        style={{
-                          width: "15px",
-                          height: "11px",
-                          marginRight: "6px",
-                          filter: "brightness(0)",
-                        }}
-                      />
-                      <span style={{ fontSize: "16px", fontWeight: "bold" }}>
-                        Filter
-                      </span>
-                    </div>
+                    {/* Filter button was moved from here */}
                   </div>
                 </div>
-
                 {/* Bookings Table */}
                 <table className="bookings-table">
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>First Name ↓</th>
-                      <th>Last Name ↓</th>
-                      <th>Middle Name ↓</th>
-                      <th>Date Booked ↓</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Middle Name</th>
+                      <th>Date Booked</th>
+                      <th>Booking Type</th>
                       <th>Time</th>
-                      <th>Action</th>
+                      <th>View</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {bookingData.map((booking, index) => (
+                    {patientData.map((patient, index) => (
                       <tr key={index}>
-                        <td>{booking.id}</td>
-                        <td>{booking.firstName}</td>
-                        <td>{booking.lastName}</td>
-                        <td>{booking.middleName}</td>
-                        <td>{booking.dateBooked}</td>
-                        <td>{booking.time}</td>
+                        <td>{patient.id}</td>
+                        <td>{patient.firstName}</td>
+                        <td>{patient.lastName}</td>
+                        <td>{patient.middleName}</td>
+                        <td>{patient.dateBooked}</td>
+                        <td>{patient.bookingType}</td>
+                        <td>{patient.time}</td>
                         <td>
-                          <div className="action-buttons">
-                            <button className="action-btn accept-btn">
-                              <span>✓</span>
-                              ACCEPT
-                            </button>
-                            <button className="action-btn reject-btn">
-                              <span>✕</span>
-                              REJECT
-                            </button>
-                            <button
-                              className="action-btn details-btn"
-                              onClick={() => handleDetailsClick(booking)}
-                            >
-                              <span>👁</span>
-                              DETAILS
-                            </button>
-                          </div>
+                          {/* Replace action buttons with View Details link */}
+                          <button
+                            className="view-details-link"
+                            onClick={() => handleDetailsClick(patient)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#4285f4",
+                              textDecoration: "underline",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                            }}
+                          >
+                            🔍 View Details..
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1449,4 +1437,4 @@ const DermaBookings = () => {
   );
 };
 
-export default DermaBookings;
+export default DermaPatients;
