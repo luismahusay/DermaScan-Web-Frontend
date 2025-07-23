@@ -42,7 +42,7 @@ const ProductManagement = () => {
   const totalPages = Math.ceil(filtered.length / entries) || 1;
 
   return (
-    <Row className="g-4 p-4 container-fluid">
+    <Row className="g-4 ps-4 container-fluid">
       <Col lg={9}>
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h3 className="fw-bold mb-0">Product Management</h3>
