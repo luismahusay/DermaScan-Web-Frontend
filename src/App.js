@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/landingpage';
 import AdminPage from './admin/admin_login';
-import DermaPage from './dermatologist/derma_login';
+import DermaLogin from './dermatologist/derma_login';
 import DermaDashboard from './dermatologist/dashboard';
 import DermaRegister from './dermatologist/register'
 import DermaVerification from './dermatologist/verification';
@@ -21,8 +21,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/admin" element={<AdminPage />} />
-        <Route path="/dermatologist" element={<DermaPage />} />
-        <Route path="/dermatologist/derma_login" element={<DermaPage />} />
+        <Route path="/admin/admin_dashboard" element={<AdminDashboard />} />
+        <Route path="/dermatologist/derma_login" element={<DermaLogin />} />
         <Route path="/dermatologist/dashboard" element={<DermaDashboard />} />
         <Route path="/dermatologist/register" element={<DermaRegister />} />
         <Route path="/dermatologist/verification" element={<DermaVerification />} />
@@ -30,8 +30,6 @@ function App() {
         <Route path="/dermatologist/emailverification" element={<EmailVerification />} />
         <Route path="/dermatologist/forgotpassword" element={<ForgotPassword />} />
         <Route path="/dermatologist/forgotpassword2" element={<ForgotPassword2 />} />
-        <Route path="/dermatologist" element={<DermaPage/>} />
-        <Route path="/admin/admin_dashboard" element={<AdminDashboard />} />
         <Route path="/dermatologist/productmanagement" element={<DermaProductManagement />} />
         <Route path="/dermatologist/bookings" element={<DermaBookings />} />
       </Routes>

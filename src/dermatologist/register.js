@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import "./register.css";
 
 function PersonalInformationForm() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ function PersonalInformationForm() {
   return (
     <Container
       fluid
-      className="vh-100 d-flex justify-content-center align-items-center p-0"
+      className="register-bg d-flex justify-content-center align-items-center p-0"
       style={{
         backgroundImage: `url("/icons/background.jpg")`,
         backgroundSize: "cover",
@@ -45,21 +46,11 @@ function PersonalInformationForm() {
       }}
     >
       {/* Centered white form container */}
-      <div
-        className="bg-white shadow-lg"
-        style={{
-          width: "100%",
-          maxWidth: "1200px",
-          height: "100vh",
-          minHeight: "650px",
-          borderRadius: "0px",
-          overflow: "hidden",
-          margin: "20px",
-        }}
-      >
+      <div className="register-form-container">
+
         {/* Blue header */}
         <div
-          className="text-center text-white"
+          className="text-center text-white register-header"
           style={{
             backgroundColor: "#2962FF",
             borderBottomLeftRadius: "20px",
@@ -81,11 +72,12 @@ function PersonalInformationForm() {
           style={{ marginTop: "-30px" }}
         >
           {/* Logo Section */}
-          <div className="text-center" style={{ marginBottom: "100px" }}>
+          <div className="text-center">
             <img
               src="/icons/DermaScan.png"
               alt="DERMAScan Text"
-              style={{ width: "200px" }}
+              className="register-logo"
+              style={{ width: "200px", marginBottom: "100px" }}
             />
           </div>
 

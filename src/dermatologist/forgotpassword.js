@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import "./forgotpassword.css";
 
 function ForgotPassword() {
   const navigate = useNavigate();
@@ -20,8 +21,8 @@ function ForgotPassword() {
   };
 
   return (
-    <Container fluid className="vh-100 p-0">
-      <Row className="h-100 m-0">
+    <Container fluid className="forgot-bg p-0">
+      <Row className="h-100 m-0 flex-grow-1">
         {/* Left image section */}
         <Col
           md={7}
@@ -37,16 +38,14 @@ function ForgotPassword() {
         <Col
           xs={12}
           md={5}
-          className="d-flex flex-column bg-white p-0"
+          className="d-flex flex-column bg-white p-0 forgot-form-container"
           style={{
-            width: "60%",
-            maxWidth: "800px",
-            overflowY: "auto",
+            overflowY: "auto"
           }}
         >
           {/* Blue Header */}
           <div
-            className="text-white text-center w-100"
+            className="text-white text-center w-100 forgot-header"
             style={{
               backgroundColor: "#2962FF",
               fontSize: "28px",
@@ -70,15 +69,15 @@ function ForgotPassword() {
 
           {/* Form Content */}
           <div
-            className="px-4 d-flex flex-column align-items-center"
-            style={{ width: "100%", maxWidth: "400px", margin: "40px auto 0" }}
+            className="px-4 d-flex flex-column align-items-center forgot-form"
           >
             {/* BIG LOGO */}
-            <div className="text-center" style={{ marginBottom: "30px" }}>
+            <div className="text-center">
               <img
                 src="/icons/biggerlogodermascan.png"
                 alt="DERMAScan Full Logo"
-                style={{ width: "200px" }}
+                className="forgot-logo"
+                style={{ width: "200px", marginBottom: "30px" }}
               />
             </div>
 

@@ -3,7 +3,7 @@ import { BsEyeFill, BsEyeSlash } from 'react-icons/bs';
 import { Container, Row, Col, Form, InputGroup, Button} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
-function LandingPage() {
+function AdminLogin() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
 
@@ -95,4 +95,4 @@ function LandingPage() {
   );
 }
 
-export default LandingPage;
+export default AdminLogin;

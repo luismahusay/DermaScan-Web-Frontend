@@ -1,0 +1,62 @@
+/* Responsive styles for the register page */
+
+.register-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+}
+
+.register-form-container {
+  background: #fff;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.06);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 2rem 1.5rem;
+}
+
+@media (max-width: 991.98px) {
+  .register-form-container {
+    max-width: 95vw;
+    padding: 1.5rem 0.5rem;
+    min-height: unset;
+  }
+  .register-header {
+    font-size: 2rem !important;
+    min-height: 80px !important;
+    padding: 1rem 0 !important;
+  }
+  .register-logo {
+    width: 120px !important;
+    margin-bottom: 32px !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .register-form-container {
+    max-width: 100vw;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 1rem 0.25rem;
+  }
+  .register-header {
+    font-size: 1.5rem !important;
+    min-height: 60px !important;
+    padding: 0.5rem 0 !important;
+  }
+  .register-logo {
+    width: 90px !important;
+    margin-bottom: 24px !important;
+  }
+  .form-control, .form-select {
+    font-size: 14px;
+    padding: 0.5rem 0.75rem;
+  }
+  .btn {
+    font-size: 14px !important;
+    padding: 12px 0 !important;
+  }
+}

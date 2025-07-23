@@ -31,29 +31,6 @@
     margin-bottom: 2px;
   }
 }
-/* --- Responsive Stat Cards and Subscription Plan Alignment --- */
-@media (min-width: 992px) and (max-width: 1200px) {
-  .stat-card {
-    min-height: 170px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .subscription-plan-card {
-    height: 100%;
-    width: 100%;
-    min-width: 240px !important;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .main-content .row > .col-lg-4 > .subscription-plan-card {
-    height: 100%;
-  }
-  .main-content .row {
-    align-items: stretch !important;
-  }
-}
 /* Subscription Plan Card Styles */
 .subscription-plan-card {
   background: #fff;
@@ -261,5 +238,26 @@ html, body {
 @media (min-width: 1024px) {
   .responsive-main-container {
     max-width: 1024px;
+  }
+  
+  /* Limit stat card height on 1024px screens */
+  .stat-card {
+    max-height: 140px;
+  }
+  
+  .stat-card .card-body {
+    padding: 1rem !important;
+    overflow: hidden;
+  }
+  
+  /* Fix spacing issues - override the stretch behavior */
+  .main-content .row {
+    align-items: flex-start !important;
+    height: auto !important;
+  }
+  
+  .main-content .row > .col-lg-8,
+  .main-content .row > .col-lg-4 {
+    height: auto !important;
   }
 }
