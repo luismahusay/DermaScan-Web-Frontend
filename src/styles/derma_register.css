@@ -1,0 +1,107 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+/* Form container */
+.responsive-register-form-container {
+  background-color: white;
+  border-radius: 20px;
+  max-width: 1000px;
+  width: 90%;
+  margin: 2rem 0;
+  overflow: hidden;
+}
+
+
+/* Header */
+.register-header {
+  background-color: #2962FF;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-header h3 {
+  font-weight: bold;
+  font-size: 2.5rem;
+}
+
+
+/* Logo */
+.register-logo {
+  width: 200px;
+  margin-bottom: 60px;
+}
+
+/* Form content */
+.register-form-content {
+  padding: 2.5rem 2rem;
+  margin-top: -30px;
+}
+
+/* Form input styles */
+.form-input {
+  border: 0;
+  border-bottom: 1px solid #ccc;
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 1rem;
+  box-shadow: none !important;
+  background-color: transparent;
+}
+
+/* Placeholder color for select */
+.form-input.placeholder-text {
+  color: #6c757d;
+}
+
+/* Button */
+.next-button {
+  width: 60%;
+  max-width: 300px;
+  background-color: #2962FF;
+  border: none;
+  border-radius: 8px;
+  padding: 16px 0;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(41, 98, 255, 0.3);
+}
+
+.signin-label {
+  color: #666;
+  font-size: 14px;
+}
+
+.login-button {
+  padding: 0;
+  text-decoration: none !important;
+  color: #2962FF;
+  font-size: 14px!important;
+  font-weight: bold;
+}
+
+/* Responsive Fixes */
+@media (max-width: 768px) {
+  .register-header h3 {
+    font-size: 1.8rem;
+  }
+
+  .register-logo {
+    width: 150px;
+    margin-bottom: 40px;
+  }
+
+  .form-input {
+    font-size: 0.9rem;
+  }
+
+  .next-button {
+    width: 100%;
+  }
+}

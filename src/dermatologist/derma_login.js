@@ -1,21 +1,11 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { BsEyeFill, BsEyeSlash } from 'react-icons/bs';
+import { Container, Row, Col, Form, InputGroup, Button} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaEye, FaEyeSlash } from 'react-icons/fa'; // ✅ Add this line
 
 function DermaLogin() {
-  const navigate = useNavigate(); // ✅ You forgot this before
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-
-  const toggleShowPassword = () => setShowPassword(!showPassword);
-
-  const handleLogin = () => {
-    // TODO: Add login logic
-    console.log('Logging in with:', email, password);
-  };
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = React.useState(false);
 
   return (
     <Container fluid className="vh-100">
@@ -26,141 +16,100 @@ function DermaLogin() {
           className="d-none d-md-block p-0"
           style={{
             backgroundImage: `url("/icons/background.jpg")`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
           }}
         />
 
-        {/* Right side - Login form */}
+        {/* Right side - Responsive */}
         <Col
           xs={12}
           md={6}
           className="d-flex justify-content-center align-items-center bg-white"
         >
-          <div
-            className="text-center px-4"
-            style={{ width: "100%", maxWidth: "400px", marginTop: "-200px" }}
-          >
-            {/* Logo Section */}
-            <div
-              className="d-flex flex-column align-items-center"
-              style={{ marginBottom: "100px" }}
-            >
+            <div className="w-100" style={{ maxWidth: '400px', padding: '10px' }}>
+            {/* Logo image */}
+            <div className="text-center mb-5">
               <img
-                src="/icons/biggerlogodermascan.png"
-                alt="Logo"
-                style={{ width: "300px", marginBottom: "10px" }}
-              />
-              <img
-                src="/icons/DermaScan.png"
-                alt="DERMAScan Text"
-                style={{ width: "180px" }}
+                src="/icons/logo.png" 
+                alt="DermaScan Logo"
+                style={{ width: '15rem', height: '13rem' }}
               />
             </div>
 
-            <Form className="text-start">
-              {/* Email Field */}
-              <div className="mb-5 position-relative">
-                <Form.Control
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: "none" }}
-                />
-                <FaUser
-                  className="position-absolute"
-                  style={{
-                    top: "50%",
-                    right: "10px",
-                    transform: "translateY(-50%)",
-                    color: "#666",
-                  }}
-                />
-              </div>
-
-              {/* Password Field */}
-              <div className="mb-2 position-relative">
-                <Form.Control
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="border-0 border-bottom rounded-0 ps-0 pe-5"
-                  style={{ boxShadow: "none" }}
-                />
-                {showPassword ? (
-                  <FaEyeSlash
-                    className="position-absolute"
-                    onClick={toggleShowPassword}
-                    style={{
-                      top: "50%",
-                      right: "10px",
-                      transform: "translateY(-50%)",
-                      cursor: "pointer",
-                      color: "#666",
-                    }}
+            {/* Email field with icon */}
+            <Form onSubmit={e => { e.preventDefault(); navigate('/dermatologist/dashboard'); }}>
+              <Form.Group controlId="formEmail" className="mb-4">
+                <InputGroup>
+                  <Form.Control
+                    type="email"
+                    placeholder="Email"
+                    className="rounded-0 border-bottom border-2 mb-3 pt-2 pb-2 ps-3 pe-3 border-top-0 border-start-0 border-end-0"
                   />
-                ) : (
-                  <FaEye
-                    className="position-absolute"
-                    onClick={toggleShowPassword}
-                    style={{
-                      top: "50%",
-                      right: "10px",
-                      transform: "translateY(-50%)",
-                      cursor: "pointer",
-                      color: "#666",
-                    }}
-                  />
-                )}
-              </div>
+                  <InputGroup.Text className="bg-white border-0 border-bottom border-2 mb-3">
+                    <img
+                      src="/icons/person.svg"
+                      alt="User Icon"
+                      className="w-100 h-auto"
+                      width="32" height="32"
+                    />
+                  </InputGroup.Text>
+                </InputGroup>
+              </Form.Group>
 
-              <div className="text-end mb-3">
+              {/* Password field with icon */}
+              <Form.Group controlId="formPassword">
+                <InputGroup>
+                  <Form.Control
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    className="rounded-0 border-bottom border-2 mb-3 pt-2 pb-2 ps-3 pe-3 border-top-0 border-start-0 border-end-0"
+                  />
+                  <InputGroup.Text className="bg-white border-0 border-bottom border-2 mb-3">
+                    <span
+                      className="text-secondary"
+                      style={{ cursor: 'pointer', fontSize: '2rem' }}
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <BsEyeSlash /> : <BsEyeFill />}
+                    </span>
+                  </InputGroup.Text>
+                </InputGroup>
+              </Form.Group>
+
+              {/* Forgot password link */}
+              <div className="text-end mb-5">
                 <Button
                   variant="link"
                   className="p-0 text-decoration-none text-primary"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.location.href = "forgotpassword"; // Change to your actual file names
-                  }}
+                  style={{ fontSize: '0.95rem' }}
+                  onClick={e => { e.preventDefault(); navigate('/dermatologist/forgotpassword'); }}
                 >
-                  Forgot Password?
+                  Forgot password?
                 </Button>
               </div>
 
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleLogin();
-                  window.location.href = "dashboard";
-                }}
-                style={{
-                  width: "100%",
-                  backgroundColor: "#2962FF",
-                  border: "none",
-                  borderRadius: "4px",
-                  padding: "18px 0",
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  fontSize: "15px",
-                  marginTop: "40px", // ← this creates the space you want
-                }}
-              >
-                LOGIN
-              </Button>
+              {/* Login Button */}
+              <div className="d-grid">
+                <Button
+                  type="submit"
+                  className="rounded-1 bg-primary border-0 py-2 px-0 fs-5 fw-bold text-white"
+                >
+                  LOGIN
+                </Button>
+              </div>
             </Form>
-
-            <div className="mt-3">
-              Don’t have an account?{" "}
+            {/* Sign up link */}
+            <div className="mt-4 text-center d-flex align-items-center justify-content-center gap-2">
+              <span style={{ color: '#666', fontSize: '0.98rem' }}>
+                Don’t have an account?{' '}
+              </span>
               <Button
                 variant="link"
                 className="p-0 text-decoration-none text-primary"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = "register";
-                }}
+                style={{ fontSize: '0.98rem', fontWeight: 500 }}
+                onClick={e => { e.preventDefault(); navigate('/dermatologist/register'); }}
               >
                 Sign up
               </Button>

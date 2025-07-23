@@ -125,9 +125,9 @@ const UserManagement = () => {
 
 return (
     <div className="user-management-main">
-      <Container fluid className="user-mgmt-container">
+      <Container fluid className="responsive-user-mgmt-container">
         {/* Header Row: Title, Toggle */}
-        <Row className="align-items-start mb-3 flex-wrap user-mgmt-header-row mt-4">
+        <Row className="align-items-start mb-3 flex-wrap user-mgmt-header-row">
           <Col xs={12} md={4} lg={4} className="mb-2 mb-lg-0 d-flex align-items-start justify-content-lg-start justify-content-start">
             <h2 className="fw-bold mb-0 user-mgmt-title">User Management</h2>
           </Col>
@@ -186,49 +186,49 @@ return (
               />
             )}
           </InputGroup>
-          {/* Mobile search overlay */}
-          {isMobile && showMobileSearch && (
-            <div
-              className="mobile-search-overlay"
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                background: 'rgba(255,255,255,0.98)',
-                zIndex: 3000,
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                paddingTop: 60,
-              }}
-              onClick={() => setShowMobileSearch(false)}
-            >
-              <form
-                style={{ width: '90%', maxWidth: 400, position: 'relative' }}
-                onSubmit={e => { e.preventDefault(); setShowMobileSearch(false); }}
-                onClick={e => e.stopPropagation()}
-              >
-                <FormControl
-                  ref={searchInputRef}
-                  placeholder="Search..."
-                  value={search}
-                  onChange={e => { setSearch(e.target.value); setPage(1); }}
-                  style={{ fontSize: 18, padding: '12px 16px', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
-                />
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  style={{ position: 'absolute', right: 8, top: 8, zIndex: 1 }}
-                  onClick={() => setShowMobileSearch(false)}
-                >
-                  Close
-                </Button>
-              </form>
-            </div>
-          )}
         </div>
+        {/* Mobile search overlay */}
+        {isMobile && showMobileSearch && (
+          <div
+            className="mobile-search-overlay"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(255,255,255,0.98)',
+              zIndex: 3000,
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              paddingTop: 60,
+            }}
+            onClick={() => setShowMobileSearch(false)}
+          >
+            <form
+              style={{ width: '90%', maxWidth: 400, position: 'relative' }}
+              onSubmit={e => { e.preventDefault(); setShowMobileSearch(false); }}
+              onClick={e => e.stopPropagation()}
+            >
+              <FormControl
+                ref={searchInputRef}
+                placeholder="Search..."
+                value={search}
+                onChange={e => { setSearch(e.target.value); setPage(1); }}
+                style={{ fontSize: 18, padding: '12px 16px', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+              />
+              <Button
+                variant="secondary"
+                size="sm"
+                style={{ position: 'absolute', right: 8, top: 8, zIndex: 1 }}
+                onClick={() => setShowMobileSearch(false)}
+              >
+                Close
+              </Button>
+            </form>
+          </div>
+        )}
         <Row>
           {/* Table Section */}
           <Col xs={12} lg={8} className="mb-2">

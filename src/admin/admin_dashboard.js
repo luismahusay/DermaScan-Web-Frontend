@@ -212,7 +212,7 @@ function AdminDashboard() {
             <Col xs={12}>
               {activeScreen === 'dashboard' ? (
                 <>
-                  <h3 className="mb-4 fw-bold text-center text-md-start">Welcome back, Admin.</h3>
+                  <h3 className="mb-4 fw-bold text-center fs-3 text-md-start">Welcome back, Admin.</h3>
                   {/* Stat Cards */}
                   <Row className="mb-4 g-3">
                     {statCards.map((card, idx) => (
