@@ -202,103 +202,187 @@ const DermaSubscription = () => {
         .subscription-btn-free:hover {
           background: #4338ca;
         }
+        /* Tablet adjustments */
+        @media (max-width: 992px) {
+          .subscription-container {
+            padding: 30px 15px;
+          }
+
+          .subscription-card {
+            padding: 30px 25px;
+            min-height: auto;
+          }
+
+          .subscription-price {
+            font-size: 2.5rem;
+          }
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+          .subscription-container {
+            padding: 20px 10px;
+          }
+
+          .subscription-card {
+            padding: 25px 20px;
+            margin-bottom: 20px;
+          }
+
+          .subscription-card-featured {
+            transform: scale(1); /* Remove scale on mobile */
+          }
+
+          .subscription-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            margin-bottom: 20px;
+          }
+
+          .subscription-price {
+            font-size: 2rem;
+          }
+
+          .subscription-plan-name {
+            font-size: 0.8rem;
+            margin-bottom: 24px;
+          }
+
+          .subscription-feature span {
+            font-size: 13px;
+          }
+
+          .subscription-btn {
+            width: 90%;
+            padding: 12px 24px;
+            font-size: 13px;
+          }
+        }
+
+        /* Small mobile adjustments */
+        @media (max-width: 576px) {
+          .subscription-card {
+            padding: 20px 15px;
+          }
+
+          .subscription-price {
+            font-size: 1.8rem;
+          }
+
+          .subscription-btn {
+            width: 100%;
+            padding: 14px 20px;
+          }
+
+          .subscription-feature {
+            margin-bottom: 12px;
+          }
+        }
+
+        /* Container row adjustment for mobile */
+        @media (max-width: 768px) {
+          .row.justify-content-center {
+            padding: 0 20px !important;
+          }
+        }
       `}</style>
 
-            <Container fluid>
-              {/* Page Title */}
+      <Container fluid>
+        {/* Page Title */}
 
-              {/* Subscription Plans */}
-              <Row
-                className="justify-content-center gx-4"
-                style={{
-                  maxWidth: "15000px",
-                  margin: "0 auto",
-                  padding: "0px 40px",
-                }}
-              >
-                {/* Free Plan */}
-                <Col lg={4} md={6} sm={12} className="mb-4">
-                  <div className="subscription-card">
-                    <div className="subscription-icon">
-                      <span>$</span>
-                    </div>
-                    <div className="subscription-price">₱ 0.00</div>
-                    <div className="subscription-plan-name">FREE PLAN</div>
+        {/* Subscription Plans */}
+        <Row
+          className="justify-content-center gx-4"
+          style={{
+            maxWidth: "15000px",
+            margin: "0 auto",
+            padding: "0px 40px",
+          }}
+        >
+          {/* Free Plan */}
+          <Col lg={4} md={6} sm={12} className="mb-4">
+            <div className="subscription-card">
+              <div className="subscription-icon">
+                <span>$</span>
+              </div>
+              <div className="subscription-price">₱ 0.00</div>
+              <div className="subscription-plan-name">FREE PLAN</div>
 
-                    <div className="subscription-features">
-                      <div className="subscription-feature">
-                        <i className="fas fa-check subscription-check"></i>
-                        <span>Add up to 5 skincare products</span>
-                      </div>
-                      <div className="subscription-feature">
-                        <i className="fas fa-check subscription-check"></i>
-                        <span>Accept up to 5 patient bookings</span>
-                      </div>
-                    </div>
+              <div className="subscription-features">
+                <div className="subscription-feature">
+                  <i className="fas fa-check subscription-check"></i>
+                  <span>Add up to 5 skincare products</span>
+                </div>
+                <div className="subscription-feature">
+                  <i className="fas fa-check subscription-check"></i>
+                  <span>Accept up to 5 patient bookings</span>
+                </div>
+              </div>
 
-                    <button className="subscription-btn subscription-btn-free">
-                      SUBSCRIBE
-                    </button>
-                  </div>
-                </Col>
+              <button className="subscription-btn subscription-btn-free">
+                SUBSCRIBE
+              </button>
+            </div>
+          </Col>
 
-                {/* Monthly Plan */}
-                <Col lg={4} md={6} sm={12} className="mb-4">
-                  <div className="subscription-card subscription-card-featured">
-                    <div className="subscription-icon subscription-icon-featured">
-                      <span>$</span>
-                    </div>
-                    <div className="subscription-price subscription-price-featured">
-                      ₱ 120.00
-                    </div>
-                    <div className="subscription-plan-name subscription-plan-featured">
-                      MONTHLY PLAN
-                    </div>
+          {/* Monthly Plan */}
+          <Col lg={4} md={6} sm={12} className="mb-4">
+            <div className="subscription-card subscription-card-featured">
+              <div className="subscription-icon subscription-icon-featured">
+                <span>$</span>
+              </div>
+              <div className="subscription-price subscription-price-featured">
+                ₱ 120.00
+              </div>
+              <div className="subscription-plan-name subscription-plan-featured">
+                MONTHLY PLAN
+              </div>
 
-                    <div className="subscription-features">
-                      <div className="subscription-feature subscription-feature-featured">
-                        <i className="fas fa-check subscription-check subscription-check-featured"></i>
-                        <span>Unlimited upload for skincare products</span>
-                      </div>
-                      <div className="subscription-feature subscription-feature-featured">
-                        <i className="fas fa-check subscription-check subscription-check-featured"></i>
-                        <span>Unlimited in accepting patient bookings</span>
-                      </div>
-                    </div>
+              <div className="subscription-features">
+                <div className="subscription-feature subscription-feature-featured">
+                  <i className="fas fa-check subscription-check subscription-check-featured"></i>
+                  <span>Unlimited upload for skincare products</span>
+                </div>
+                <div className="subscription-feature subscription-feature-featured">
+                  <i className="fas fa-check subscription-check subscription-check-featured"></i>
+                  <span>Unlimited in accepting patient bookings</span>
+                </div>
+              </div>
 
-                    <button className="subscription-btn subscription-btn-featured">
-                      SUBSCRIBE
-                    </button>
-                  </div>
-                </Col>
+              <button className="subscription-btn subscription-btn-featured">
+                SUBSCRIBE
+              </button>
+            </div>
+          </Col>
 
-                {/* Yearly Plan */}
-                <Col lg={4} md={6} sm={12} className="mb-4">
-                  <div className="subscription-card">
-                    <div className="subscription-icon">
-                      <span>$</span>
-                    </div>
-                    <div className="subscription-price">₱ 1,400.00</div>
-                    <div className="subscription-plan-name">YEARLY PLAN</div>
+          {/* Yearly Plan */}
+          <Col lg={4} md={6} sm={12} className="mb-4">
+            <div className="subscription-card">
+              <div className="subscription-icon">
+                <span>$</span>
+              </div>
+              <div className="subscription-price">₱ 1,400.00</div>
+              <div className="subscription-plan-name">YEARLY PLAN</div>
 
-                    <div className="subscription-features">
-                      <div className="subscription-feature">
-                        <i className="fas fa-check subscription-check"></i>
-                        <span>Unlimited upload for skincare products</span>
-                      </div>
-                      <div className="subscription-feature">
-                        <i className="fas fa-check subscription-check"></i>
-                        <span>Unlimited in accepting patient bookings</span>
-                      </div>
-                    </div>
+              <div className="subscription-features">
+                <div className="subscription-feature">
+                  <i className="fas fa-check subscription-check"></i>
+                  <span>Unlimited upload for skincare products</span>
+                </div>
+                <div className="subscription-feature">
+                  <i className="fas fa-check subscription-check"></i>
+                  <span>Unlimited in accepting patient bookings</span>
+                </div>
+              </div>
 
-                    <button className="subscription-btn subscription-btn-free">
-                      SUBSCRIBE
-                    </button>
-                  </div>
-                </Col>
-              </Row>
-            </Container>
+              <button className="subscription-btn subscription-btn-free">
+                SUBSCRIBE
+              </button>
+            </div>
+          </Col>
+        </Row>
+      </Container>
     </Layout>
   );
 };

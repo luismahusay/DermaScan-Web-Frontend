@@ -1,9 +1,11 @@
 // Header.js
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Navbar, Container, InputGroup, Form } from "react-bootstrap";
 
 const Header = ({ showSidebar, setShowSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const notificationRef = useRef(null);
 
   const notifications = [
     {
@@ -28,19 +30,61 @@ const Header = ({ showSidebar, setShowSidebar }) => {
     },
   ];
 
+  // Check if mobile screen
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 320);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Close notifications when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside);
+      // Prevent body scroll on mobile when notifications are open
+      if (isMobile) {
+        document.body.style.overflow = "hidden";
+      }
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "";
+    };
+  }, [showNotifications, isMobile]);
+
+  const handleNotificationClose = () => {
+    setShowNotifications(false);
+  };
+  const handleNotificationToggle = (e) => {
+    setShowNotifications(!showNotifications);
+    // Remove focus from the button to clear the gray background
+    const button = e.currentTarget; // Gets the button element regardless of what was clicked inside
+    button.blur();
+  };
+
   return (
     <Navbar bg="white" className="border-bottom px-4 py-3">
       <Container fluid>
         <div className="brand-section">
           <button
             className="mobile-menu-btn me-2"
-            onClick={() => setShowSidebar(!showSidebar)} // You'll need to add this state
+            onClick={() => setShowSidebar(!showSidebar)}
           >
-            {/* <img
-              src="/icons/hamburgericon.png"
-              alt="Menu"
-              style={{ width: "20px", height: "20px" }}
-            /> */}
             <i className="fas fa-bars"></i>
           </button>
           <img
@@ -83,11 +127,8 @@ const Header = ({ showSidebar, setShowSidebar }) => {
             />
           </button>
 
-          <div style={{ position: "relative" }}>
-            <button
-              className="header-icon"
-              onClick={() => setShowNotifications(!showNotifications)}
-            >
+          <div style={{ position: "relative" }} ref={notificationRef}>
+            <button className="header-icon" onClick={handleNotificationToggle}>
               <img
                 src="/icons/notificationicon.png"
                 alt="Notification"
@@ -97,38 +138,79 @@ const Header = ({ showSidebar, setShowSidebar }) => {
             </button>
 
             {showNotifications && (
-              <div className="notification-dropdown">
-                <div className="notification-header">
-                  <h5 className="notification-title">New Appointments</h5>
-                  <a href="#" className="mark-read-link">
-                    Mark all as read
-                  </a>
-                </div>
+              <>
+                {/* Backdrop for very small screens */}
+                {isMobile && (
+                  <div
+                    className="notification-backdrop"
+                    onClick={handleNotificationClose}
+                  />
+                )}
 
-                {notifications.map((appt, index) => (
-                  <div key={index} className="notification-item">
-                    <div className="notification-icon">
-                      <img
-                        src="/icons/notificationcalendar.png"
-                        alt="Calendar"
-                        style={{ width: "20px", height: "20px" }}
-                      />
-                    </div>
-                    <div className="notification-content">
-                      <p className="notification-text">
-                        New appointment from {appt.name}
-                      </p>
-                      <p className="notification-time">
-                        Appointment scheduled for {appt.time}
-                      </p>
-                      <div className="notification-meta">
-                        <span className="notification-ago">{appt.ago}</span>
-                        <span className="notification-tag">APPOINTMENT</span>
-                      </div>
-                    </div>
+                <div className="notification-dropdown">
+                  <div className="notification-header">
+                    <h5 className="notification-title">New Appointments</h5>
+                    <a
+                      href="#"
+                      className="mark-read-link"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        // Handle mark all as read logic here
+                      }}
+                    >
+                      Mark all as read
+                    </a>
+
+                    {/* Close button for mobile modal */}
+                    {isMobile && (
+                      <button
+                        className="mobile-close-btn"
+                        onClick={handleNotificationClose}
+                        style={{
+                          position: "absolute",
+                          top: "16px",
+                          right: "16px",
+                          background: "none",
+                          border: "none",
+                          fontSize: "24px",
+                          cursor: "pointer",
+                          color: "#666",
+                        }}
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
-                ))}
-              </div>
+
+                  <div className="notifications-list">
+                    {notifications.map((appt, index) => (
+                      <div key={index} className="notification-item">
+                        <div className="notification-icon">
+                          <img
+                            src="/icons/notificationcalendar.png"
+                            alt="Calendar"
+                            style={{ width: "20px", height: "20px" }}
+                          />
+                        </div>
+                        <div className="notification-content">
+                          <p className="notification-text">
+                            New appointment from {appt.name}
+                          </p>
+                          <p className="notification-time">
+                            Appointment scheduled for {appt.time}
+                          </p>
+                          <div className="notification-meta">
+                            <span className="notification-ago">{appt.ago}</span>
+                            <span className="notification-tag">
+                              APPOINTMENT
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
           </div>
 
@@ -144,4 +226,5 @@ const Header = ({ showSidebar, setShowSidebar }) => {
     </Navbar>
   );
 };
+
 export default Header;

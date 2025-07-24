@@ -151,8 +151,30 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
           width: 450px;
           z-index: 1000;
           font-family: "Segoe UI", sans-serif;
+          max-height: 400px; /* Add max-height */
+          overflow-y: auto; /* Add scrolling */
+        }
+        .notification-dropdown {
+          scrollbar-width: thin;
+          scrollbar-color: #cbd5e0 #f7fafc;
+        }
+        .notification-dropdown::-webkit-scrollbar {
+          width: 6px;
         }
 
+        .notification-dropdown::-webkit-scrollbar-track {
+          background: #f7fafc;
+          border-radius: 3px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-thumb {
+          background: #cbd5e0;
+          border-radius: 3px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-thumb:hover {
+          background: #a0aec0;
+        }
         .notification-header {
           display: flex;
           justify-content: space-between;
@@ -199,24 +221,28 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
 
         .notification-content {
           flex: 1;
+          min-width: 0;
         }
 
         .notification-text {
           font-weight: bold;
           margin: 0 0 4px 0;
           font-size: 14px;
+          line-height: 1.4;
         }
 
         .notification-time {
           font-size: 14px;
           color: #6b7280;
           margin: 0 0 6px 0;
+          line-height: 1.3;
         }
 
         .notification-meta {
           display: flex;
           align-items: center;
           gap: 10px;
+          flex-wrap: wrap;
         }
 
         .notification-ago {
@@ -232,7 +258,185 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
           border-radius: 12px;
           font-weight: 500;
         }
+        @media (max-width: 768px) {
+          .notification-dropdown {
+            width: 380px;
+            right: -20px;
+            padding: 16px;
+            max-height: 300px; /* Reduce height for tablets */
+          }
 
+          .notification-header {
+            margin-bottom: 16px;
+          }
+
+          .notification-title {
+            font-size: 16px;
+          }
+
+          .notification-item {
+            padding: 10px;
+            margin-bottom: 12px;
+          }
+
+          .notification-icon {
+            width: 36px;
+            height: 36px;
+            margin-right: 10px;
+          }
+        }
+
+        /* Mobile phones */
+        @media (max-width: 480px) {
+          .notification-dropdown {
+            position: fixed;
+            top: 70px;
+            left: 12px;
+            right: 12px;
+            width: auto;
+            border-radius: 12px;
+            max-height: 250px; /* Limit height to show ~2 notifications */
+            padding: 16px;
+            overflow-y: auto; /* Ensure scrolling */
+          }
+
+          .notification-header {
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+
+          .notification-title {
+            font-size: 16px;
+          }
+
+          .mark-read-link {
+            font-size: 13px;
+          }
+
+          .notification-item {
+            padding: 12px;
+            margin-bottom: 12px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+          }
+
+          .notification-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 0;
+            align-self: flex-start;
+          }
+
+          .notification-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+          }
+
+          .notification-tag {
+            align-self: flex-start;
+          }
+        }
+
+        /* Very small screens */
+        @media (max-width: 360px) {
+          .notification-dropdown {
+            left: 8px;
+            right: 8px;
+            padding: 12px;
+            max-height: 220px; /* Even smaller for very small screens */
+          }
+
+          .notification-text,
+          .notification-time {
+            font-size: 13px;
+          }
+
+          .notification-header {
+            margin-bottom: 12px;
+          }
+
+          .notification-item {
+            padding: 10px;
+            margin-bottom: 10px;
+          }
+
+          .notification-icon {
+            width: 28px;
+            height: 28px;
+          }
+        }
+
+        /* Alternative: Modal-style for very small screens */
+        @media (max-width: 320px) {
+          .notification-dropdown {
+            position: fixed;
+            top: 70px;
+            left: 4px;
+            right: 4px;
+            width: auto;
+            border-radius: 12px;
+            max-height: 200px; /* Limit to show ~2 notifications */
+            padding: 12px;
+            overflow-y: auto;
+          }
+
+          .notification-header {
+            position: relative;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 16px;
+          }
+
+          .mobile-close-btn {
+            position: absolute !important;
+            top: 0 !important;
+            right: 0 !important;
+            background: none !important;
+            border: none !important;
+            font-size: 24px !important;
+            cursor: pointer !important;
+            color: #6b7280 !important;
+            padding: 0 !important;
+            width: auto !important;
+            height: auto !important;
+          }
+
+          .notifications-list {
+            flex: 1;
+            overflow-y: auto;
+          }
+
+          .notification-item {
+            border-bottom: 1px solid #f3f4f6;
+            margin-bottom: 0;
+            padding: 16px 0;
+          }
+
+          .notification-item:last-child {
+            border-bottom: none;
+          }
+        }
+
+        /* Backdrop for mobile modal */
+        .notification-backdrop {
+          display: none;
+        }
+
+        @media (max-width: 320px) {
+          .notification-backdrop {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+          }
+        }
         /* Add all your other CSS styles here... */
         .main-content {
           background-color: #f8f9fa;

@@ -4,6 +4,7 @@ import { ResponsiveContainer, Area, AreaChart, XAxis, YAxis } from "recharts";
 import { Layout } from "./Layout";
 
 const DermaDashboard = () => {
+  const [timeFilter, setTimeFilter] = useState("6months");
   // Sample data for the chart
   const chartData = [
     { month: "Jan", value: 4 },
@@ -59,8 +60,9 @@ const DermaDashboard = () => {
           font-size: 0.85rem;
           font-weight: 600;
           color: #28a745;
+          margin-top: -8px; /* Negative margin to move it up closer */
+          line-height: 1.2; /* Add line-height for better spacing */
         }
-
         .stat-icon {
           width: 48px;
           height: 48px;
@@ -78,6 +80,7 @@ const DermaDashboard = () => {
           padding: 24px;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           border: 1px solid #205efa;
+          height: 400px; /* Set fixed height */
         }
         .table-card {
           background: white;
@@ -180,13 +183,51 @@ const DermaDashboard = () => {
           .table-card {
             padding: 16px;
           }
-        }
+          .tables-column {
+            margin-top: 0 !important;
+          }
 
+          .chart-container {
+            height: 400px; /* Smaller height on mobile */
+            margin-bottom: 20px;
+            padding: 16px; /* Smaller padding on mobile */
+          }
+          .filter-dropdown {
+            font-size: 0.75rem;
+            padding: 3px 6px;
+          }
+        }
+        @media (min-width: 769px) {
+          .tables-column {
+            margin-top: -210px;
+          }
+        }
         @media (max-width: 992px) {
           /* Adjust layout for medium screens */
           .main-content {
             padding: 15px;
           }
+        }
+        .filter-dropdown {
+          background: #f8f9fa;
+          border: 1px solid #dee2e6;
+          border-radius: 6px;
+          padding: 4px 8px;
+          font-size: 0.8rem;
+          color: #6c757d;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .filter-dropdown:hover {
+          background: #e9ecef;
+          border-color: #adb5bd;
+        }
+
+        .filter-dropdown:focus {
+          outline: none;
+          border-color: #007bff;
+          box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
         }
       `}</style>
       <Container fluid>
@@ -259,14 +300,21 @@ const DermaDashboard = () => {
             <div className="chart-container">
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h5 className="mb-0">Cancelled Bookings</h5>
-                <small className="text-muted">Last 6 months</small>
+                <select
+                  className="filter-dropdown"
+                  value={timeFilter}
+                  onChange={(e) => setTimeFilter(e.target.value)}
+                >
+                  <option value="6months">Last 6 months</option>
+                  <option value="3months">Last 3 months</option>
+                  <option value="1month">Last month</option>
+                  <option value="1year">Last year</option>
+                </select>
               </div>
               <div className="mb-2">
                 <small className="text-muted">Monthly overview</small>
               </div>
-              <div
-                style={{ height: window.innerWidth < 768 ? "250px" : "300px" }}
-              >
+              <div style={{ height: "calc(100% - 80px)", minHeight: "200px" }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData}>
                     <XAxis

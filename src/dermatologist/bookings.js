@@ -285,6 +285,203 @@ const DermaBookings = () => {
           cursor: not-allowed;
           opacity: 0.5;
         }
+        .product-grid {
+          display: flex;
+          overflow-x: auto;
+          gap: 12px;
+          padding-bottom: 10px;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: thin;
+          scrollbar-color: #888 #f1f1f1;
+        }
+
+        .product-grid::-webkit-scrollbar {
+          height: 8px;
+        }
+
+        .product-grid::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 4px;
+        }
+
+        .product-grid::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 4px;
+        }
+
+        .product-grid::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+
+        .product-card {
+          flex: 0 0 280px;
+          min-height: 180px;
+        }
+        @media (max-width: 768px) {
+          .bookings-container {
+            padding: 16px;
+            margin-top: 10px;
+          }
+
+          .bookings-title {
+            font-size: 1.5rem;
+          }
+
+          .tab-button {
+            padding: 10px 16px;
+            font-size: 14px;
+          }
+
+          .table-controls {
+            flex-direction: column;
+            gap: 16px;
+            align-items: stretch;
+          }
+
+          .search-control {
+            justify-content: space-between;
+          }
+
+          .search-input {
+            width: 150px;
+          }
+
+          /* Make table horizontally scrollable */
+          .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .bookings-table {
+            min-width: 800px;
+          }
+
+          .bookings-table th,
+          .bookings-table td {
+            padding: 8px;
+            font-size: 13px;
+          }
+
+          .action-buttons {
+            flex-direction: column;
+            gap: 4px;
+          }
+
+          .action-btn {
+            padding: 4px 8px;
+            font-size: 11px;
+          }
+
+          /* Modal adjustments */
+          .modal-content {
+            width: 95vw !important;
+            height: 95vh !important;
+            margin: 2.5vh auto;
+          }
+
+          .modal-header .modal-title {
+            font-size: 24px !important;
+            padding: 30px 0 !important;
+          }
+
+          .modal-body {
+            padding: 20px !important;
+          }
+        }
+
+        /* Mobile styles (480px and below) */
+        @media (max-width: 480px) {
+          .bookings-container {
+            padding: 12px;
+          }
+
+          .bookings-title {
+            font-size: 1.25rem;
+          }
+
+          .tab-buttons {
+            flex-direction: column;
+          }
+
+          .tab-button {
+            border-radius: 8px !important;
+            margin-bottom: 8px;
+          }
+
+          .tab-button:last-child {
+            margin-bottom: 0;
+          }
+
+          .table-controls {
+            gap: 12px;
+          }
+
+          .entries-control {
+            font-size: 12px;
+          }
+
+          .search-input {
+            width: 120px;
+            font-size: 12px;
+          }
+
+          .bookings-table th,
+          .bookings-table td {
+            padding: 6px;
+            font-size: 12px;
+          }
+
+          .pagination {
+            flex-wrap: wrap;
+            gap: 4px;
+          }
+
+          .pagination button {
+            padding: 6px 8px;
+            font-size: 12px;
+          }
+
+          /* Modal full screen on mobile */
+          .modal-content {
+            width: 100vw !important;
+            height: 100vh !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+          }
+
+          .modal-header {
+            border-radius: 0 !important;
+          }
+
+          .modal-header .modal-title {
+            font-size: 20px !important;
+            padding: 20px 0 !important;
+          }
+
+          .modal-body {
+            padding: 15px !important;
+          }
+
+          .close-button {
+            top: 10px !important;
+            right: 20px !important;
+            font-size: 24px !important;
+          }
+
+          /* Product recommendations grid adjustment */
+          .product-grid {
+            display: flex !important;
+            overflow-x: auto !important;
+            gap: 12px !important;
+            padding-bottom: 10px !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+
+          .product-card {
+            flex: 0 0 280px !important;
+            padding: 12px !important;
+          }
+        }
       `}</style>
       {showPatientModal && (
         <>
@@ -316,6 +513,7 @@ const DermaBookings = () => {
                 position: "relative",
                 boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
               }}
+              className="modal-content" // Add this class
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
@@ -371,6 +569,7 @@ const DermaBookings = () => {
                     cursor: "pointer",
                     zIndex: 1000,
                   }}
+                  className="close-button"
                 >
                   ✕
                 </button>
@@ -717,6 +916,7 @@ const DermaBookings = () => {
                                 "repeat(auto-fit, minmax(140px, 1fr))",
                               gap: "12px",
                             }}
+                            className="product-grid"
                           >
                             {[
                               {
@@ -752,6 +952,7 @@ const DermaBookings = () => {
                                   padding: "15px",
                                   backgroundColor: "#fafafa",
                                 }}
+                                className="product-card"
                               >
                                 <div
                                   style={{
@@ -846,134 +1047,133 @@ const DermaBookings = () => {
           </div>
         </>
       )}
-            <Container fluid>
-              <div className="bookings-container">
-                <div className="bookings-header">
-                  <h1 className="bookings-title">Pending Patients</h1>
-                </div>
+      <Container fluid>
+        <div className="bookings-container">
+          <div className="bookings-header">
+            <h1 className="bookings-title">Pending Patients</h1>
+          </div>
 
-                {/* Tabs */}
-                <div className="tab-buttons">
-                  <button
-                    className={`tab-button ${
-                      activeTab === "Walk-In" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveTab("Walk-In")}
-                  >
-                    Walk-In
-                  </button>
-                  <button
-                    className={`tab-button ${
-                      activeTab === "Online" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveTab("Online")}
-                  >
-                    Online
-                  </button>
-                </div>
+          {/* Tabs */}
+          <div className="tab-buttons">
+            <button
+              className={`tab-button ${
+                activeTab === "Walk-In" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("Walk-In")}
+            >
+              Walk-In
+            </button>
+            <button
+              className={`tab-button ${activeTab === "Online" ? "active" : ""}`}
+              onClick={() => setActiveTab("Online")}
+            >
+              Online
+            </button>
+          </div>
 
-                {/* Table Controls */}
-                <div className="table-controls">
-                  <div className="entries-control">
-                    <span>Show</span>
-                    <select
-                      className="entries-select"
-                      value={entries}
-                      onChange={(e) => setEntries(Number(e.target.value))}
-                    >
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                    </select>
-                    <span>entries</span>
-                  </div>
+          {/* Table Controls */}
+          <div className="table-controls">
+            <div className="entries-control">
+              <span>Show</span>
+              <select
+                className="entries-select"
+                value={entries}
+                onChange={(e) => setEntries(Number(e.target.value))}
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+              <span>entries</span>
+            </div>
 
-                  <div className="search-control">
-                    <input
-                      type="text"
-                      className="search-input"
-                      placeholder="Search..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <div
-                      className="d-flex align-items-center"
-                      style={{ color: "#000000", cursor: "pointer" }}
-                    >
-                      <img
-                        src="/icons/filtericon.png"
-                        alt="Filter"
-                        style={{
-                          width: "15px",
-                          height: "11px",
-                          marginRight: "6px",
-                          filter: "brightness(0)",
-                        }}
-                      />
-                      <span style={{ fontSize: "16px", fontWeight: "bold" }}>
-                        Filter
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bookings Table */}
-                <table className="bookings-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>First Name ↓</th>
-                      <th>Last Name ↓</th>
-                      <th>Middle Name ↓</th>
-                      <th>Date Booked ↓</th>
-                      <th>Time</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {bookingData.map((booking, index) => (
-                      <tr key={index}>
-                        <td>{booking.id}</td>
-                        <td>{booking.firstName}</td>
-                        <td>{booking.lastName}</td>
-                        <td>{booking.middleName}</td>
-                        <td>{booking.dateBooked}</td>
-                        <td>{booking.time}</td>
-                        <td>
-                          <div className="action-buttons">
-                            <button className="action-btn accept-btn">
-                              <span>✓</span>
-                              ACCEPT
-                            </button>
-                            <button className="action-btn reject-btn">
-                              <span>✕</span>
-                              REJECT
-                            </button>
-                            <button
-                              className="action-btn details-btn"
-                              onClick={() => handleDetailsClick(booking)}
-                            >
-                              <span>👁</span>
-                              DETAILS
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {/* Pagination */}
-                <div className="pagination">
-                  <button disabled>Previous</button>
-                  <button className="active">1</button>
-                  <button>2</button>
-                  <button>3</button>
-                  <button>Next</button>
-                </div>
+            <div className="search-control">
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <div
+                className="d-flex align-items-center"
+                style={{ color: "#000000", cursor: "pointer" }}
+              >
+                <img
+                  src="/icons/filtericon.png"
+                  alt="Filter"
+                  style={{
+                    width: "15px",
+                    height: "11px",
+                    marginRight: "6px",
+                    filter: "brightness(0)",
+                  }}
+                />
+                <span style={{ fontSize: "16px", fontWeight: "bold" }}>
+                  Filter
+                </span>
               </div>
-            </Container>
+            </div>
+          </div>
+
+          {/* Bookings Table */}
+          <div className="table-wrapper">
+            <table className="bookings-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>First Name ↓</th>
+                  <th>Last Name ↓</th>
+                  <th>Middle Name ↓</th>
+                  <th>Date Booked ↓</th>
+                  <th>Time</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {bookingData.map((booking, index) => (
+                  <tr key={index}>
+                    <td>{booking.id}</td>
+                    <td>{booking.firstName}</td>
+                    <td>{booking.lastName}</td>
+                    <td>{booking.middleName}</td>
+                    <td>{booking.dateBooked}</td>
+                    <td>{booking.time}</td>
+                    <td>
+                      <div className="action-buttons">
+                        <button className="action-btn accept-btn">
+                          <span>✓</span>
+                          ACCEPT
+                        </button>
+                        <button className="action-btn reject-btn">
+                          <span>✕</span>
+                          REJECT
+                        </button>
+                        <button
+                          className="action-btn details-btn"
+                          onClick={() => handleDetailsClick(booking)}
+                        >
+                          <span>👁</span>
+                          DETAILS
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* Pagination */}
+          <div className="pagination">
+            <button disabled>Previous</button>
+            <button className="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>Next</button>
+          </div>
+        </div>
+      </Container>
     </Layout>
   );
 };

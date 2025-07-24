@@ -501,7 +501,7 @@ const DermaProductManagement = () => {
         </Modal.Header>
         <Modal.Body style={{ backgroundColor: "#EDF8F6", padding: "30px" }}>
           <Form>
-            <Row className="mb-3">
+            <Row className="mb-2" style={{ marginBottom: "0.75rem" }}>
               <Col lg={6} md={6} sm={12}>
                 <Form.Group controlId="productName">
                   <Form.Label
@@ -540,7 +540,7 @@ const DermaProductManagement = () => {
               </Col>
             </Row>
 
-            <Row className="mb-3">
+            <Row className="mb-1" style={{ marginBottom: "5rem" }}>
               <Col lg={6} md={6} sm={12}>
                 <Form.Group controlId="skinCondition">
                   <Form.Label
@@ -580,7 +580,8 @@ const DermaProductManagement = () => {
                 </Form.Group>
               </Col>
             </Row>
-            <Row className="mb-4">
+
+            <Row className="mb-1">
               <Col lg={6} md={6} sm={12}>
                 <Form.Group className="mb-3" controlId="ingredients">
                   <Form.Label
@@ -590,7 +591,7 @@ const DermaProductManagement = () => {
                   </Form.Label>
                   <Form.Control
                     as="textarea"
-                    rows={4}
+                    rows={6}
                     placeholder="Type here"
                     style={{
                       padding: "15px",
@@ -601,6 +602,9 @@ const DermaProductManagement = () => {
                   />
                 </Form.Group>
               </Col>
+            </Row>
+
+            <Row className="mb-4">
               <Col lg={6} md={6} sm={12}>
                 <Form.Group className="mb-3" controlId="imageUpload">
                   <Form.Label
@@ -708,6 +712,7 @@ const DermaProductManagement = () => {
                 </Form.Group>
               </Col>
             </Row>
+
             <div
               className="d-flex justify-content-end"
               style={{ marginTop: "40px" }}
@@ -810,7 +815,7 @@ const DermaProductManagement = () => {
               </Col>
             </Row>
 
-            <Row className="mb-3">
+            <Row className="mb-2" style={{ marginBottom: "0.25rem" }}>
               <Col md={6}>
                 <Form.Group controlId="editSkinCondition">
                   <Form.Label
@@ -852,119 +857,129 @@ const DermaProductManagement = () => {
                 </Form.Group>
               </Col>
             </Row>
-            <div
-              style={{ width: "49%", marginLeft: "0px", marginTop: "-120px" }}
-            >
-              <Form.Group className="mb-4" controlId="editIngredients">
-                <Form.Label style={{ fontWeight: "500", marginBottom: "8px" }}>
-                  Ingredients
-                </Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={6}
-                  placeholder="Type here"
-                  defaultValue={editingProduct?.ingredients || ""}
-                  style={{
-                    padding: "15px",
-                    borderRadius: "6px",
-                    border: "1px solid #ccc",
-                    resize: "none",
-                  }}
-                />
-              </Form.Group>
 
-              <Form.Group className="mb-4" controlId="editImageUpload">
-                <Form.Label style={{ fontWeight: "500", marginBottom: "8px" }}>
-                  Upload Image
-                </Form.Label>
-                <div
-                  style={{
-                    border: "2px dashed #ccc",
-                    padding: "20px",
-                    textAlign: "center",
-                    borderRadius: "6px",
-                    marginBottom: "12px",
-                    backgroundColor: "white",
-                    height: "80px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <div>
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group className="mb-3" controlId="editIngredients">
+                  <Form.Label
+                    style={{ fontWeight: "500", marginBottom: "8px" }}
+                  >
+                    Ingredients
+                  </Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={6}
+                    placeholder="Type here"
+                    defaultValue={editingProduct?.ingredients || ""}
+                    style={{
+                      padding: "15px",
+                      borderRadius: "6px",
+                      border: "1px solid #ccc",
+                      resize: "none",
+                    }}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row className="mb-4">
+              <Col md={6}>
+                <Form.Group className="mb-4" controlId="editImageUpload">
+                  <Form.Label
+                    style={{ fontWeight: "500", marginBottom: "8px" }}
+                  >
+                    Upload Image
+                  </Form.Label>
+                  <div
+                    style={{
+                      border: "2px dashed #ccc",
+                      padding: "20px",
+                      textAlign: "center",
+                      borderRadius: "6px",
+                      marginBottom: "12px",
+                      backgroundColor: "white",
+                      height: "80px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          marginBottom: "4px",
+                        }}
+                      >
+                        <img
+                          src="/icons/uploadicon.png"
+                          alt="Upload icon"
+                          style={{
+                            width: "29px",
+                            height: "24px",
+                            color: "#ddd",
+                            filter: "opacity(0.8)",
+                          }}
+                        />
+                      </div>
+                      <p style={{ marginBottom: "-8px", fontSize: "14px" }}>
+                        Drag & drop images or{" "}
+                        <span
+                          style={{
+                            color: "#4285F4",
+                            fontWeight: "500",
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          Browse
+                        </span>
+                      </p>
+                      <small style={{ color: "#666", fontSize: "10px" }}>
+                        Supported formats: JPG, PNG, PDF
+                      </small>
+                    </div>
+                  </div>
+
+                  {/* Uploaded files */}
+                  <div style={{ marginBottom: "8px" }}>
                     <div
                       style={{
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "8px 12px",
+                        backgroundColor: "#e8f5e8",
+                        border: "1px solid #4caf50",
+                        borderRadius: "4px",
+                        fontSize: "14px",
                         marginBottom: "4px",
                       }}
                     >
-                      <img
-                        src="/icons/uploadicon.png"
-                        alt="Upload icon"
-                        style={{
-                          width: "29px",
-                          height: "24px",
-                          color: "#ddd",
-                          filter: "opacity(0.8)",
-                        }}
-                      />
-                    </div>
-                    <p style={{ marginBottom: "-8px", fontSize: "14px" }}>
-                      Drag & drop images or{" "}
-                      <span
-                        style={{
-                          color: "#4285F4",
-                          fontWeight: "500",
-                          cursor: "pointer",
-                          textDecoration: "underline",
-                        }}
-                      >
-                        Browse
+                      <span style={{ flexGrow: 1 }}>sampleimage.jpg</span>
+                      <span style={{ color: "#4caf50", cursor: "pointer" }}>
+                        ✕
                       </span>
-                    </p>
-                    <small style={{ color: "#666", fontSize: "10px" }}>
-                      Supported formats: JPG, PNG, PDF
-                    </small>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "8px 12px",
+                        backgroundColor: "#e8f5e8",
+                        border: "1px solid #4caf50",
+                        borderRadius: "4px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      <span style={{ flexGrow: 1 }}>sampleimage.jpg</span>
+                      <span style={{ color: "#4caf50", cursor: "pointer" }}>
+                        ✕
+                      </span>
+                    </div>
                   </div>
-                </div>
+                </Form.Group>
+              </Col>
+            </Row>
 
-                {/* Uploaded files */}
-                <div style={{ marginBottom: "8px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "8px 12px",
-                      backgroundColor: "#e8f5e8",
-                      border: "1px solid #4caf50",
-                      borderRadius: "4px",
-                      fontSize: "14px",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    <span style={{ flexGrow: 1 }}>sampleimage.jpg</span>
-                    <span style={{ color: "#4caf50", cursor: "pointer" }}>
-                      ✕
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "8px 12px",
-                      backgroundColor: "#e8f5e8",
-                      border: "1px solid #4caf50",
-                      borderRadius: "4px",
-                      fontSize: "14px",
-                    }}
-                  >
-                    <span style={{ flexGrow: 1 }}>sampleimage.jpg</span>
-                    <span style={{ color: "#4caf50", cursor: "pointer" }}>
-                      ✕
-                    </span>
-                  </div>
-                </div>
-              </Form.Group>
-            </div>
             <div
               className="d-flex justify-content-end"
               style={{ marginTop: "40px" }}
@@ -1421,19 +1436,6 @@ const DermaProductManagement = () => {
                       entries
                     </div>
                     <div className="d-flex gap-2">
-                      <svg
-                        className="table-search-icon"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                      </svg>
                       <input
                         type="text"
                         placeholder="Search..."

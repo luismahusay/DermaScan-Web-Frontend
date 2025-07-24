@@ -296,6 +296,195 @@ const DermaPatients = () => {
           cursor: not-allowed;
           opacity: 0.5;
         }
+        /* Tablet styles (768px and below) */
+        @media (max-width: 768px) {
+          .bookings-container {
+            padding: 16px;
+            margin-top: 10px;
+          }
+
+          .bookings-title {
+            font-size: 1.5rem;
+          }
+
+          .bookings-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+          }
+
+          .filter-type-btn {
+            align-self: flex-end;
+          }
+
+          .table-controls {
+            flex-direction: column;
+            gap: 16px;
+            align-items: stretch;
+          }
+
+          .search-control {
+            justify-content: space-between;
+          }
+
+          .search-input {
+            width: 150px;
+          }
+
+          /* Make table horizontally scrollable */
+          .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .bookings-table {
+            min-width: 800px;
+          }
+
+          .bookings-table th,
+          .bookings-table td {
+            padding: 8px;
+            font-size: 13px;
+          }
+
+          .view-details-link {
+            font-size: 12px !important;
+          }
+
+          /* Modal adjustments */
+          .modal-content {
+            width: 95vw !important;
+            height: 95vh !important;
+            margin: 2.5vh auto;
+          }
+
+          .modal-header .modal-title {
+            font-size: 24px !important;
+            padding: 30px 0 !important;
+          }
+
+          .modal-body {
+            padding: 20px !important;
+          }
+        }
+
+        /* Mobile styles (480px and below) */
+        @media (max-width: 480px) {
+          .bookings-container {
+            padding: 12px;
+          }
+
+          .bookings-title {
+            font-size: 1.25rem;
+          }
+
+          .bookings-header {
+            gap: 12px;
+          }
+
+          .bookings-header p {
+            font-size: 12px !important;
+          }
+
+          .filter-type-btn {
+            padding: 6px 10px;
+            font-size: 12px;
+          }
+
+          .table-controls {
+            gap: 12px;
+          }
+
+          .entries-control {
+            font-size: 12px;
+          }
+
+          .search-input {
+            width: 120px;
+            font-size: 12px;
+          }
+
+          .bookings-table th,
+          .bookings-table td {
+            padding: 6px;
+            font-size: 12px;
+          }
+
+          .view-details-link {
+            font-size: 11px !important;
+          }
+
+          .pagination {
+            flex-wrap: wrap;
+            gap: 4px;
+          }
+
+          .pagination button {
+            padding: 6px 8px;
+            font-size: 12px;
+          }
+
+          /* Modal full screen on mobile */
+          .modal-content {
+            width: 100vw !important;
+            height: 100vh !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+          }
+
+          .modal-header {
+            border-radius: 0 !important;
+          }
+
+          .modal-header .modal-title {
+            font-size: 20px !important;
+            padding: 20px 0 !important;
+          }
+
+          .modal-body {
+            padding: 15px !important;
+          }
+
+          .close-button {
+            top: 10px !important;
+            right: 20px !important;
+            font-size: 24px !important;
+          }
+
+          /* Product recommendations grid adjustment */
+          .product-grid {
+            display: flex !important;
+            overflow-x: auto !important;
+            gap: 12px !important;
+            padding-bottom: 10px !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: thin;
+            scrollbar-color: #888 #f1f1f1;
+          }
+
+          .product-grid::-webkit-scrollbar {
+            height: 8px;
+          }
+
+          .product-grid::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+          }
+
+          .product-grid::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+          }
+
+          .product-grid::-webkit-scrollbar-thumb:hover {
+            background: #555;
+          }
+
+          .product-card {
+            flex: 0 0 280px !important;
+            padding: 12px !important;
+          }
+        }
       `}</style>
       {showPatientModal && (
         <>
@@ -328,6 +517,7 @@ const DermaPatients = () => {
                 boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
               }}
               onClick={(e) => e.stopPropagation()}
+              className="modal-content"
             >
               {/* Modal Header */}
               <div
@@ -382,6 +572,7 @@ const DermaPatients = () => {
                     cursor: "pointer",
                     zIndex: 1000,
                   }}
+                  className="close-button"
                 >
                   ✕
                 </button>
@@ -728,6 +919,7 @@ const DermaPatients = () => {
                                 "repeat(auto-fit, minmax(140px, 1fr))",
                               gap: "12px",
                             }}
+                            className="product-grid"
                           >
                             {[
                               {
@@ -763,6 +955,7 @@ const DermaPatients = () => {
                                   padding: "15px",
                                   backgroundColor: "#fafafa",
                                 }}
+                                className="product-card"
                               >
                                 <div
                                   style={{
@@ -857,105 +1050,107 @@ const DermaPatients = () => {
           </div>
         </>
       )}
-            <Container fluid>
-              <div className="bookings-container">
-                <div
-                  className="bookings-header"
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <div>
-                    <h1 className="bookings-title">Accepted Booked Patients</h1>
-                    <p
-                      style={{
-                        color: "#666",
-                        margin: "5px 0 0 0",
-                        fontSize: "14px",
-                      }}
-                    >
-                      List of On-Going Booking Patients
-                    </p>
-                  </div>
-                  {/* Filter Type button moved to right corner */}
-                  <button className="filter-type-btn">
-                    <img
-                      src="/icons/filtericon.png"
-                      alt="Filter"
-                      style={{
-                        width: "15px",
-                        height: "11px",
-                        marginRight: "6px",
-                      }}
-                    />
-                    Filter Type
-                  </button>
-                </div>
+      <Container fluid>
+        <div className="bookings-container">
+          <div
+            className="bookings-header"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
+          >
+            <div>
+              <h1 className="bookings-title">Accepted Booked Patients</h1>
+              <p
+                style={{
+                  color: "#666",
+                  margin: "5px 0 0 0",
+                  fontSize: "14px",
+                }}
+              >
+                List of On-Going Booking Patients
+              </p>
+            </div>
+            {/* Filter Type button moved to right corner */}
+            <button className="filter-type-btn">
+              <img
+                src="/icons/filtericon.png"
+                alt="Filter"
+                style={{
+                  width: "15px",
+                  height: "11px",
+                  marginRight: "6px",
+                }}
+              />
+              Filter Type
+            </button>
+          </div>
 
-                {/* Table Controls */}
-                <div className="table-controls">
-                  <div className="search-control">
-                    {/* Filter button was moved from here */}
-                  </div>
-                </div>
-                {/* Bookings Table */}
-                <table className="bookings-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>First Name</th>
-                      <th>Last Name</th>
-                      <th>Middle Name</th>
-                      <th>Date Booked</th>
-                      <th>Booking Type</th>
-                      <th>Time</th>
-                      <th>View</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {patientData.map((patient, index) => (
-                      <tr key={index}>
-                        <td>{patient.id}</td>
-                        <td>{patient.firstName}</td>
-                        <td>{patient.lastName}</td>
-                        <td>{patient.middleName}</td>
-                        <td>{patient.dateBooked}</td>
-                        <td>{patient.bookingType}</td>
-                        <td>{patient.time}</td>
-                        <td>
-                          {/* Replace action buttons with View Details link */}
-                          <button
-                            className="view-details-link"
-                            onClick={() => handleDetailsClick(patient)}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              color: "#4285f4",
-                              textDecoration: "underline",
-                              cursor: "pointer",
-                              fontSize: "14px",
-                            }}
-                          >
-                            🔍 View Details..
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          {/* Table Controls */}
+          <div className="table-controls">
+            <div className="search-control">
+              {/* Filter button was moved from here */}
+            </div>
+          </div>
+          {/* Bookings Table */}
+          <div className="table-wrapper">
+            <table className="bookings-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Middle Name</th>
+                  <th>Date Booked</th>
+                  <th>Booking Type</th>
+                  <th>Time</th>
+                  <th>View</th>
+                </tr>
+              </thead>
+              <tbody>
+                {patientData.map((patient, index) => (
+                  <tr key={index}>
+                    <td>{patient.id}</td>
+                    <td>{patient.firstName}</td>
+                    <td>{patient.lastName}</td>
+                    <td>{patient.middleName}</td>
+                    <td>{patient.dateBooked}</td>
+                    <td>{patient.bookingType}</td>
+                    <td>{patient.time}</td>
+                    <td>
+                      {/* Replace action buttons with View Details link */}
+                      <button
+                        className="view-details-link"
+                        onClick={() => handleDetailsClick(patient)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#4285f4",
+                          textDecoration: "underline",
+                          cursor: "pointer",
+                          fontSize: "14px",
+                        }}
+                      >
+                        🔍 View Details..
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-                {/* Pagination */}
-                <div className="pagination">
-                  <button disabled>Previous</button>
-                  <button className="active">1</button>
-                  <button>2</button>
-                  <button>3</button>
-                  <button>Next</button>
-                </div>
-              </div>
-            </Container>
+          {/* Pagination */}
+          <div className="pagination">
+            <button disabled>Previous</button>
+            <button className="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>Next</button>
+          </div>
+        </div>
+      </Container>
     </Layout>
   );
 };
