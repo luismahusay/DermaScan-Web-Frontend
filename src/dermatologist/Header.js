@@ -1,11 +1,14 @@
 // Header.js
 import React, { useState, useEffect, useRef } from "react";
 import { Navbar, Container, InputGroup, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const Header = ({ showSidebar, setShowSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const notificationRef = useRef(null);
+  const profileRef = useRef(null);
 
   const notifications = [
     {
@@ -67,14 +70,54 @@ const Header = ({ showSidebar, setShowSidebar }) => {
     };
   }, [showNotifications, isMobile]);
 
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    if (showProfileDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showProfileDropdown]);
+
   const handleNotificationClose = () => {
     setShowNotifications(false);
   };
+
   const handleNotificationToggle = (e) => {
     setShowNotifications(!showNotifications);
     // Remove focus from the button to clear the gray background
     const button = e.currentTarget; // Gets the button element regardless of what was clicked inside
     button.blur();
+  };
+
+  const handleProfileToggle = (e) => {
+    setShowProfileDropdown(!showProfileDropdown);
+    // Remove focus from the button to clear the gray background
+    const button = e.currentTarget;
+    button.blur();
+  };
+
+  const handleProfileClose = () => {
+    setShowProfileDropdown(false);
+  };
+
+  const handleMyProfile = (e) => {
+    e.preventDefault();
+    setShowProfileDropdown(false);
+    window.location.href = "profile"; // Navigate to profile page
+  };
+  const handleLogout = () => {
+    // Add your logout logic here
+    console.log("Logout user");
+    setShowProfileDropdown(false);
   };
 
   return (
@@ -214,13 +257,41 @@ const Header = ({ showSidebar, setShowSidebar }) => {
             )}
           </div>
 
-          <button className="header-icon">
-            <img
-              src="/icons/profileicon.png"
-              alt="User"
-              style={{ width: "30px", height: "30px" }}
-            />
-          </button>
+          <div style={{ position: "relative" }} ref={profileRef}>
+            <button className="header-icon" onClick={handleProfileToggle}>
+              <img
+                src="/icons/profileicon.png"
+                alt="User"
+                style={{ width: "30px", height: "30px" }}
+              />
+            </button>
+
+            {showProfileDropdown && (
+              <div className="profile-dropdown">
+                <div
+                  className="profile-dropdown-item"
+                  onClick={handleMyProfile}
+                >
+                  <img
+                    src="/icons/avataricon.png"
+                    alt="Profile"
+                    className="profile-dropdown-icon"
+                    style={{ width: "16px", height: "16px" }}
+                  />
+                  <span>My Profile</span>
+                </div>
+                <div className="profile-dropdown-item" onClick={handleLogout}>
+                  <img
+                    src="/icons/logouticon.png"
+                    alt="Logout"
+                    className="profile-dropdown-icon"
+                    style={{ width: "16px", height: "16px" }}
+                  />
+                  <span>Logout</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </Container>
     </Navbar>

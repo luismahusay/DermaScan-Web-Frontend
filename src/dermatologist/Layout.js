@@ -2,17 +2,22 @@ import React, { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 
-const Layout = ({ children, currentPage = "dashboard" }) => {
+const Layout = ({
+  children,
+  currentPage = "dashboard",
+  hideSidebar = false,
+}) => {
   const [active, setActive] = useState(currentPage);
-  const [showSidebar, setShowSidebar] = useState(false); // Add this state
+  const [showSidebar, setShowSidebar] = useState(false);
+
   return (
     <>
       {/* Move all your CSS styles here */}
       <style jsx>{`
         @media (min-width: 768px) {
           .main-content {
-            margin-left: 50px !important;
-            width: calc(100vw - 250px) !important;
+            margin-left: ${hideSidebar ? "0" : "50px"} !important;
+            width: ${hideSidebar ? "100vw" : "calc(100vw - 250px)"} !important;
           }
         }
         .admin-sidebar {
@@ -20,9 +25,10 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
         }
         .sidebar {
           min-height: 100vh;
-          background-color: #f8f9fa;
+          background-color: #ffffff;
           border-right: 1px solid #2196f3;
           padding: 0;
+          ${hideSidebar ? "display: none !important;" : ""}
         }
         .sidebar-item {
           padding: 12px 20px;
@@ -30,7 +36,7 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
           text-decoration: none;
           display: flex;
           align-items: center;
-          border-radius: 8px;
+          border-radius: 1px;
           margin: 4px 12px;
           transition: all 0.3s ease;
           background-color: transparent;
@@ -439,7 +445,7 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
         }
         /* Add all your other CSS styles here... */
         .main-content {
-          background-color: #f8f9fa;
+          background-color: #ffffff;
           min-height: calc(100vh - 80px);
           padding: 20px;
         }
@@ -454,6 +460,7 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
             transition: left 0.3s ease;
             height: 100vh;
             overflow-y: auto;
+            ${hideSidebar ? "display: none !important;" : ""}
           }
 
           .sidebar.show {
@@ -482,7 +489,7 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
 
           /* Add hamburger menu button styles */
           .mobile-menu-btn {
-            display: block !important;
+            display: ${hideSidebar ? "none" : "block"} !important;
             background: none;
             border: none;
             font-size: 1.5rem;
@@ -495,6 +502,7 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
         @media (min-width: 769px) and (max-width: 992px) {
           .sidebar {
             width: 80px !important;
+            ${hideSidebar ? "display: none !important;" : ""}
           }
 
           .sidebar-item span {
@@ -507,8 +515,8 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
           }
 
           .main-content {
-            margin-left: 80px !important;
-            width: calc(100vw - 80px) !important;
+            margin-left: ${hideSidebar ? "0" : "80px"} !important;
+            width: ${hideSidebar ? "100vw" : "calc(100vw - 80px)"} !important;
           }
         }
 
@@ -516,12 +524,13 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
         @media (min-width: 992px) {
           .sidebar {
             position: relative;
+            ${hideSidebar ? "display: none !important;" : ""}
           }
         }
 
         /* Hide mobile menu button on desktop */
         .mobile-menu-btn {
-          display: none;
+          display: ${hideSidebar ? "none" : "none"};
         }
         @media (max-width: 768px) {
           .search-container {
@@ -552,7 +561,7 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
         }
         @media (min-width: 769px) {
           .mobile-menu-btn {
-            display: none !important;
+            display: ${hideSidebar ? "none" : "none"} !important;
           }
 
           .mobile-search-icon {
@@ -568,6 +577,7 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
           }
           .sidebar {
             position: relative;
+            ${hideSidebar ? "display: none !important;" : ""}
           }
         }
         .mobile-sidebar-logo {
@@ -583,24 +593,85 @@ const Layout = ({ children, currentPage = "dashboard" }) => {
             display: none;
           }
         }
+        .profile-dropdown {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          background: white;
+          border: 1px solid #205efa;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          min-width: 150px;
+          z-index: 1000;
+          margin-top: 8px;
+        }
+
+        .profile-dropdown-item {
+          display: flex;
+          align-items: center;
+          padding: 12px 16px;
+          cursor: pointer;
+          transition: background-color 0.2s;
+          gap: 8px;
+        }
+
+        .profile-dropdown-item:hover {
+          background-color: #f5f5f5;
+        }
+
+        .profile-dropdown-item:first-child {
+          border-top-left-radius: 8px;
+          border-top-right-radius: 8px;
+        }
+
+        .profile-dropdown-item:last-child {
+          border-bottom-left-radius: 8px;
+          border-bottom-right-radius: 8px;
+        }
+
+        .profile-dropdown-item span {
+          font-size: 14px;
+          color: #205efa;
+        }
+
+        .profile-dropdown-icon {
+          opacity: 0.7;
+        }
+
+        .profile-dropdown-divider {
+          height: 1px;
+          background-color: #205efa;
+          margin: 0 16px;
+        }
       `}</style>
 
       <div className="d-flex flex-column vh-100">
-        <Header showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+        <Header
+          showSidebar={showSidebar}
+          setShowSidebar={setShowSidebar}
+          hideSidebar={hideSidebar}
+        />
         <div className="d-flex flex-grow-1">
-          <div
-            className={`sidebar-backdrop ${showSidebar ? "show" : ""}`}
-            onClick={() => setShowSidebar(false)}
-          ></div>
-          <Sidebar
-            active={active}
-            setActive={setActive}
-            showSidebar={showSidebar}
-            setShowSidebar={setShowSidebar}
-          />
+          {!hideSidebar && (
+            <>
+              <div
+                className={`sidebar-backdrop ${showSidebar ? "show" : ""}`}
+                onClick={() => setShowSidebar(false)}
+              ></div>
+              <Sidebar
+                active={active}
+                setActive={setActive}
+                showSidebar={showSidebar}
+                setShowSidebar={setShowSidebar}
+              />
+            </>
+          )}
           <div
             className="flex-grow-1 main-content"
-            style={{ marginTop: "-70px", marginLeft: "-50px" }}
+            style={{
+              marginTop: "-70px",
+              marginLeft: hideSidebar ? "0" : "-50px",
+            }}
           >
             {children}
           </div>

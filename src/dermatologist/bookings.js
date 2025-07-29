@@ -3,6 +3,7 @@ import {
   Container,
 } from "react-bootstrap";
 import {Layout} from "./Layout";
+import "../styles/derma_booking.css"; // Import your CSS styles
 
 const DermaBookings = () => {
   const [activeTab, setActiveTab] = useState("Walk-In"); // Track active tab
@@ -11,6 +12,7 @@ const DermaBookings = () => {
   const [showPatientModal, setShowPatientModal] = useState(false);
   const [currentPatient, setCurrentPatient] = useState(null);
   const [modalPage, setModalPage] = useState(1);
+  const [showFilterModal, setShowFilterModal] = useState(false);
   // Sample booking data
   const bookingData = [
     {
@@ -99,390 +101,98 @@ const DermaBookings = () => {
     setShowPatientModal(true);
     setModalPage(1);
   };
+  const [filters, setFilters] = useState({
+    bookingType: "",
+    dateRange: "",
+    timeSlot: "",
+    status: "",
+  });
+  const filteredBookings = bookingData.filter((booking) => {
+    const matchesSearch =
+      booking.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.middleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.id.toLowerCase().includes(searchTerm.toLowerCase());
 
+    const matchesBookingType =
+      !filters.bookingType || activeTab === filters.bookingType;
+    const matchesDateRange =
+      !filters.dateRange ||
+      filterByDateRange(booking.dateBooked, filters.dateRange);
+    const matchesTimeSlot =
+      !filters.timeSlot || filterByTimeSlot(booking.time, filters.timeSlot);
+
+    return (
+      matchesSearch && matchesBookingType && matchesDateRange && matchesTimeSlot
+    );
+  });
+  const filterByDateRange = (bookingDate, range) => {
+    const today = new Date();
+    const bookingDateObj = new Date(bookingDate);
+
+    switch (range) {
+      case "today":
+        return bookingDateObj.toDateString() === today.toDateString();
+      case "week":
+        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return bookingDateObj >= weekAgo && bookingDateObj <= today;
+      case "month":
+        return (
+          bookingDateObj.getMonth() === today.getMonth() &&
+          bookingDateObj.getFullYear() === today.getFullYear()
+        );
+      case "year":
+        return bookingDateObj.getFullYear() === today.getFullYear();
+      default:
+        return true;
+    }
+  };
+
+  const filterByTimeSlot = (bookingTime, slot) => {
+    if (bookingTime === "--") return slot === "unscheduled";
+
+    // This is a simple example - you can enhance based on your time format
+    switch (slot) {
+      case "morning":
+        return (
+          bookingTime.includes("AM") ||
+          (bookingTime.includes("PM") && parseInt(bookingTime) === 12)
+        );
+      case "afternoon":
+        return (
+          bookingTime.includes("PM") &&
+          parseInt(bookingTime) >= 1 &&
+          parseInt(bookingTime) <= 5
+        );
+      case "evening":
+        return bookingTime.includes("PM") && parseInt(bookingTime) >= 6;
+      case "unscheduled":
+        return bookingTime === "--";
+      default:
+        return true;
+    }
+  };
+  const handleFilterChange = (filterType, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterType]: value,
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      bookingType: "",
+      dateRange: "",
+      timeSlot: "",
+      status: "",
+    });
+  };
+
+  const applyFilters = () => {
+    setShowFilterModal(false);
+  };
   return (
     <Layout currentPage="bookings">
-      <style jsx>{`
-        /* Bookings specific styles */
-        .bookings-container {
-          background: white;
-          border-radius: 12px;
-          padding: 24px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-          margin-top: 20px;
-        }
-        .bookings-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 24px;
-        }
-        .bookings-title {
-          font-size: 2rem;
-          font-weight: bold;
-          color: #000;
-          margin: 0;
-        }
-        .tab-buttons {
-          display: flex;
-          gap: 0;
-          margin-bottom: 24px;
-        }
-        .tab-button {
-          padding: 12px 24px;
-          border: 2px solid #205efa;
-          background: white;
-          color: #205efa;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .tab-button:first-child {
-          border-radius: 8px 0 0 8px;
-        }
-        .tab-button:last-child {
-          border-radius: 0 8px 8px 0;
-        }
-        .tab-button.active {
-          background: #205efa;
-          color: white;
-          border: 2px solid #205efa;
-        }
-        .table-controls {
-          display: flex;
-          justify-content: flex-start;
-          align-items: center;
-          margin-bottom: 20px;
-          gap: 24px;
-        }
-        .entries-control {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 14px;
-        }
-        .entries-select {
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          padding: 4px 8px;
-          font-size: 14px;
-        }
-        .search-control {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-        .search-input {
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          padding: 8px 12px;
-          font-size: 14px;
-          width: 200px;
-        }
-        .filters-button {
-          background: #f8f9fa;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          padding: 8px 12px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-        .bookings-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 24px;
-        }
-        .bookings-table th {
-          background: #f8f9fa;
-          padding: 12px;
-          text-align: left;
-          font-weight: 600;
-          color: #495057;
-          border-bottom: 1px solid #dee2e6;
-          font-size: 14px;
-        }
-        .bookings-table td {
-          padding: 12px;
-          border-bottom: 1px solid #dee2e6;
-          color: #495057;
-          font-size: 14px;
-        }
-        .bookings-table tbody tr:hover {
-          background-color: #f8f9fa;
-        }
-        .action-buttons {
-          display: flex;
-          gap: 8px;
-          align-items: center;
-        }
-        .action-btn {
-          border: none;
-          border-radius: 4px;
-          padding: 6px 12px;
-          font-size: 12px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          text-transform: uppercase;
-        }
-        .accept-btn {
-          background: #d4edda;
-          color: #155724;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-        .reject-btn {
-          background: #f8d7da;
-          color: #721c24;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-        .details-btn {
-          background: #cce5ff;
-          color: #0056b3;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-        .accept-btn:hover {
-          background: #c3e6cb;
-        }
-        .reject-btn:hover {
-          background: #f1b0b7;
-        }
-        .details-btn:hover {
-          background: #b3d9ff;
-        }
-        .pagination {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 8px;
-          margin-top: 20px;
-        }
-        .pagination button {
-          border: 1px solid #ddd;
-          background: white;
-          padding: 8px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-        .pagination button.active {
-          background: #007bff;
-          color: white;
-          border-color: #007bff;
-        }
-        .pagination button:hover:not(.active) {
-          background: #f8f9fa;
-        }
-        .pagination button:disabled {
-          cursor: not-allowed;
-          opacity: 0.5;
-        }
-        .product-grid {
-          display: flex;
-          overflow-x: auto;
-          gap: 12px;
-          padding-bottom: 10px;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: thin;
-          scrollbar-color: #888 #f1f1f1;
-        }
-
-        .product-grid::-webkit-scrollbar {
-          height: 8px;
-        }
-
-        .product-grid::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 4px;
-        }
-
-        .product-grid::-webkit-scrollbar-thumb {
-          background: #888;
-          border-radius: 4px;
-        }
-
-        .product-grid::-webkit-scrollbar-thumb:hover {
-          background: #555;
-        }
-
-        .product-card {
-          flex: 0 0 280px;
-          min-height: 180px;
-        }
-        @media (max-width: 768px) {
-          .bookings-container {
-            padding: 16px;
-            margin-top: 10px;
-          }
-
-          .bookings-title {
-            font-size: 1.5rem;
-          }
-
-          .tab-button {
-            padding: 10px 16px;
-            font-size: 14px;
-          }
-
-          .table-controls {
-            flex-direction: column;
-            gap: 16px;
-            align-items: stretch;
-          }
-
-          .search-control {
-            justify-content: space-between;
-          }
-
-          .search-input {
-            width: 150px;
-          }
-
-          /* Make table horizontally scrollable */
-          .table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-          }
-
-          .bookings-table {
-            min-width: 800px;
-          }
-
-          .bookings-table th,
-          .bookings-table td {
-            padding: 8px;
-            font-size: 13px;
-          }
-
-          .action-buttons {
-            flex-direction: column;
-            gap: 4px;
-          }
-
-          .action-btn {
-            padding: 4px 8px;
-            font-size: 11px;
-          }
-
-          /* Modal adjustments */
-          .modal-content {
-            width: 95vw !important;
-            height: 95vh !important;
-            margin: 2.5vh auto;
-          }
-
-          .modal-header .modal-title {
-            font-size: 24px !important;
-            padding: 30px 0 !important;
-          }
-
-          .modal-body {
-            padding: 20px !important;
-          }
-        }
-
-        /* Mobile styles (480px and below) */
-        @media (max-width: 480px) {
-          .bookings-container {
-            padding: 12px;
-          }
-
-          .bookings-title {
-            font-size: 1.25rem;
-          }
-
-          .tab-buttons {
-            flex-direction: column;
-          }
-
-          .tab-button {
-            border-radius: 8px !important;
-            margin-bottom: 8px;
-          }
-
-          .tab-button:last-child {
-            margin-bottom: 0;
-          }
-
-          .table-controls {
-            gap: 12px;
-          }
-
-          .entries-control {
-            font-size: 12px;
-          }
-
-          .search-input {
-            width: 120px;
-            font-size: 12px;
-          }
-
-          .bookings-table th,
-          .bookings-table td {
-            padding: 6px;
-            font-size: 12px;
-          }
-
-          .pagination {
-            flex-wrap: wrap;
-            gap: 4px;
-          }
-
-          .pagination button {
-            padding: 6px 8px;
-            font-size: 12px;
-          }
-
-          /* Modal full screen on mobile */
-          .modal-content {
-            width: 100vw !important;
-            height: 100vh !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
-          }
-
-          .modal-header {
-            border-radius: 0 !important;
-          }
-
-          .modal-header .modal-title {
-            font-size: 20px !important;
-            padding: 20px 0 !important;
-          }
-
-          .modal-body {
-            padding: 15px !important;
-          }
-
-          .close-button {
-            top: 10px !important;
-            right: 20px !important;
-            font-size: 24px !important;
-          }
-
-          /* Product recommendations grid adjustment */
-          .product-grid {
-            display: flex !important;
-            overflow-x: auto !important;
-            gap: 12px !important;
-            padding-bottom: 10px !important;
-            -webkit-overflow-scrolling: touch !important;
-          }
-
-          .product-card {
-            flex: 0 0 280px !important;
-            padding: 12px !important;
-          }
-        }
-      `}</style>
       {showPatientModal && (
         <>
           {/* Modal Backdrop */}
@@ -1047,6 +757,347 @@ const DermaBookings = () => {
           </div>
         </>
       )}
+      {showFilterModal && (
+        <>
+          {/* Modal Backdrop */}
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              zIndex: 1060,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={() => setShowFilterModal(false)}
+          >
+            {/* Modal Content */}
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: "12px",
+                width: "600px",
+                maxHeight: "80vh",
+                overflow: "hidden",
+                position: "relative",
+                boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div
+                style={{
+                  backgroundColor: "#205EFA",
+                  margin: "-1rem 0rem 0 -.05rem",
+                  borderRadius: "12px 12px 12px 12px",
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "28px",
+                    padding: "20px 0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "10px",
+                    width: "100%",
+                    textAlign: "center",
+                    margin: 0,
+                    color: "white",
+                  }}
+                >
+                  🔍 Filter Bookings
+                </div>
+              </div>
+
+              {/* Modal Body */}
+              <div
+                style={{
+                  backgroundColor: "#EDF8F6",
+                  padding: "30px",
+                  position: "relative",
+                  maxHeight: "60vh",
+                  overflowY: "auto",
+                }}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowFilterModal(false)}
+                  style={{
+                    position: "absolute",
+                    top: "15px",
+                    right: "20px",
+                    background: "none",
+                    border: "none",
+                    fontSize: "24px",
+                    color: "#000000",
+                    cursor: "pointer",
+                    zIndex: 1000,
+                  }}
+                >
+                  ✕
+                </button>
+
+                {/* Booking Type Filter */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      fontWeight: "500",
+                      marginBottom: "8px",
+                      display: "block",
+                    }}
+                  >
+                    Booking Type
+                  </label>
+                  <select
+                    value={filters.bookingType}
+                    onChange={(e) =>
+                      handleFilterChange("bookingType", e.target.value)
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "6px",
+                      border: "1px solid #ccc",
+                      backgroundColor: "white",
+                    }}
+                  >
+                    <option value="">All Types</option>
+                    <option value="Walk-In">Walk-In</option>
+                    <option value="Online">Online</option>
+                  </select>
+                </div>
+
+                {/* Date Range Filter */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      fontWeight: "500",
+                      marginBottom: "8px",
+                      display: "block",
+                    }}
+                  >
+                    Date Range
+                  </label>
+                  <select
+                    value={filters.dateRange}
+                    onChange={(e) =>
+                      handleFilterChange("dateRange", e.target.value)
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "6px",
+                      border: "1px solid #ccc",
+                      backgroundColor: "white",
+                    }}
+                  >
+                    <option value="">All Dates</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                  </select>
+                </div>
+
+                {/* Time Slot Filter */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      fontWeight: "500",
+                      marginBottom: "8px",
+                      display: "block",
+                    }}
+                  >
+                    Time Slot
+                  </label>
+                  <select
+                    value={filters.timeSlot}
+                    onChange={(e) =>
+                      handleFilterChange("timeSlot", e.target.value)
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "6px",
+                      border: "1px solid #ccc",
+                      backgroundColor: "white",
+                    }}
+                  >
+                    <option value="">All Times</option>
+                    <option value="morning">Morning (6AM - 12PM)</option>
+                    <option value="afternoon">Afternoon (12PM - 6PM)</option>
+                    <option value="evening">Evening (6PM - 12AM)</option>
+                    <option value="unscheduled">Unscheduled (--)</option>
+                  </select>
+                </div>
+
+                {/* Status Filter */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      fontWeight: "500",
+                      marginBottom: "8px",
+                      display: "block",
+                    }}
+                  >
+                    Status
+                  </label>
+                  <select
+                    value={filters.status}
+                    onChange={(e) =>
+                      handleFilterChange("status", e.target.value)
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "6px",
+                      border: "1px solid #ccc",
+                      backgroundColor: "white",
+                    }}
+                  >
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+
+                {/* Active Filters Display */}
+                {(filters.bookingType ||
+                  filters.dateRange ||
+                  filters.timeSlot ||
+                  filters.status) && (
+                  <div style={{ marginBottom: "20px" }}>
+                    <small
+                      style={{
+                        color: "#666",
+                        marginBottom: "8px",
+                        display: "block",
+                      }}
+                    >
+                      Active Filters:
+                    </small>
+                    <div
+                      style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}
+                    >
+                      {filters.bookingType && (
+                        <span
+                          style={{
+                            backgroundColor: "#205EFA",
+                            color: "white",
+                            padding: "4px 8px",
+                            fontSize: "12px",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          Type: {filters.bookingType}
+                        </span>
+                      )}
+                      {filters.dateRange && (
+                        <span
+                          style={{
+                            backgroundColor: "#28a745",
+                            color: "white",
+                            padding: "4px 8px",
+                            fontSize: "12px",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          Date: {filters.dateRange}
+                        </span>
+                      )}
+                      {filters.timeSlot && (
+                        <span
+                          style={{
+                            backgroundColor: "#ffc107",
+                            color: "black",
+                            padding: "4px 8px",
+                            fontSize: "12px",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          Time: {filters.timeSlot}
+                        </span>
+                      )}
+                      {filters.status && (
+                        <span
+                          style={{
+                            backgroundColor: "#dc3545",
+                            color: "white",
+                            padding: "4px 8px",
+                            fontSize: "12px",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          Status: {filters.status}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: "10px",
+                  }}
+                >
+                  <button
+                    onClick={clearFilters}
+                    style={{
+                      padding: "10px 20px",
+                      fontWeight: "500",
+                      borderRadius: "6px",
+                      border: "1px solid #ccc",
+                      backgroundColor: "white",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    onClick={() => setShowFilterModal(false)}
+                    style={{
+                      padding: "10px 20px",
+                      fontWeight: "500",
+                      borderRadius: "6px",
+                      border: "none",
+                      backgroundColor: "#dc3545",
+                      color: "white",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={applyFilters}
+                    style={{
+                      padding: "10px 30px",
+                      fontWeight: "500",
+                      borderRadius: "6px",
+                      border: "none",
+                      backgroundColor: "#2857CC",
+                      color: "white",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
       <Container fluid>
         <div className="bookings-container">
           <div className="bookings-header">
@@ -1099,6 +1150,7 @@ const DermaBookings = () => {
               <div
                 className="d-flex align-items-center"
                 style={{ color: "#000000", cursor: "pointer" }}
+                onClick={() => setShowFilterModal(true)}
               >
                 <img
                   src="/icons/filtericon.png"
@@ -1132,7 +1184,7 @@ const DermaBookings = () => {
                 </tr>
               </thead>
               <tbody>
-                {bookingData.map((booking, index) => (
+                {filteredBookings.map((booking, index) => (
                   <tr key={index}>
                     <td>{booking.id}</td>
                     <td>{booking.firstName}</td>

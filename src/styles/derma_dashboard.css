@@ -1,0 +1,562 @@
+.stat-card {
+  background: white;
+  border: 1px solid #205efa;
+  border-radius: 16px;
+  padding: 16px; /* Start with smaller base padding */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 120px;
+  overflow: hidden; /* Prevent any overflow */
+}
+
+.stat-card > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  height: 100%;
+  gap: 12px;
+}
+
+.stat-card > div:first-child > div:first-child {
+  flex: 1;
+  min-width: 0; /* Allow text to shrink */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.stat-number {
+  font-size: 1.8rem; /* Start smaller */
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 4px;
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+.stat-label {
+  color: #6c757d;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+  font-weight: 500;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.stat-change {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #28a745;
+  margin-top: auto; /* Push to bottom */
+  line-height: 1.2;
+  word-break: break-word;
+  padding-top: 4px;
+}
+
+.stat-icon {
+  width: 36px;
+  height: 36px;
+  background-color: #007bff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #205efa;
+  height: 370px;
+}
+
+.table-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #205efa;
+  margin-bottom: 20px;
+}
+
+.table-header {
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.booking-type {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.booking-online {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.booking-walkin {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.view-link {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.view-link:hover {
+  text-decoration: underline;
+}
+
+.red-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.filter-dropdown {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-dropdown:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.filter-dropdown:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Mobile Spacing Classes */
+.mobile-chart-spacing {
+  margin-bottom: 60px !important;
+}
+
+.mobile-tables-spacing {
+  margin-top: 60px !important;
+}
+
+/* Extra Small Mobile - 320px to 479px */
+@media (min-width: 320px) and (max-width: 479px) {
+  .stat-card {
+    padding: 12px;
+    min-height: 100px;
+    margin-bottom: 12px;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+    margin-bottom: 3px;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    margin-bottom: 6px;
+  }
+
+  .stat-change {
+    font-size: 0.65rem;
+  }
+
+  .stat-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .chart-container {
+    height: 350px !important; /* Further increased height for mobile */
+    padding: 12px;
+    margin-bottom: 40px !important; /* Reduced spacing after chart */
+  }
+
+  .table-card {
+    padding: 12px;
+  }
+
+  .tables-column {
+    margin-top: 60px !important; /* Reduced spacing before tables */
+  }
+
+  h5 {
+    font-size: 1.5rem !important;
+  }
+}
+
+/* Small Mobile - 480px to 575px */
+@media (min-width: 480px) and (max-width: 575px) {
+  .stat-card {
+    padding: 14px;
+    min-height: 110px;
+    margin-bottom: 14px;
+  }
+
+  .stat-number {
+    font-size: 1.7rem;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    margin-bottom: 7px;
+  }
+
+  .stat-change {
+    font-size: 0.68rem;
+  }
+
+  .stat-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 1.05rem;
+  }
+
+  .chart-container {
+    height: 400px !important; /* Further increased height for mobile */
+    padding: 14px;
+    margin-bottom: 50px !important; /* Reduced spacing after chart */
+  }
+
+  .table-card {
+    padding: 14px;
+  }
+
+  .tables-column {
+    margin-top: 50px !important; /* Reduced spacing before tables */
+  }
+
+  h5 {
+    font-size: 1.7rem !important;
+  }
+}
+
+/* Large Mobile - 576px to 767px */
+@media (min-width: 576px) and (max-width: 767px) {
+  .stat-card {
+    padding: 16px;
+    min-height: 115px;
+    margin-bottom: 15px;
+  }
+
+  .stat-number {
+    font-size: 1.9rem;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    margin-bottom: 8px;
+  }
+
+  .stat-change {
+    font-size: 0.7rem;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  .chart-container {
+    height: 390px !important; /* Further increased height for mobile */
+    padding: 16px;
+    margin-bottom: 20px !important; /* Reduced spacing after chart */
+  }
+
+  .table-card {
+    padding: 16px;
+  }
+
+  .tables-column {
+    margin-top: 45px !important; /* Reduced spacing before tables */
+  }
+
+  h5 {
+    font-size: 1.8rem !important;
+  }
+}
+
+/* Small Tablet - 768px to 991px */
+@media (min-width: 768px) and (max-width: 991px) {
+  .chart-tables-row {
+    flex-direction: column;
+  }
+
+  .tables-column {
+    margin-top: 50px !important; /* Increased spacing for tablet */
+  }
+
+  .stat-card {
+    padding: 18px;
+    min-height: 120px;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+  }
+
+  .stat-change {
+    font-size: 0.72rem;
+  }
+
+  .stat-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.15rem;
+  }
+
+  .chart-container {
+    height: 400px !important; /* Increased height for tablet */
+    margin-bottom: 10px !important; /* Increased spacing after chart */
+    padding: 18px;
+  }
+
+  .table-card {
+    padding: 18px;
+  }
+
+  .filter-dropdown {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+  }
+
+  h5 {
+    font-size: 2rem !important;
+  }
+}
+
+/* Medium Tablet/Small Desktop - 992px to 1199px */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .tables-column {
+    margin-top: -210px;
+  }
+
+  .stat-card {
+    padding: 18px;
+    min-height: 125px;
+  }
+
+  .stat-number {
+    font-size: 2.1rem;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    font-size: 0.82rem;
+    margin-bottom: 8px;
+  }
+
+  .stat-change {
+    font-size: 0.74rem;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .chart-container {
+    height: 350px;
+    padding: 20px;
+  }
+
+  .table-card {
+    padding: 20px;
+  }
+
+  .table-header {
+    font-size: 0.95rem;
+  }
+}
+
+/* Standard Desktop - 1200px to 1399px */
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .tables-column {
+    margin-top: -210px;
+  }
+
+  .stat-card {
+    padding: 20px;
+    min-height: 130px;
+  }
+
+  .stat-number {
+    font-size: 2.3rem;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    margin-bottom: 9px;
+  }
+
+  .stat-change {
+    font-size: 0.76rem;
+  }
+
+  .stat-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 1.25rem;
+  }
+
+  .chart-container {
+    height: 380px;
+    padding: 22px;
+  }
+
+  .table-card {
+    padding: 22px;
+  }
+
+  .table-header {
+    font-size: 1rem;
+  }
+}
+
+/* Large Desktop - 1400px to 1599px */
+@media (min-width: 1400px) and (max-width: 1599px) {
+  .tables-column {
+    margin-top: -210px;
+  }
+
+  .stat-card {
+    padding: 22px;
+    min-height: 135px;
+  }
+
+  .stat-number {
+    font-size: 2.4rem;
+    margin-bottom: 7px;
+  }
+
+  .stat-label {
+    font-size: 0.87rem;
+    margin-bottom: 10px;
+  }
+
+  .stat-change {
+    font-size: 0.78rem;
+  }
+
+  .stat-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+  }
+
+  .chart-container {
+    height: 420px;
+    padding: 24px;
+  }
+
+  .table-card {
+    padding: 24px;
+  }
+}
+
+/* Extra Large Desktop - 1600px and above */
+@media (min-width: 1600px) {
+  .tables-column {
+    margin-top: -210px;
+  }
+
+  .stat-card {
+    padding: 24px;
+    min-height: 140px;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+
+  .stat-change {
+    font-size: 0.8rem;
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+
+  .chart-container {
+    height: 400px;
+    padding: 24px;
+  }
+
+  .table-card {
+    padding: 24px;
+  }
+}
+
+/* General responsive utilities */
+@media (max-width: 991px) {
+  .main-content {
+    padding: 15px;
+  }
+
+  .chart-tables-row {
+    flex-direction: column;
+  }
+}
+
+/* Ensure tables are always scrollable on smaller screens */
+@media (max-width: 991px) {
+  .table-card {
+    overflow-x: auto;
+  }
+
+  .table-responsive {
+    font-size: 0.85rem;
+  }
+}

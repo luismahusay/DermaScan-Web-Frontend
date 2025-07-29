@@ -9,6 +9,7 @@ import {
   Modal
 } from "react-bootstrap";
 import { Layout } from "./Layout";
+import "../styles/derma_product_management.css";
 
 const DermaProductManagement = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(10);
@@ -20,6 +21,7 @@ const DermaProductManagement = () => {
   const [viewingProduct, setViewingProduct] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [showFilterModal, setShowFilterModal] = useState(false);
   // Sample products data matching your image
   const productsData = [
     {
@@ -145,12 +147,6 @@ const DermaProductManagement = () => {
   ];
 
   // Filter products based on search term
-  const filteredProducts = productsData.filter(
-    (product) =>
-      product.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.skinType.toLowerCase().includes(searchTerm.toLowerCase())
-  );
   const handleEdit = (product) => {
     setEditingProduct(product);
     setShowEditModal(true);
@@ -173,305 +169,46 @@ const DermaProductManagement = () => {
     setShowDeleteModal(false);
     setProductToDelete(null);
   };
+  const [filters, setFilters] = useState({
+    category: "",
+    skinType: "",
+    dateRange: "",
+  });
+  const filteredProducts = productsData.filter((product) => {
+    const matchesSearch =
+      product.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.skinType.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCategory =
+      !filters.category || product.category === filters.category;
+    const matchesSkinType =
+      !filters.skinType || product.skinType === filters.skinType;
+
+    return matchesSearch && matchesCategory && matchesSkinType;
+  });
+  const handleFilterChange = (filterType, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterType]: value,
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      category: "",
+      skinType: "",
+      dateRange: "",
+    });
+  };
+
+  const applyFilters = () => {
+    setShowFilterModal(false);
+    // Filters are applied automatically through the filteredProducts logic
+  };
   return (
     <Layout currentPage="products">
-      <style jsx>{`
-        .products-table-container {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-          overflow: hidden;
-        }
-        .table-controls {
-          padding: 20px 24px;
-          border-bottom: 1px solid #e9ecef;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 16px;
-        }
-        .entries-selector {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 14px;
-          color: #6c757d;
-        }
-        .entries-select {
-          border: 1px solid #dee2e6;
-          border-radius: 4px;
-          padding: 4px 8px;
-          font-size: 14px;
-        }
-        .add-product-btn {
-          background-color: #007bff;
-          border: none;
-          padding: 8px 16px;
-          border-radius: 6px;
-          color: white;
-          font-size: 14px;
-          font-weight: 500;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .add-product-btn:hover {
-          background-color: #0056b3;
-        }
-        .table-wrapper {
-          overflow-x: auto;
-        }
-        .products-table {
-          margin-bottom: 0;
-        }
-        .products-table th {
-          background-color: #f8f9fa;
-          border-bottom: 2px solid #dee2e6;
-          color: #495057;
-          font-weight: 600;
-          font-size: 14px;
-          padding: 16px 12px;
-          white-space: nowrap;
-        }
-        .products-table td {
-          padding: 16px 12px;
-          border-bottom: 1px solid #e9ecef;
-          font-size: 14px;
-          vertical-align: middle;
-        }
-        .products-table tbody tr:hover {
-          background-color: #f8f9fa;
-        }
-        .action-buttons {
-          display: flex;
-          gap: 8px;
-          align-items: center;
-        }
-        .action-btn {
-          width: 32px;
-          height: 32px;
-          border: none;
-          border-radius: 4px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .view-btn {
-          background-color: #e3f2fd;
-          color: #1976d2;
-        }
-        .view-btn:hover {
-          background-color: #bbdefb;
-        }
-        .edit-btn {
-          background-color: #fff3e0;
-          color: #f57c00;
-        }
-        .edit-btn:hover {
-          background-color: #ffe0b2;
-        }
-        .delete-btn {
-          background-color: #ffebee;
-          color: #d32f2f;
-        }
-        .delete-btn:hover {
-          background-color: #ffcdd2;
-        }
-        .pagination-container {
-          padding: 20px 24px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 12px;
-          border-top: 1px solid #e9ecef;
-        }
-        .pagination-btn {
-          padding: 8px 12px;
-          border: 1px solid #dee2e6;
-          background: white;
-          color: #6c757d;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-          transition: all 0.2s ease;
-        }
-        .pagination-btn:hover:not(:disabled) {
-          background-color: #f8f9fa;
-        }
-        .pagination-btn.active {
-          background-color: #007bff;
-          color: white;
-          border-color: #007bff;
-        }
-        .pagination-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-        .table-search {
-          position: relative;
-          min-width: 250px;
-        }
-        .table-search input {
-          padding-left: 36px;
-          border: 1px solid #dee2e6;
-          border-radius: 6px;
-          padding-right: 12px;
-          padding-top: 8px;
-          padding-bottom: 8px;
-          font-size: 14px;
-        }
-        .table-search input:focus {
-          outline: none;
-          border-color: #007bff;
-          box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-        }
-        .table-search-icon {
-          position: absolute;
-          left: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #6c757d;
-          width: 16px;
-          height: 16px;
-        }
-        /* Mobile First Responsive Styles */
-        @media (max-width: 768px) {
-          .modal-body {
-            padding: 20px 15px !important;
-          }
-          .modal-body .row.mb-3 {
-            margin-bottom: 1rem !important;
-          }
-
-          .modal-body .form-control,
-          .modal-body textarea {
-            font-size: 16px; /* Prevents zoom on iOS */
-          }
-
-          /* Stack buttons vertically on mobile */
-          .modal-body .d-flex.justify-content-end {
-            flex-direction: column !important;
-          }
-
-          .modal-body .d-flex.justify-content-end .btn {
-            width: 100%;
-            margin-bottom: 10px;
-          }
-
-          .modal-body .d-flex.justify-content-end .btn:last-child {
-            margin-bottom: 0;
-          }
-          .table-controls {
-            padding: 16px;
-          }
-          .table-controls .d-flex.justify-content-between {
-            flex-direction: column;
-            align-items: stretch !important;
-          }
-          .table-controls .ms-auto {
-            margin-left: 0 !important;
-            margin-top: 12px;
-          }
-          .table-controls .add-product-btn {
-            width: 100%;
-            justify-content: center;
-          }
-          .table-search {
-            min-width: 180px;
-            flex: 1;
-          }
-          .table-search {
-            min-width: 200px;
-            width: 100%;
-          }
-
-          .products-table th,
-          .products-table td {
-            padding: 12px 8px;
-            font-size: 13px;
-          }
-
-          .products-table th:nth-child(5),
-          .products-table td:nth-child(5),
-          .products-table th:nth-child(6),
-          .products-table td:nth-child(6) {
-            display: none; /* Hide description and ingredients on mobile */
-          }
-
-          .action-buttons {
-            flex-direction: column;
-            gap: 4px;
-          }
-
-          .action-btn {
-            width: 28px;
-            height: 28px;
-          }
-
-          .add-product-btn {
-            font-size: 13px;
-            padding: 6px 12px;
-          }
-
-          .pagination-btn {
-            padding: 6px 10px;
-            font-size: 13px;
-          }
-        }
-
-        @media (max-width: 576px) {
-          .products-table th:nth-child(4),
-          .products-table td:nth-child(4) {
-            display: none; /* Also hide skin type on very small screens */
-          }
-          .modal-dialog {
-            margin: 5px !important;
-            max-width: calc(100% - 10px) !important;
-          }
-
-          .modal-title {
-            font-size: 24px !important;
-          }
-
-          /* Reduce textarea rows on very small screens */
-          .modal-body textarea {
-            min-height: 80px;
-          }
-
-          /* Upload area adjustments */
-          .modal-body [style*="minHeight: 120px"] {
-            min-height: 100px !important;
-            padding: 15px !important;
-          }
-          .table-controls .d-flex.flex-wrap {
-            flex-direction: column;
-            align-items: stretch !important;
-            gap: 12px !important;
-          }
-          .table-controls {
-            padding: 12px;
-          }
-          .table-search {
-            min-width: unset;
-            width: 100%;
-          }
-          .entries-selector {
-            font-size: 13px;
-          }
-          .entries-selector,
-          .table-search,
-          .d-flex.align-items-center {
-            width: 100%;
-          }
-          .pagination-container {
-            padding: 16px 12px;
-            gap: 8px;
-          }
-        }
-      `}</style>
+      {/* Modals */}
       <Modal
         show={showAddModal}
         onHide={() => setShowAddModal(false)}
@@ -1412,6 +1149,205 @@ const DermaProductManagement = () => {
           </div>
         </Modal.Body>
       </Modal>
+      <Modal
+        show={showFilterModal}
+        onHide={() => setShowFilterModal(false)}
+        size="md"
+        centered
+      >
+        <Modal.Header
+          closeButton
+          className="border-0 pb-0"
+          style={{
+            backgroundColor: "#205EFA",
+            margin: "-1rem 0rem 0 -.05rem",
+            borderRadius: "12px 12px 12px 12px",
+            position: "relative",
+          }}
+        >
+          <Modal.Title
+            className="w-100 text-center text-white m-0"
+            style={{
+              fontWeight: "bold",
+              fontSize: "28px",
+              padding: "20px 0",
+            }}
+          >
+            🔍 Filter Products
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body style={{ backgroundColor: "#EDF8F6", padding: "30px" }}>
+          <Form>
+            {/* Category Filter */}
+            <Form.Group className="mb-3">
+              <Form.Label style={{ fontWeight: "500", marginBottom: "8px" }}>
+                Category
+              </Form.Label>
+              <Form.Select
+                value={filters.category}
+                onChange={(e) => handleFilterChange("category", e.target.value)}
+                style={{
+                  padding: "12px",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="">All Categories</option>
+                <option value="Serum / Treatment">Serum / Treatment</option>
+                <option value="Mask">Mask</option>
+                <option value="Cleanser">Cleanser</option>
+                <option value="Sunscreen">Sunscreen</option>
+                <option value="Treatment">Treatment</option>
+                <option value="Toner">Toner</option>
+                <option value="Moisturizer">Moisturizer</option>
+                <option value="Cream">Cream</option>
+              </Form.Select>
+            </Form.Group>
+
+            {/* Skin Type Filter */}
+            <Form.Group className="mb-3">
+              <Form.Label style={{ fontWeight: "500", marginBottom: "8px" }}>
+                Skin Type
+              </Form.Label>
+              <Form.Select
+                value={filters.skinType}
+                onChange={(e) => handleFilterChange("skinType", e.target.value)}
+                style={{
+                  padding: "12px",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="">All Skin Types</option>
+                <option value="Oily">Oily</option>
+                <option value="Dry">Dry</option>
+                <option value="Combination">Combination</option>
+                <option value="Normal">Normal</option>
+                <option value="All">All</option>
+              </Form.Select>
+            </Form.Group>
+
+            {/* Date Range Filter */}
+            <Form.Group className="mb-4">
+              <Form.Label style={{ fontWeight: "500", marginBottom: "8px" }}>
+                Date Range
+              </Form.Label>
+              <Form.Select
+                value={filters.dateRange}
+                onChange={(e) =>
+                  handleFilterChange("dateRange", e.target.value)
+                }
+                style={{
+                  padding: "12px",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="">All Dates</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+              </Form.Select>
+            </Form.Group>
+
+            {/* Active Filters Display */}
+            {(filters.category || filters.skinType || filters.dateRange) && (
+              <div className="mb-3">
+                <small
+                  style={{
+                    color: "#666",
+                    marginBottom: "8px",
+                    display: "block",
+                  }}
+                >
+                  Active Filters:
+                </small>
+                <div className="d-flex flex-wrap gap-2">
+                  {filters.category && (
+                    <span
+                      className="badge"
+                      style={{
+                        backgroundColor: "#205EFA",
+                        color: "white",
+                        padding: "4px 8px",
+                        fontSize: "12px",
+                      }}
+                    >
+                      Category: {filters.category}
+                    </span>
+                  )}
+                  {filters.skinType && (
+                    <span
+                      className="badge"
+                      style={{
+                        backgroundColor: "#28a745",
+                        color: "white",
+                        padding: "4px 8px",
+                        fontSize: "12px",
+                      }}
+                    >
+                      Skin Type: {filters.skinType}
+                    </span>
+                  )}
+                  {filters.dateRange && (
+                    <span
+                      className="badge"
+                      style={{
+                        backgroundColor: "#ffc107",
+                        color: "black",
+                        padding: "4px 8px",
+                        fontSize: "12px",
+                      }}
+                    >
+                      Date: {filters.dateRange}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="d-flex justify-content-end gap-2">
+              <Button
+                variant="outline-secondary"
+                onClick={clearFilters}
+                style={{
+                  padding: "10px 20px",
+                  fontWeight: "500",
+                  borderRadius: "6px",
+                }}
+              >
+                Clear All
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => setShowFilterModal(false)}
+                style={{
+                  padding: "10px 20px",
+                  fontWeight: "500",
+                  borderRadius: "6px",
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={applyFilters}
+                style={{
+                  backgroundColor: "#2857CC",
+                  border: "none",
+                  padding: "10px 30px",
+                  fontWeight: "500",
+                  borderRadius: "6px",
+                }}
+              >
+                Apply Filters
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
       <Container fluid className="px-2 px-md-3">
         <Row className="mb-4">
           <Col>
@@ -1446,6 +1382,7 @@ const DermaProductManagement = () => {
                     <div
                       className="d-flex align-items-center"
                       style={{ color: "#000000", cursor: "pointer" }}
+                      onClick={() => setShowFilterModal(true)}
                     >
                       <img
                         src="/icons/filtericon.png"

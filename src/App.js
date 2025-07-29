@@ -15,6 +15,7 @@ import DermaProductManagement from './dermatologist/productmanagement';
 import DermaBookings from './dermatologist/bookings';
 import DermaPatients from './dermatologist/acceptedpatients';
 import DermaSubscription from './dermatologist/subscription';
+import DermaProfile from './dermatologist/profile';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="/dermatologist/bookings" element={<DermaBookings />} />
         <Route path="/dermatologist/acceptedpatients" element={<DermaPatients />} />
         <Route path="/dermatologist/subscription" element={<DermaSubscription />} />
+        <Route path="/dermatologist/profile" element={<DermaProfile />} />
       </Routes>
     </Router>
   );

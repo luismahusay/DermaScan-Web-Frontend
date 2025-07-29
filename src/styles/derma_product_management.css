@@ -1,0 +1,491 @@
+.products-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.table-controls {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.entries-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.entries-select {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+.add-product-btn {
+  background-color: #007bff;
+  border: none;
+  padding: 12px 20px; /* Increased padding for better desktop appearance */
+  border-radius: 8px; /* Slightly more rounded */
+  color: white;
+  font-size: 15px; /* Slightly larger font */
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.add-product-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px); /* Subtle hover effect */
+}
+
+/* Updated table wrapper for horizontal scroll */
+.table-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Enhanced scrollbar styling */
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Fixed table layout and minimum widths for consistent spacing */
+.products-table {
+  margin-bottom: 0;
+  table-layout: fixed; /* This ensures consistent column widths */
+  min-width: 1000px; /* Minimum table width to trigger horizontal scroll */
+  width: 100%;
+}
+
+/* Define specific column widths to maintain consistent spacing */
+.products-table th:nth-child(1), /* ID */
+.products-table td:nth-child(1) {
+  width: 80px;
+  min-width: 80px;
+}
+
+.products-table th:nth-child(2), /* Product */
+.products-table td:nth-child(2) {
+  width: 180px;
+  min-width: 180px;
+}
+
+.products-table th:nth-child(3), /* Category */
+.products-table td:nth-child(3) {
+  width: 140px;
+  min-width: 140px;
+}
+
+.products-table th:nth-child(4), /* Skin Type */
+.products-table td:nth-child(4) {
+  width: 120px;
+  min-width: 120px;
+}
+
+.products-table th:nth-child(5), /* Description */
+.products-table td:nth-child(5) {
+  width: 200px;
+  min-width: 200px;
+}
+
+.products-table th:nth-child(6), /* Ingredients */
+.products-table td:nth-child(6) {
+  width: 200px;
+  min-width: 200px;
+}
+
+.products-table th:nth-child(7), /* Action */
+.products-table td:nth-child(7) {
+  width: 140px;
+  min-width: 140px;
+}
+
+.products-table th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  color: #495057;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 16px 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.products-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 14px;
+  vertical-align: middle;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Special handling for long text in description and ingredients */
+.products-table td:nth-child(5),
+.products-table td:nth-child(6) {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.products-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px; /* Increased gap between buttons */
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap; /* Prevent wrapping */
+}
+
+.action-btn {
+  width: 40px; /* Increased from 32px */
+  height: 40px; /* Increased from 32px */
+  border: none;
+  border-radius: 8px; /* More rounded corners */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  flex-shrink: 0; /* Prevent buttons from shrinking */
+}
+
+.action-btn:hover {
+  transform: translateY(-2px); /* Subtle lift effect on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn svg {
+  width: 18px; /* Increased icon size */
+  height: 18px;
+}
+
+.view-btn {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.view-btn:hover {
+  background-color: #bbdefb;
+}
+
+.edit-btn {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.edit-btn:hover {
+  background-color: #ffe0b2;
+}
+
+.delete-btn {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.delete-btn:hover {
+  background-color: #ffcdd2;
+}
+
+.pagination-container {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid #e9ecef;
+}
+
+.pagination-btn {
+  padding: 10px 16px; /* Increased padding */
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #6c757d;
+  border-radius: 6px; /* More rounded */
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  min-width: 44px; /* Minimum touch target size */
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  transform: translateY(-1px);
+}
+
+.pagination-btn.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.table-search {
+  position: relative;
+  min-width: 250px;
+}
+
+.table-search input {
+  padding-left: 36px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding-right: 12px;
+  padding-top: 10px; /* Increased padding */
+  padding-bottom: 10px;
+  font-size: 14px;
+}
+
+.table-search input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.table-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  width: 16px;
+  height: 16px;
+}
+
+/* Desktop specific styles */
+@media (min-width: 992px) {
+  .action-buttons {
+    gap: 12px; /* Even more space on large screens */
+  }
+  
+  .action-btn {
+    width: 44px; /* Even larger on desktop */
+    height: 44px;
+    border-radius: 10px;
+  }
+  
+  .action-btn svg {
+    width: 20px; /* Larger icons on desktop */
+    height: 20px;
+  }
+  
+  .add-product-btn {
+    padding: 14px 24px;
+    font-size: 16px;
+  }
+  
+  .pagination-btn {
+    padding: 12px 18px;
+    font-size: 15px;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 991px) {
+  .action-btn {
+    width: 38px;
+    height: 38px;
+  }
+  
+  .action-btn svg {
+    width: 17px;
+    height: 17px;
+  }
+}
+
+/* Mobile First Responsive Styles */
+@media (max-width: 768px) {
+  .modal-body {
+    padding: 20px 15px !important;
+  }
+  
+  .modal-body .row.mb-3 {
+    margin-bottom: 1rem !important;
+  }
+
+  .modal-body .form-control,
+  .modal-body textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  /* Stack buttons vertically on mobile */
+  .modal-body .d-flex.justify-content-end {
+    flex-direction: column !important;
+  }
+
+  .modal-body .d-flex.justify-content-end .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .modal-body .d-flex.justify-content-end .btn:last-child {
+    margin-bottom: 0;
+  }
+  
+  .table-controls {
+    padding: 16px;
+  }
+  
+  .table-controls .d-flex.justify-content-between {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+  
+  .table-controls .ms-auto {
+    margin-left: 0 !important;
+    margin-top: 12px;
+  }
+  
+  .table-controls .add-product-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 16px; /* Smaller on mobile */
+    font-size: 14px;
+  }
+  
+  .table-search {
+    min-width: 180px;
+    flex: 1;
+  }
+  
+  .table-search {
+    min-width: 200px;
+    width: 100%;
+  }
+
+  /* Keep all columns visible on mobile with horizontal scroll */
+  .products-table th,
+  .products-table td {
+    padding: 12px 8px;
+    font-size: 13px;
+    /* Remove the display: none rules to keep all columns visible */
+  }
+
+  /* Adjust button layout for mobile but keep horizontal */
+  .action-buttons {
+    gap: 6px;
+    flex-direction: row; /* Keep horizontal on mobile */
+  }
+
+  .action-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .action-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .add-product-btn {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+
+  .pagination-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Keep all columns visible even on very small screens */
+  .products-table {
+    min-width: 900px; /* Slightly smaller minimum width for very small screens */
+  }
+  
+  .modal-dialog {
+    margin: 5px !important;
+    max-width: calc(100% - 10px) !important;
+  }
+
+  .modal-title {
+    font-size: 24px !important;
+  }
+
+  /* Reduce textarea rows on very small screens */
+  .modal-body textarea {
+    min-height: 80px;
+  }
+
+  /* Upload area adjustments */
+  .modal-body [style*="minHeight: 120px"] {
+    min-height: 100px !important;
+    padding: 15px !important;
+  }
+  
+  .table-controls .d-flex.flex-wrap {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  
+  .table-controls {
+    padding: 12px;
+  }
+  
+  .table-search {
+    min-width: unset;
+    width: 100%;
+  }
+  
+  .entries-selector {
+    font-size: 13px;
+  }
+  
+  .entries-selector,
+  .table-search,
+  .d-flex.align-items-center {
+    width: 100%;
+  }
+  
+  .pagination-container {
+    padding: 16px 12px;
+    gap: 8px;
+  }
+  
+  .action-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}

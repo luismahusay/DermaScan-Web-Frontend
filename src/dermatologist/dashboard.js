@@ -1,10 +1,83 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Table } from "react-bootstrap";
 import { ResponsiveContainer, Area, AreaChart, XAxis, YAxis } from "recharts";
 import { Layout } from "./Layout";
+import "../styles/derma_dashboard.css"; // Import your CSS styles
 
 const DermaDashboard = () => {
   const [timeFilter, setTimeFilter] = useState("6months");
+  const [screenSize, setScreenSize] = useState("desktop");
+
+  // Monitor screen size changes for chart responsiveness
+  useEffect(() => {
+    const updateScreenSize = () => {
+      const width = window.innerWidth;
+      if (width < 576) setScreenSize("mobile");
+      else if (width < 768) setScreenSize("large-mobile");
+      else if (width < 992) setScreenSize("tablet");
+      else if (width < 1200) setScreenSize("small-desktop");
+      else setScreenSize("desktop");
+    };
+
+    updateScreenSize();
+    window.addEventListener("resize", updateScreenSize);
+    return () => window.removeEventListener("resize", updateScreenSize);
+  }, []);
+
+  // Dynamic chart configuration based on screen size
+  const getChartConfig = () => {
+    const configs = {
+      mobile: {
+        fontSize: 10,
+        strokeWidth: 1.5,
+        dotRadius: 2.5,
+        tickCount: 4,
+        margin: { top: 5, right: 5, left: 0, bottom: 5 },
+        yAxisWidth: 20,
+        showAllTicks: false,
+      },
+      "large-mobile": {
+        fontSize: 11,
+        strokeWidth: 1.5,
+        dotRadius: 3,
+        tickCount: 5,
+        margin: { top: 8, right: 8, left: 5, bottom: 8 },
+        yAxisWidth: 25,
+        showAllTicks: false,
+      },
+      tablet: {
+        fontSize: 11,
+        strokeWidth: 2,
+        dotRadius: 3.5,
+        tickCount: 6,
+        margin: { top: 10, right: 10, left: 8, bottom: 10 },
+        yAxisWidth: 30,
+        showAllTicks: true,
+      },
+      "small-desktop": {
+        fontSize: 12,
+        strokeWidth: 2,
+        dotRadius: 4,
+        tickCount: 6,
+        margin: { top: 15, right: 15, left: 10, bottom: 15 },
+        yAxisWidth: 35,
+        showAllTicks: true,
+      },
+      desktop: {
+        fontSize: 12,
+        strokeWidth: 2,
+        dotRadius: 4,
+        tickCount: 6,
+        margin: { top: 20, right: 30, left: 15, bottom: 20 },
+        yAxisWidth: 40,
+        showAllTicks: true,
+      },
+    };
+    return configs[screenSize] || configs.desktop;
+  };
+
+  const chartConfig = getChartConfig();
+
   // Sample data for the chart
   const chartData = [
     { month: "Jan", value: 4 },
@@ -31,216 +104,27 @@ const DermaDashboard = () => {
     { patient: "Test", type: "Online", time: "6:00 PM", status: "Accepted" },
     { patient: "Test", type: "Online", time: "7:00 PM", status: "Accepted" },
   ];
+
   return (
     <Layout currentPage="dashboard">
-      <style jsx>{`
-        .stat-card {
-          background: white;
-          border: 1px solid #205efa;
-          border-radius: 16px;
-          padding: 24px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-          height: 100%;
-        }
-
-        .stat-number {
-          font-size: 2.5rem;
-          font-weight: 700;
-          color: #212529;
-          margin-bottom: 8px;
-        }
-
-        .stat-label {
-          color: #6c757d;
-          font-size: 0.9rem;
-          margin-bottom: 12px;
-        }
-
-        .stat-change {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #28a745;
-          margin-top: -8px; /* Negative margin to move it up closer */
-          line-height: 1.2; /* Add line-height for better spacing */
-        }
-        .stat-icon {
-          width: 48px;
-          height: 48px;
-          background-color: #007bff;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 1.5rem;
-        }
-        .chart-container {
-          background: white;
-          border-radius: 16px;
-          padding: 24px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          border: 1px solid #205efa;
-          height: 400px; /* Set fixed height */
-        }
-        .table-card {
-          background: white;
-          border-radius: 16px;
-          padding: 24px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          border: 1px solid #205efa;
-          margin-bottom: 20px;
-        }
-
-        .table-header {
-          font-weight: 600;
-          color: #212529;
-          margin-bottom: 20px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .status-badge {
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 0.8rem;
-          font-weight: 500;
-          background-color: #d4edda;
-          color: #155724;
-        }
-
-        .booking-type {
-          padding: 4px 8px;
-          border-radius: 4px;
-          font-size: 0.8rem;
-          font-weight: 500;
-        }
-
-        .booking-online {
-          background-color: #e3f2fd;
-          color: #1976d2;
-        }
-
-        .booking-walkin {
-          background-color: #fff3e0;
-          color: #f57c00;
-        }
-        .view-link {
-          color: #007bff;
-          text-decoration: none;
-          font-size: 0.85rem;
-        }
-
-        .view-link:hover {
-          text-decoration: underline;
-        }
-        .red-dot {
-          width: 12px;
-          height: 12px;
-          background-color: #dc3545;
-          border-radius: 50%;
-          margin-right: 8px;
-        }
-        @media (max-width: 576px) {
-          /* Stack stat cards vertically on mobile */
-          .stat-card {
-            margin-bottom: 15px;
-          }
-
-          /* Adjust font sizes for mobile */
-          .stat-number {
-            font-size: 2rem;
-          }
-
-          /* Hide chart on very small screens or make it smaller */
-          .chart-container {
-            height: 250px;
-          }
-
-          /* Make tables horizontally scrollable */
-          .table-card {
-            overflow-x: auto;
-          }
-
-          /* Adjust dashboard title */
-          h5 {
-            fontsize: "2rem" !important;
-          }
-        }
-        @media (max-width: 768px) {
-          /* Stack chart and tables vertically on tablets */
-          .chart-tables-row {
-            flex-direction: column;
-          }
-
-          /* Remove negative margin for tables on mobile */
-          .tables-column {
-            margin-top: 0 !important;
-          }
-
-          /* Adjust padding for mobile */
-          .stat-card,
-          .chart-container,
-          .table-card {
-            padding: 16px;
-          }
-          .tables-column {
-            margin-top: 0 !important;
-          }
-
-          .chart-container {
-            height: 400px; /* Smaller height on mobile */
-            margin-bottom: 20px;
-            padding: 16px; /* Smaller padding on mobile */
-          }
-          .filter-dropdown {
-            font-size: 0.75rem;
-            padding: 3px 6px;
-          }
-        }
-        @media (min-width: 769px) {
-          .tables-column {
-            margin-top: -210px;
-          }
-        }
-        @media (max-width: 992px) {
-          /* Adjust layout for medium screens */
-          .main-content {
-            padding: 15px;
-          }
-        }
-        .filter-dropdown {
-          background: #f8f9fa;
-          border: 1px solid #dee2e6;
-          border-radius: 6px;
-          padding: 4px 8px;
-          font-size: 0.8rem;
-          color: #6c757d;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .filter-dropdown:hover {
-          background: #e9ecef;
-          border-color: #adb5bd;
-        }
-
-        .filter-dropdown:focus {
-          outline: none;
-          border-color: #007bff;
-          box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-        }
-      `}</style>
       <Container fluid>
         {/* Stats Cards */}
         <Row className="mb-2">
           <Col>
             <h5
               style={{
-                color: "#000", // Black text color
-                fontSize: "3rem", // Bigger font size (adjust as needed)
+                color: "#000",
+                fontSize:
+                  screenSize === "mobile"
+                    ? "2rem"
+                    : screenSize === "large-mobile"
+                    ? "2.2rem"
+                    : screenSize === "tablet"
+                    ? "2.5rem"
+                    : "3rem",
                 fontWeight: "bold",
                 display: "inline-block",
-                marginBottom: "16px", // Optional spacing below
+                marginBottom: "16px",
               }}
             >
               Dashboard
@@ -263,7 +147,10 @@ const DermaDashboard = () => {
                   <img
                     src="/icons/userstatsicon.png"
                     alt="Stat Icon"
-                    style={{ width: "24px", height: "24px" }}
+                    style={{
+                      width: screenSize === "mobile" ? "20px" : "24px",
+                      height: screenSize === "mobile" ? "20px" : "24px",
+                    }}
                   />
                 </div>
               </div>
@@ -285,7 +172,10 @@ const DermaDashboard = () => {
                   <img
                     src="/icons/userstatsicon.png"
                     alt="Stat Icon"
-                    style={{ width: "24px", height: "24px" }}
+                    style={{
+                      width: screenSize === "mobile" ? "20px" : "24px",
+                      height: screenSize === "mobile" ? "20px" : "24px",
+                    }}
                   />
                 </div>
               </div>
@@ -295,15 +185,36 @@ const DermaDashboard = () => {
 
         {/* Chart and Tables Row */}
         <Row className="mb-4 chart-tables-row">
-          {/* Chart */}
+          {/* Responsive Chart */}
           <Col md={6} lg={6} xl={6}>
             <div className="chart-container">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mb-0">Cancelled Bookings</h5>
+                <h5
+                  className="mb-0"
+                  style={{
+                    fontSize:
+                      screenSize === "mobile"
+                        ? "1rem"
+                        : screenSize === "large-mobile"
+                        ? "1.1rem"
+                        : "1.25rem",
+                  }}
+                >
+                  Cancelled Bookings
+                </h5>
                 <select
                   className="filter-dropdown"
                   value={timeFilter}
                   onChange={(e) => setTimeFilter(e.target.value)}
+                  style={{
+                    fontSize:
+                      screenSize === "mobile"
+                        ? "0.7rem"
+                        : screenSize === "large-mobile"
+                        ? "0.75rem"
+                        : "0.8rem",
+                    padding: screenSize === "mobile" ? "2px 4px" : "4px 8px",
+                  }}
                 >
                   <option value="6months">Last 6 months</option>
                   <option value="3months">Last 3 months</option>
@@ -312,30 +223,70 @@ const DermaDashboard = () => {
                 </select>
               </div>
               <div className="mb-2">
-                <small className="text-muted">Monthly overview</small>
+                <small
+                  className="text-muted"
+                  style={{
+                    fontSize: screenSize === "mobile" ? "0.7rem" : "0.8rem",
+                  }}
+                >
+                  Monthly overview
+                </small>
               </div>
-              <div style={{ height: "calc(100% - 80px)", minHeight: "200px" }}>
+              <div
+                style={{
+                  height: "calc(100% - 80px)",
+                  minHeight:
+                    screenSize === "mobile"
+                      ? "150px"
+                      : screenSize === "large-mobile"
+                      ? "180px"
+                      : "200px",
+                }}
+              >
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
+                  <AreaChart data={chartData} margin={chartConfig.margin}>
                     <XAxis
                       dataKey="month"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: "#6c757d", fontSize: 12 }}
+                      tick={{
+                        fill: "#6c757d",
+                        fontSize: chartConfig.fontSize,
+                        textAnchor: "middle",
+                      }}
+                      interval={
+                        chartConfig.showAllTicks ? 0 : "preserveStartEnd"
+                      }
+                      height={screenSize === "mobile" ? 20 : 30}
                     />
                     <YAxis
                       domain={[0, 8]}
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: "#6c757d", fontSize: 12 }}
+                      tick={{
+                        fill: "#6c757d",
+                        fontSize: chartConfig.fontSize,
+                      }}
+                      width={chartConfig.yAxisWidth}
+                      tickCount={screenSize === "mobile" ? 4 : 5}
                     />
                     <Area
                       type="monotone"
                       dataKey="value"
                       stroke="#ff6b9d"
                       fill="rgba(255, 107, 157, 0.1)"
-                      strokeWidth={2}
-                      dot={{ fill: "#ff6b9d", strokeWidth: 2, r: 4 }}
+                      strokeWidth={chartConfig.strokeWidth}
+                      dot={{
+                        fill: "#ff6b9d",
+                        strokeWidth: chartConfig.strokeWidth,
+                        r: chartConfig.dotRadius,
+                      }}
+                      activeDot={{
+                        r: chartConfig.dotRadius + 1,
+                        stroke: "#ff6b9d",
+                        strokeWidth: 2,
+                        fill: "#ff6b9d",
+                      }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -344,24 +295,47 @@ const DermaDashboard = () => {
           </Col>
 
           {/* Tables */}
-
           <Col
             md={6}
             lg={6}
             xl={6}
             className="tables-column"
-            style={{ marginTop: "-210px" }}
+            style={{
+              marginTop:
+                screenSize === "tablet" ||
+                screenSize === "mobile" ||
+                screenSize === "large-mobile"
+                  ? "0"
+                  : "-210px",
+            }}
           >
             {/* Pending Booking Requests */}
             <div className="table-card">
               <div className="table-header">
                 <div className="red-dot"></div>
-                Pending Booking Request
+                <span
+                  style={{
+                    fontSize:
+                      screenSize === "mobile"
+                        ? "0.85rem"
+                        : screenSize === "large-mobile"
+                        ? "0.9rem"
+                        : "1rem",
+                  }}
+                >
+                  Pending Booking Request
+                </span>
               </div>
               <div className="table-responsive">
                 <Table responsive size="sm">
                   <thead>
-                    <tr style={{ fontSize: "0.85rem", color: "#6c757d" }}>
+                    <tr
+                      style={{
+                        fontSize:
+                          screenSize === "mobile" ? "0.75rem" : "0.85rem",
+                        color: "#6c757d",
+                      }}
+                    >
                       <th>Patient Name</th>
                       <th>Booking Type</th>
                       <th>Date</th>
@@ -371,7 +345,13 @@ const DermaDashboard = () => {
                   </thead>
                   <tbody>
                     {bookingData.map((booking, index) => (
-                      <tr key={index}>
+                      <tr
+                        key={index}
+                        style={{
+                          fontSize:
+                            screenSize === "mobile" ? "0.75rem" : "0.85rem",
+                        }}
+                      >
                         <td>{booking.patient}</td>
                         <td>
                           <span
@@ -380,16 +360,35 @@ const DermaDashboard = () => {
                                 ? "booking-online"
                                 : "booking-walkin"
                             }`}
+                            style={{
+                              fontSize:
+                                screenSize === "mobile" ? "0.7rem" : "0.8rem",
+                            }}
                           >
                             {booking.type}
                           </span>
                         </td>
                         <td>{booking.time}</td>
                         <td>
-                          <span className="status-badge">{booking.status}</span>
+                          <span
+                            className="status-badge"
+                            style={{
+                              fontSize:
+                                screenSize === "mobile" ? "0.7rem" : "0.8rem",
+                            }}
+                          >
+                            {booking.status}
+                          </span>
                         </td>
                         <td>
-                          <a href="#" className="view-link">
+                          <a
+                            href="#"
+                            className="view-link"
+                            style={{
+                              fontSize:
+                                screenSize === "mobile" ? "0.75rem" : "0.85rem",
+                            }}
+                          >
                             View Booking...
                           </a>
                         </td>
@@ -404,12 +403,29 @@ const DermaDashboard = () => {
             <div className="table-card">
               <div className="table-header">
                 <div className="red-dot"></div>
-                Product Summary
+                <span
+                  style={{
+                    fontSize:
+                      screenSize === "mobile"
+                        ? "0.85rem"
+                        : screenSize === "large-mobile"
+                        ? "0.9rem"
+                        : "1rem",
+                  }}
+                >
+                  Product Summary
+                </span>
               </div>
               <div className="table-responsive">
                 <Table responsive size="sm">
                   <thead>
-                    <tr style={{ fontSize: "0.85rem", color: "#6c757d" }}>
+                    <tr
+                      style={{
+                        fontSize:
+                          screenSize === "mobile" ? "0.75rem" : "0.85rem",
+                        color: "#6c757d",
+                      }}
+                    >
                       <th>Patient Name</th>
                       <th>Booking Type</th>
                       <th>Time</th>
@@ -419,7 +435,13 @@ const DermaDashboard = () => {
                   </thead>
                   <tbody>
                     {productData.map((product, index) => (
-                      <tr key={index}>
+                      <tr
+                        key={index}
+                        style={{
+                          fontSize:
+                            screenSize === "mobile" ? "0.75rem" : "0.85rem",
+                        }}
+                      >
                         <td>{product.patient}</td>
                         <td>
                           <span
@@ -428,16 +450,35 @@ const DermaDashboard = () => {
                                 ? "booking-online"
                                 : "booking-walkin"
                             }`}
+                            style={{
+                              fontSize:
+                                screenSize === "mobile" ? "0.7rem" : "0.8rem",
+                            }}
                           >
                             {product.type}
                           </span>
                         </td>
                         <td>{product.time}</td>
                         <td>
-                          <span className="status-badge">{product.status}</span>
+                          <span
+                            className="status-badge"
+                            style={{
+                              fontSize:
+                                screenSize === "mobile" ? "0.7rem" : "0.8rem",
+                            }}
+                          >
+                            {product.status}
+                          </span>
                         </td>
                         <td>
-                          <a href="#" className="view-link">
+                          <a
+                            href="#"
+                            className="view-link"
+                            style={{
+                              fontSize:
+                                screenSize === "mobile" ? "0.75rem" : "0.85rem",
+                            }}
+                          >
                             View Product...
                           </a>
                         </td>
