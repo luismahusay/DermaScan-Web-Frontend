@@ -310,18 +310,19 @@ return (
           </Col>
           {/* KPI/Analytics Panel: All cards in one column for patient */}
           <Col xs={12} lg={4}>
-            <div className="kpi-panel d-flex flex-column align-items-stretch user-kpi-panel-col">
+            <div className="kpi-panel d-flex flex-column align-items-start justify-content-start user-kpi-panel-col ">
               {activeTab === 'patient' ? (
                 <>
                 {/* total revenue */}
-                  <Card className="kpi-card subscription-card mb-3 mobile-kpi-spacing">
-                    <Card.Body className="p-3 position-relative">
+                  <Card className="kpi-card subscription-card mb-3 mobile-kpi-spacing user-mgmt-revenue-card">
+                    <Card.Body className="p-2 position-relative">
                       <div className="d-flex align-items-center justify-content-between mb-1">
                         <span className="kpi-label">Total Revenue</span>
                         <img src="/icons/today_subscriber.png" alt="Wallet" className="user-mgmt-revenue-icon" />
                       </div>
-                      <div className="kpi-value user-mgmt-kpi-value">₱1000</div>
-                      <div className="kpi-change text-danger mt-2 d-flex align-items-center user-mgmt-kpi-change">
+                      <div className="d-flex justify-content-start fs-3 fw-bold">₱1000</div>
+                      <hr className="my-2 border-secondary" />
+                      <div className="kpi-change text-danger mt-2 d-flex align-items-center justify-content-center user-mgmt-kpi-change">
                         -20% <span className="ms-1 user-mgmt-kpi-subtext">than last month</span>
                       </div>
                     </Card.Body>
@@ -329,28 +330,30 @@ return (
                   {/* Free Subscription Card */}
                   <Card className="kpi-card subscription-card mb-3 mobile-kpi-spacing">
                     <Card.Body>
-                      <div className="subscription-header text-primary fw-bold">
+                      <div className="subscription-header text-primary fw-bold d-flex align-items-start">
                         Free
                       </div>
-                      <div className="subscription-value fw-bold text-dark">
+                      <div className="subscription-value fw-bold text-dark d-flex align-items-center gap-2">
                         123 <span className="kpi-subscribtions">Subscriptions</span>
                       </div>
-                      <div className="subscription-growth d-flex align-items-center mt-2">
+                      <hr className="my-2 border-secondary" />
+                      <div className="subscription-growth d-flex align-items-center justify-content-center mt-2">
                         <span className="me-1 label">&#128200;</span>
-                        <span className="text-success success">+36% than last month</span>
+                        <span className="text-success success ">+36% than last month</span>
                       </div>
                     </Card.Body>
                   </Card>
                   {/* Monthly Subscription Card */}
                   <Card className="kpi-card subscription-card mb-3 mobile-kpi-spacing">
                     <Card.Body>
-                      <div className="subscription-header text-primary fw-bold">
+                      <div className="subscription-header text-primary fw-bold d-flex align-items-start">
                         Monthly
                       </div>
-                      <div className="subscription-value fw-bold text-dark">
+                      <div className="subscription-value fw-bold text-dark d-flex align-items-center gap-2">
                         45 <span className="kpi-subscribtions">Subscriptions</span>
                       </div>
-                      <div className="subscription-growth d-flex align-items-center mt-2">
+                      <hr className="my-2 border-secondary" />
+                      <div className="subscription-growth d-flex align-items-center justify-content-center mt-2">
                         <span className="me-1 label">&#128201;</span>
                         <span className="text-danger success">-10% than last month</span>
                       </div>
@@ -359,13 +362,14 @@ return (
                   {/* Yearly Subscription Card */}
                   <Card className="kpi-card subscription-card mb-3 mobile-kpi-spacing">
                     <Card.Body>
-                      <div className="subscription-header text-primary fw-bold">
+                      <div className="subscription-header text-primary fw-bold d-flex align-items-start">
                         Yearly
                       </div>
-                      <div className="subscription-value fw-bold text-dark" >
+                      <div className="subscription-value fw-bold text-dark d-flex align-items-center gap-2" >
                         12 <span className="kpi-subscribtions">Subscriptions</span>
                       </div>
-                      <div className="subscription-growth d-flex align-items-center mt-2">
+                      <hr className="my-2 border-secondary" />
+                      <div className="subscription-growth d-flex align-items-center justify-content-center mt-2">
                         <span className="me-1 label">&#128200;</span>
                         <span className="text-success success">+5% than last month</span>
                       </div>
@@ -377,13 +381,14 @@ return (
                   {dermKPI.map((k, i) => (
                     <Card className=" subscription-card mb-3 mobile-kpi-spacing" key={k.label}>
                       <Card.Body>
-                        <div className="subscription-header text-primary fw-bold">
+                        <div className="subscription-header text-primary fw-bold d-flex align-items-start">
                           {k.label}
                         </div>
-                        <div className="subscription-value fw-bold text-dark">
+                        <div className="subscription-value fw-bold text-dark d-flex align-items-center gap-2">
                           {k.value}
                         </div>
-                        <div className="subscription-growth d-flex align-items-center mt-2">
+                        <hr className="my-2 border-secondary" />
+                        <div className="subscription-growth d-flex align-items-center justify-content-center mt-2">
                           <span className="me-1 label">{k.up ? '▲' : '▼'}</span>
                           <span className={k.up ? 'text-success success' : 'text-danger success'}>{k.change} than last month</span>
                         </div>

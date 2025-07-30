@@ -217,12 +217,26 @@ function AdminDashboard() {
                   <Row className="mb-4 g-3">
                     {statCards.map((card, idx) => (
                       <Col key={idx} xs={12} sm={6} md={6} lg={3}>
-                        <Card className="shadow-sm rounded-4 h-100 stat-card">
-                          <Card.Body className="position-relative p-3">
-                            <img src={card.icon} alt={card.iconAlt} className="stat-card-icon position-absolute top-0 end-0 m-3" />
-                            <div className="text-muted" style={{ fontSize: 13 }}>{card.label}</div>
-                            <div className="fw-bold fs-2 my-2">{card.value}</div>
-                            <div style={{ fontSize: 13, color: card.trendColor }}>{card.trend}</div>
+                        <Card className="shadow-sm border border-primary rounded-5 h-100">
+                          <Card.Body className="position-relative d-flex flex-column justify-content-between p-3">
+                            {/* Icon top-right */}
+                            <div className="position-absolute top-0 end-0 m-3">
+                              <img src={card.icon} alt={card.iconAlt} style={{ width: '38px', height: '38px' }} />
+                            </div>
+                            {/* Label top-left */}
+                            <div className="text-muted small">{card.label}</div>
+                            {/* Value center-right */}
+                            <div className="mt-2 d-flex justify-content-start align-items-center">
+                              <span className="fw-bold fs-3">{card.value}</span>
+                            </div>
+                            {/* Horizontal Line */}
+                            <hr className="my-2 border-secondary" />
+                            {/* Trend bottom-center */}
+                            <div className="text-center mt-auto">
+                              <span className="small" style={{ color: card.trendColor }}>
+                                {card.trend}
+                              </span>
+                            </div>
                           </Card.Body>
                         </Card>
                       </Col>
@@ -233,7 +247,7 @@ function AdminDashboard() {
                   <Row>
                     {/* Left: Table */}
                     <Col xs={12} lg={8} className="mb-4">
-                      <Card className="shadow-sm mb-4 recent-product-card">
+                      <Card className="border border-primary shadow-sm mb-4 recent-product-card">
                         <Card.Body>
                           <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
                             <div className="fw-semibold">Recent Product Submissions</div>

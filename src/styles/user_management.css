@@ -8,10 +8,6 @@
   .user-mgmt-tab-icon {
     display: none !important;
   }
-  .kpi-panel {
-    margin-top: 16px !important;
-    margin-bottom: 16px !important;
-  }
   .mobile-kpi-spacing {
     margin-bottom: 20px !important;
   }
@@ -88,10 +84,6 @@ user-mgmt-filter-row {
   gap: 20px;
 }
 
-.user-mgmt-kpi-value {
-  font-size: 28px;
-  color: #23272e;
-}
 
 .user-mgmt-kpi-change {
   font-size: 15px;
@@ -146,7 +138,6 @@ user-mgmt-filter-row {
   color: #23272e !important; 
   letter-spacing: -0.5px;
 }
-/* User Management Page Styles */
 /* User Management Page Styles */
 .user-management-main {
   background: #F7F9FB;
@@ -226,6 +217,7 @@ user-mgmt-filter-row {
   gap: 1rem;
   margin-top: 0 !important;
   align-items: flex-start;
+  padding: none !important;
 }
 .kpi-card {
     border-radius: 7px;
@@ -247,8 +239,8 @@ user-mgmt-filter-row {
   align-items: center;
 }
 .subscription-card {
-  min-width: 250px !important;
-  max-width: 250px !important;
+  min-height: 11rem !important;
+  max-height: 11rem !important;
 }
 .kpi-subscribtions{
     font-size: 12px;
