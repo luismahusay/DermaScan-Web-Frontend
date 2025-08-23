@@ -16,7 +16,7 @@ const Layout = ({
       <style jsx>{`
         @media (min-width: 768px) {
           .main-content {
-            margin-left: ${hideSidebar ? "0" : "50px"} !important;
+            margin-left: ${hideSidebar ? "0" : "10px"} !important;
             width: ${hideSidebar ? "100vw" : "calc(100vw - 250px)"} !important;
           }
         }
