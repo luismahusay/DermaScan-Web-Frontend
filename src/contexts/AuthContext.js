@@ -52,21 +52,10 @@ export const AuthProvider = ({ children }) => {
       const otp = generateOTP();
       setOtpStore({ [email]: otp });
 
-      // ⚠️ Temporary: call Brevo API directly (not secure, but okay for thesis localhost)
-      await fetch("https://api.brevo.com/v3/smtp/email", {
+      await fetch("http://localhost:5000/api/email/send-otp", {
         method: "POST",
-        headers: {
-          accept: "application/json",
-          "api-key":
-            "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", // ⚠️ keep secret later
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          sender: { name: "DermaScan", email: "eufemiocapoy.anhs@gmail.com" },
-          to: [{ email }],
-          subject: "Your OTP Code",
-          htmlContent: `<p>Your OTP is: <b>${otp}</b></p><p>This code will expire in 5 minutes.</p>`,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
       });
 
       console.log("OTP sent:", otp);
