@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import React, { useState, useContext } from "react";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-
+import { RegistrationContext } from "../contexts/RegistrationContext";
 function VerificationForm() {
   const navigate = useNavigate();
 
@@ -12,13 +12,16 @@ function VerificationForm() {
     zipCode: "",
     clinicName: "",
     clinicAvailableDays: "",
+    clinicTimeSchedule: "",
     timeFrom: "",
     timeTo: "",
     licenseImage: null,
     validIdType: "",
     validIdImage: null,
   });
-
+  const { updateVerificationInfo } = useContext(RegistrationContext);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -35,8 +38,50 @@ function VerificationForm() {
     }));
   };
 
-  const handleNext = () => {
-    navigate("/dermatologist/security");
+  const handleNext = async () => {
+    // Validation
+    const requiredFields = [
+      "clinicAddress",
+      "city",
+      "region",
+      "zipCode",
+      "clinicName",
+      "clinicAvailableDays",
+      "clinicTimeSchedule",
+    ];
+
+    const emptyFields = requiredFields.filter(
+      (field) => !formData[field]?.trim()
+    );
+
+    if (emptyFields.length > 0) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    // File validation
+    if (!formData.licenseImage) {
+      setError("Please upload your license image.");
+      return;
+    }
+
+    if (!formData.validIdType || !formData.validIdImage) {
+      setError("Please select valid ID type and upload image.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      // Store verification data in context
+      updateVerificationInfo(formData);
+      navigate("/dermatologist/security");
+    } catch (error) {
+      setError("Failed to proceed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignIn = () => {
@@ -77,7 +122,11 @@ function VerificationForm() {
             Verification
           </h3>
         </div>
-
+        {error && (
+          <Alert variant="danger" className="mx-5 mt-3">
+            {error}
+          </Alert>
+        )}
         <div
           className="p-md-5 overflow-auto flex-grow-1 d-flex flex-column"
           style={{ borderRadius: "0 0 20px 20px" }}

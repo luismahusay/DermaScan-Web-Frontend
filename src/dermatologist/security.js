@@ -1,21 +1,50 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import React, { useState, useContext } from "react";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { FaShieldAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useAuth } from "../contexts/AuthContext";
+import { RegistrationContext } from "../contexts/RegistrationContext";
 import "../styles/derma_security.css";
 
 function SecurityRegister() {
-  const navigate = useNavigate();
+   const navigate = useNavigate();
+   const { registerDermatologist } = useAuth();
+   const { personalInfo, verificationInfo } = useContext(RegistrationContext);
 
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+   const [password, setPassword] = useState("");
+   const [confirmPassword, setConfirmPassword] = useState("");
+   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+   const [showPassword, setShowPassword] = useState(false);
+   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+   const [error, setError] = useState("");
+   const [loading, setLoading] = useState(false);
 
-  const handleRegister = () => {
-    navigate("/dermatologist/emailverification");
-  };
+   const handleRegister = async () => {
+     // Validation
+     if (password.length < 6) {
+       setError("Password must be at least 6 characters long.");
+       return;
+     }
+
+     if (password !== confirmPassword) {
+       setError("Passwords do not match.");
+       return;
+     }
+
+     try {
+       setLoading(true);
+       setError("");
+
+       await registerDermatologist(personalInfo, verificationInfo, password);
+
+       navigate("/dermatologist/emailverification");
+     } catch (error) {
+       console.error("Registration error:", error);
+       setError(error.message || "Registration failed. Please try again.");
+     } finally {
+       setLoading(false);
+     }
+   };
 
   const handleLogin = () => {
     navigate("/dermatologist/derma_login");
@@ -34,13 +63,13 @@ function SecurityRegister() {
             backgroundPosition: "center",
           }}
         />
-
         {/* Right form section */}
         <Col xs={12} md={5} className="form-section d-flex flex-column p-0">
           {/* Blue Header */}
           <div className="header-section">
             <h3>Set up Security</h3>
           </div>
+          {error && <Alert variant="danger">{error}</Alert>}
           <div className="form-container">
             <div className="text-center mb-5">
               <img
@@ -118,8 +147,12 @@ function SecurityRegister() {
               </div>
 
               {/* Register Button */}
-              <Button onClick={handleRegister} className="register-btn">
-                REGISTER
+              <Button
+                onClick={handleRegister}
+                className="register-btn"
+                disabled={loading}
+              >
+                {loading ? "REGISTERING..." : "REGISTER"}
               </Button>
             </Form>
 

@@ -1,15 +1,17 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import React, { useState, useContext } from "react";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { fetchSignInMethodsForEmail } from "firebase/auth";
+import { RegistrationContext } from "../contexts/RegistrationContext";
+import { auth } from "../config/firebase";
 import "../styles/derma_register.css";
 
 function PersonalInformationForm() {
   const navigate = useNavigate();
+  const { updatePersonalInfo } = useContext(RegistrationContext);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-
-  const handleNext = () => {
-    navigate('/dermatologist/verification');
-  };
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -29,10 +31,72 @@ function PersonalInformationForm() {
     }));
   };
 
-  const handleSignIn = () => {
-    navigate('/dermatologist/derma_login');
+  // Function to check if email already exists using Firebase
+  const checkEmailAvailability = async (email) => {
+    try {
+      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+      return signInMethods.length === 0; // true if email is available (no sign-in methods found)
+    } catch (error) {
+      console.error("Error checking email availability:", error);
+      throw new Error("Failed to verify email availability. Please try again.");
+    }
   };
 
+  const handleNext = async () => {
+    // Validation
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "emailAddress",
+      "phoneNumber",
+      "address",
+      "gender",
+    ];
+    const emptyFields = requiredFields.filter(
+      (field) => !formData[field].trim()
+    );
+
+    if (emptyFields.length > 0) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.emailAddress)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      // Check if email is already in use
+      const isEmailAvailable = await checkEmailAvailability(
+        formData.emailAddress
+      );
+
+      if (!isEmailAvailable) {
+        setError(
+          "This email address is already registered. Please use a different email or try logging in instead."
+        );
+        return;
+      }
+
+      // Store data in context
+      updatePersonalInfo(formData);
+      navigate("/dermatologist/verification");
+    } catch (error) {
+      setError(error.message || "Failed to proceed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignIn = () => {
+    navigate("/dermatologist/derma_login");
+  };
 
   return (
     <Container fluid className="vh-100">
@@ -53,7 +117,7 @@ function PersonalInformationForm() {
             <div className="register-header text-center text-white">
               <h3 className="mb-0">Personal Information</h3>
             </div>
-
+            {error && <Alert variant="danger">{error}</Alert>}
             <div className="register-form-content">
               <div className="text-center">
                 <img
@@ -165,8 +229,12 @@ function PersonalInformationForm() {
                 </Row>
 
                 <div className="text-center fw-semibold">
-                  <Button onClick={handleNext} className="next-button">
-                    NEXT
+                  <Button
+                    onClick={handleNext}
+                    className="next-button"
+                    disabled={loading}
+                  >
+                    {loading ? "Processing..." : "NEXT"}
                   </Button>
                 </div>
               </Form>
@@ -188,4 +256,5 @@ function PersonalInformationForm() {
     </Container>
   );
 }
+
 export default PersonalInformationForm;

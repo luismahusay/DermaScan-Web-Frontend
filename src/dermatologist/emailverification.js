@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext"; // ✅ Import your AuthContext
 import "../styles/email_verification.css";
 
 function EmailVerification() {
   const navigate = useNavigate();
+  const { verifyOTP, currentUser, sendOTP } = useAuth();
   const [showPendingReview, setShowPendingReview] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleOtpChange = (index, value) => {
     if (value.length > 1) return;
@@ -15,10 +21,36 @@ function EmailVerification() {
     setOtp(newOtp);
   };
 
-  const handleConfirmation = () => {
-    setShowPendingReview(true);
-  };
+  const handleConfirmation = async () => {
+    setError("");
+    setLoading(true);
 
+    try {
+      const code = otp.join(""); // join ["1","2","3","4"] → "1234"
+      await verifyOTP(currentUser?.email, code); // ✅ call verifyOTP
+      setShowPendingReview(true); // show pending screen
+    } catch (err) {
+      console.error("OTP verification failed:", err);
+      setError("Invalid OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleResendOTP = async () => {
+    setResendLoading(true);
+    setError("");
+
+    try {
+      await sendOTP(currentUser?.email);
+      setSuccessMessage("New OTP sent!");
+      setOtp(["", "", "", ""]);
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      setError("Failed to resend OTP. Please try again.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
   const handleLogin = () => {
     navigate("/dermatologist/derma_login");
   };
@@ -26,7 +58,7 @@ function EmailVerification() {
   return (
     <Container fluid className="vh-100 p-0 ">
       <Row className="h-100 m-0">
-        {/* Left Image - hidden on small screens */}
+        {/* Left Image */}
         <Col
           md={7}
           className="d-none d-md-block p-0"
@@ -49,7 +81,10 @@ function EmailVerification() {
           </div>
 
           {/* Content */}
-          <div className=" py-4 px-5 mx-auto w-100" style={{ maxWidth: "400px" }}>
+          <div
+            className="py-4 px-5 mx-auto w-100"
+            style={{ maxWidth: "400px" }}
+          >
             {/* Logos */}
             <div className="text-center mb-4 d-flex flex-column align-items-center justify-content-center">
               <img
@@ -85,6 +120,15 @@ function EmailVerification() {
                 <span className="badge text-secondary bg-secondary-subtle py-2 px-3">
                   Status: Pending Admin Review
                 </span>
+                 <div className="mt-3">
+                  <Button
+                    variant="link"
+                    onClick={handleLogin}
+                    className="p-0 text-primary fw-semibold"
+                  >
+                    ← Back to log in
+                  </Button>
+                </div>
               </div>
             ) : (
               <>
@@ -113,17 +157,30 @@ function EmailVerification() {
                       value={digit}
                       onChange={(e) => handleOtpChange(index, e.target.value)}
                       className="text-center fs-4 fw-bold"
-                      style={{ width: "65px", height: "60px", backgroundColor: "#a2a8aeff" }}
+                      style={{
+                        width: "65px",
+                        height: "60px",
+                        backgroundColor: "#a2a8aeff",
+                      }}
                     />
                   ))}
                 </div>
+                {successMessage && (
+                  <p className="text-success text-center small mb-3">
+                    {successMessage}
+                  </p>
+                )}
+                {error && (
+                  <p className="text-danger text-center small mb-3">{error}</p>
+                )}
 
                 <div className="confirmation-button d-flex align-items-center justify-content-center mb-2">
                   <Button
                     onClick={handleConfirmation}
                     className="w-100 mb-3 text-uppercase fw-bold"
+                    disabled={loading}
                   >
-                    Confirmation
+                    {loading ? "Verifying..." : "Confirmation"}
                   </Button>
                 </div>
 
@@ -131,8 +188,13 @@ function EmailVerification() {
                   <span className="text-muted small">
                     Didn't receive the email?{" "}
                   </span>
-                  <Button variant="link" className="p-0 fw-semibold text-center ">
-                    Click to resend
+                  <Button
+                    variant="link"
+                    onClick={handleResendOTP}
+                    disabled={resendLoading}
+                    className="p-0 fw-semibold text-center"
+                  >
+                    {resendLoading ? "Sending..." : "Click to resend"}
                   </Button>
                 </div>
 

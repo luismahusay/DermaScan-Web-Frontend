@@ -1,0 +1,136 @@
+[debug] [2025-08-19T14:11:29.564Z] ----------------------------------------------------------------------
+[debug] [2025-08-19T14:11:29.568Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init functions
+[debug] [2025-08-19T14:11:29.568Z] CLI Version:   14.10.1
+[debug] [2025-08-19T14:11:29.568Z] Platform:      win32
+[debug] [2025-08-19T14:11:29.568Z] Node Version:  v22.14.0
+[debug] [2025-08-19T14:11:29.568Z] Time:          Tue Aug 19 2025 07:11:29 GMT-0700 (Pacific Daylight Time)
+[debug] [2025-08-19T14:11:29.568Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-19T14:11:29.571Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-08-19T14:11:29.629Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-19T14:11:29.629Z] > authorizing via signed-in user (eufemiocapoy.anhs@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\Administrator\Desktop\DermaScanWebFrontEnd\webfrontend
+
+[debug] [2025-08-19T14:11:30.065Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-08-19T14:11:30.065Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-08-19T14:11:59.279Z] Checked if tokens are valid: false, expires at: 1752418448935
+[debug] [2025-08-19T14:11:59.279Z] Checked if tokens are valid: false, expires at: 1752418448935
+[debug] [2025-08-19T14:11:59.280Z] > refreshing access token with scopes: []
+[debug] [2025-08-19T14:11:59.281Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-08-19T14:11:59.281Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-19T14:11:59.418Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-08-19T14:11:59.418Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-19T14:11:59.504Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2025-08-19T14:12:00.107Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-08-19T14:12:00.107Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-08-19T14:12:48.899Z] ----------------------------------------------------------------------
+[debug] [2025-08-19T14:12:48.901Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init functions
+[debug] [2025-08-19T14:12:48.902Z] CLI Version:   14.10.1
+[debug] [2025-08-19T14:12:48.902Z] Platform:      win32
+[debug] [2025-08-19T14:12:48.902Z] Node Version:  v22.14.0
+[debug] [2025-08-19T14:12:48.902Z] Time:          Tue Aug 19 2025 07:12:48 GMT-0700 (Pacific Daylight Time)
+[debug] [2025-08-19T14:12:48.903Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-19T14:12:48.909Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-19T14:12:48.909Z] > authorizing via signed-in user (eufemiocapoy.anhs@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\Administrator\Desktop\DermaScanWebFrontEnd\webfrontend
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-08-19T14:12:52.596Z] Checked if tokens are valid: true, expires at: 1755616318418
+[debug] [2025-08-19T14:12:52.596Z] Checked if tokens are valid: true, expires at: 1755616318418
+[debug] [2025-08-19T14:12:52.597Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2025-08-19T14:12:53.192Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-08-19T14:12:53.192Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-08-19T14:19:33.349Z] ----------------------------------------------------------------------
+[debug] [2025-08-19T14:19:33.351Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init functions
+[debug] [2025-08-19T14:19:33.352Z] CLI Version:   14.10.1
+[debug] [2025-08-19T14:19:33.352Z] Platform:      win32
+[debug] [2025-08-19T14:19:33.352Z] Node Version:  v22.14.0
+[debug] [2025-08-19T14:19:33.352Z] Time:          Tue Aug 19 2025 07:19:33 GMT-0700 (Pacific Daylight Time)
+[debug] [2025-08-19T14:19:33.352Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-19T14:19:33.358Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-19T14:19:33.359Z] > authorizing via signed-in user (eufemiocapoy.anhs@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\Administrator\Desktop\DermaScanWebFrontEnd\webfrontend
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-08-19T14:19:37.765Z] Checked if tokens are valid: true, expires at: 1755616318418
+[debug] [2025-08-19T14:19:37.765Z] Checked if tokens are valid: true, expires at: 1755616318418
+[debug] [2025-08-19T14:19:37.767Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2025-08-19T14:19:38.380Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-08-19T14:19:38.380Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-08-19T14:20:01.948Z] ----------------------------------------------------------------------
+[debug] [2025-08-19T14:20:01.951Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init functions
+[debug] [2025-08-19T14:20:01.951Z] CLI Version:   14.10.1
+[debug] [2025-08-19T14:20:01.952Z] Platform:      win32
+[debug] [2025-08-19T14:20:01.952Z] Node Version:  v22.14.0
+[debug] [2025-08-19T14:20:01.952Z] Time:          Tue Aug 19 2025 07:20:01 GMT-0700 (Pacific Daylight Time)
+[debug] [2025-08-19T14:20:01.952Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-19T14:20:01.957Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-19T14:20:01.958Z] > authorizing via signed-in user (eufemiocapoy.anhs@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\Administrator\Desktop\DermaScanWebFrontEnd\webfrontend
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[info] i  If you want to create a project in a Google Cloud organization or folder, please use "firebase projects:create" instead, and return to this command when you've created the project. 
