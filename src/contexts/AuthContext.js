@@ -65,59 +65,24 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
-  const sendApprovalNotification = async (email, firstName, isApproved) => {
-    try {
-      const subject = isApproved
-        ? "Account Approved - DermaScan"
-        : "Account Status Update - DermaScan";
-      const htmlContent = isApproved
-        ? `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #28a745;">Congratulations, Dr. ${firstName}!</h2>
-          <p>Your DermaScan dermatologist account has been <strong>approved</strong> by our administrator.</p>
-          <p>You can now fully access all dermatologist features on our platform.</p>
-          <p>Thank you for joining DermaScan!</p>
-          <br>
-          <p>Best regards,<br>The DermaScan Team</p>
-        </div>
-      `
-        : `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #dc3545;">Account Status Update</h2>
-          <p>Dear Dr. ${firstName},</p>
-          <p>We regret to inform you that your DermaScan dermatologist account application has been <strong>rejected</strong>.</p>
-          <p>If you believe this is an error, please contact our support team.</p>
-          <br>
-          <p>Best regards,<br>The DermaScan Team</p>
-        </div>
-      `;
+ const sendApprovalNotification = async (email, firstName, isApproved) => {
+   try {
+     await fetch("http://localhost:5000/api/email/send-approval", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ email, firstName, isApproved }),
+     });
 
-      await fetch("https://api.brevo.com/v3/smtp/email", {
-        method: "POST",
-        headers: {
-          accept: "application/json",
-          "api-key":
-            "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",
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          sender: { name: "DermaScan", email: "eufemiocapoy.anhs@gmail.com" },
-          to: [{ email }],
-          subject,
-          htmlContent,
-        }),
-      });
-
-      console.log(
-        `${isApproved ? "Approval" : "Rejection"} notification sent to:`,
-        email
-      );
-      return { success: true };
-    } catch (error) {
-      console.error("Email notification error:", error);
-      throw error;
-    }
-  };
+     console.log(
+       `${isApproved ? "Approval" : "Rejection"} notification sent to:`,
+       email
+     );
+     return { success: true };
+   } catch (error) {
+     console.error("Email notification error:", error);
+     throw error;
+   }
+ };
  const verifyOTP = async (email, otp) => {
    try {
      if (otpStore[email] && otpStore[email] === otp) {
