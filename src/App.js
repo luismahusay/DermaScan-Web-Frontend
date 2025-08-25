@@ -17,6 +17,7 @@ import DermaVerification from "./dermatologist/verification";
 import SecurityRegister from "./dermatologist/security";
 import EmailVerification from "./dermatologist/emailverification";
 import ForgotPassword from "./dermatologist/forgotpassword";
+import ResetPassword from "./dermatologist/resetpassword";
 import AdminDashboard from "./admin/admin_dashboard";
 import DermaProductManagement from "./dermatologist/productmanagement";
 import DermaBookings from "./dermatologist/bookings";
@@ -60,7 +61,10 @@ function App() {
                 path="/dermatologist/forgotpassword"
                 element={<ForgotPassword />}
               />
-
+              <Route
+                path="/dermatologist/resetpassword"
+                element={<ResetPassword />}
+              />
               {/* Admin Protected Routes */}
               <Route
                 path="/admin/admin_dashboard"

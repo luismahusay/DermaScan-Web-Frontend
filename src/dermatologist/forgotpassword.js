@@ -1,15 +1,50 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import "../styles/derma_forgot_password.css";
 
 function ForgotPassword() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const { sendPasswordResetOTP } = useAuth();
 
-  const handleResetPassword = () => {
-    navigate("/dermatologist/emailverification");
-    // TODO: Add actual password reset logic
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      setError("Please enter your email address");
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+      setSuccess("");
+
+      await sendPasswordResetOTP(email);
+      setSuccess("OTP sent to your email address!");
+
+      // Navigate to OTP verification screen after a short delay
+      setTimeout(() => {
+        navigate("/dermatologist/resetpassword", {
+          state: { email: email },
+        });
+      }, 1500);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogin = () => {
@@ -61,7 +96,7 @@ function ForgotPassword() {
             <img
               src="/icons/biggerlogodermascan.png"
               alt="DERMAScan Logo"
-              style={{ width: "9rem"}}
+              style={{ width: "9rem" }}
             />
             <img
               src="/icons/DermaScan.png"
@@ -71,9 +106,24 @@ function ForgotPassword() {
           </div>
 
           {/* Instruction */}
-          <p className="text-center text-muted mb-4 fw-semibold" style={{ fontSize: "0.9rem" }}>
+          <p
+            className="text-center text-muted mb-4 fw-semibold"
+            style={{ fontSize: "0.9rem" }}
+          >
             Please enter your email to reset the password
           </p>
+
+          {/* Success/Error Messages */}
+          {error && (
+            <Alert variant="danger" className="mx-4 mb-3">
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert variant="success" className="mx-4 mb-3">
+              {success}
+            </Alert>
+          )}
 
           {/* Form */}
           <Form className="d-flex flex-column align-items-center justify-content-center">
@@ -85,11 +135,13 @@ function ForgotPassword() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="border-0 border-bottom rounded-0 ps-0 pe-3"
                 style={{ boxShadow: "none", width: "20rem" }}
+                disabled={loading}
               />
             </Form.Group>
 
             <Button
               onClick={handleResetPassword}
+              disabled={loading}
               className="mb-3 d-flex justify-content-center align-items-center"
               style={{
                 backgroundColor: "#2962FF",
@@ -101,7 +153,7 @@ function ForgotPassword() {
                 width: "20rem",
               }}
             >
-              Reset Password
+              {loading ? "Sending..." : "Reset Password"}
             </Button>
           </Form>
 
@@ -111,6 +163,7 @@ function ForgotPassword() {
               variant="link"
               onClick={handleLogin}
               className="back-login"
+              disabled={loading}
             >
               ← Back to log in
             </Button>

@@ -10,4 +10,7 @@ export const API_ENDPOINTS = {
   HEALTH_CHECK: `${API_BASE_URL}/api/product-images/health`,
   SEND_OTP: `${API_BASE_URL}/api/email/send-otp`,
   SEND_APPROVAL: `${API_BASE_URL}/api/email/send-approval`,
+  SEND_PASSWORD_RESET_OTP: `${API_BASE_URL}/api/email/send-password-reset-otp`,
+  UPLOAD_VERIFICATION_IMAGE: `${API_BASE_URL}/api/user-images/upload-image`,
+  UPLOAD_PROFILE_PICTURE: `${API_BASE_URL}/api/user-images/upload-profile-picture`,
 };

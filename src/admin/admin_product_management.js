@@ -28,6 +28,7 @@ import "../styles/admin_product_management.css";
 import { useImageUpload } from "../hooks/useImageUpload";
 import { useProduct } from "../contexts/ProductContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useActivityLogger } from "../hooks/useActivityLogger";
 
 const ProductManagement = () => {
   // Context hooks
@@ -42,7 +43,7 @@ const ProductManagement = () => {
   } = useProduct();
   const { userProfile } = useAuth();
   const { uploadImages, uploading, uploadError } = useImageUpload();
-
+  const { logActivity, ACTIVITY_TYPES } = useActivityLogger();
   // State management
   const [entries, setEntries] = useState(10);
   const [search, setSearch] = useState("");
@@ -163,6 +164,16 @@ const ProductManagement = () => {
         description: "",
         ingredients: "",
       });
+      const newProduct = await addProduct;
+       await logActivity(
+         ACTIVITY_TYPES.ADD_PRODUCT,
+         userProfile?.User_Email || "admin@example.com",
+         {
+           product_name: formData.productName,
+           product_category: formData.category,
+           product_id: newProduct?.Product_ID, // if available
+         }
+       );
       setShowModal(false);
       setUploadedImages([]);
       setSelectedFiles([]);
@@ -189,7 +200,15 @@ const ProductManagement = () => {
       }
 
       await updateProduct(editProduct.Product_ID, editFormData, newImageUrls);
-
+       await logActivity(
+         ACTIVITY_TYPES.UPDATE_PRODUCT,
+         userProfile?.User_Email || "admin@example.com",
+         {
+           product_id: editProduct.Product_ID,
+           product_name: editFormData.productName,
+           changes: editFormData,
+         }
+       );
       setShowEditModal(false);
       setEditUploadedImages([]);
       setEditSelectedFiles([]);
@@ -218,6 +237,14 @@ const ProductManagement = () => {
 
     try {
       await deleteProduct(deleteProductData.Product_ID);
+        await logActivity(
+          ACTIVITY_TYPES.DELETE_PRODUCT,
+          userProfile?.User_Email || "admin@example.com",
+          {
+            product_id: deleteProductData.Product_ID,
+            product_name: deleteProductData.Product_Name,
+          }
+        );
       setShowDeleteModal(false);
       setDeleteProductData(null);
       showAlert("success", "Product deleted successfully");

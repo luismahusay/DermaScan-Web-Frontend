@@ -5,7 +5,9 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
+  updatePassword,
   fetchSignInMethodsForEmail,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import {
   doc,
@@ -18,6 +20,7 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "../config/firebase";
+import { API_ENDPOINTS } from "../config/api";
 
 const AuthContext = createContext();
 
@@ -30,6 +33,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
   const [otpStore, setOtpStore] = useState({}); // temp storage for OTPs
+  const [passwordResetOtpStore, setPasswordResetOtpStore] = useState({}); // temp storage for password reset OTPs
 
   // ---------- Email Check Function ----------
   const checkEmailAvailability = async (email) => {
@@ -39,6 +43,22 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Error checking email availability:", error);
       throw new Error("Failed to verify email availability. Please try again.");
+    }
+  };
+
+  // ---------- Check if Email Exists ----------
+  const checkEmailExists = async (email) => {
+    try {
+      console.log("Checking email:", email); // Debug log
+      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+      console.log("Sign in methods found:", signInMethods); // Debug log
+      console.log("Email exists:", signInMethods.length > 0); // Debug log
+      return signInMethods.length > 0; // true if email exists
+    } catch (error) {
+      console.error("Error checking email existence:", error);
+      console.error("Error code:", error.code); // Debug log
+      console.error("Error message:", error.message); // Debug log
+      throw new Error("Failed to verify email. Please try again.");
     }
   };
 
@@ -65,54 +85,190 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
- const sendApprovalNotification = async (email, firstName, isApproved) => {
-   try {
-     await fetch("http://localhost:5000/api/email/send-approval", {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ email, firstName, isApproved }),
-     });
 
-     console.log(
-       `${isApproved ? "Approval" : "Rejection"} notification sent to:`,
-       email
-     );
-     return { success: true };
-   } catch (error) {
-     console.error("Email notification error:", error);
-     throw error;
-   }
- };
- const verifyOTP = async (email, otp) => {
-   try {
-     if (otpStore[email] && otpStore[email] === otp) {
-       if (currentUser) {
-         await updateDoc(doc(db, "Users", currentUser.uid), {
-           emailVerified: true, // 👈 ADD THIS
-         });
+  // ---------- Password Reset OTP Functions ----------
+  // Alternative approach - Skip the email existence check and let Firebase handle it:
+  const sendPasswordResetOTP = async (email) => {
+    try {
+      console.log("Starting password reset for:", email);
 
-         setUserProfile((prev) => ({
-           ...prev,
-           emailVerified: true, // 👈 ADD THIS
-         }));
-       }
+      // Skip email existence check and proceed directly
+      // If email doesn't exist, we'll still send OTP but Firebase reset will fail silently
 
-       // Clear OTP after successful verification
-       setOtpStore((prev) => {
-         const updated = { ...prev };
-         delete updated[email];
-         return updated;
-       });
+      const otp = generateOTP();
+      console.log("Generated OTP:", otp); // Debug log (remove in production)
 
-       return { success: true };
-     } else {
-       throw new Error("Invalid or expired OTP");
-     }
-   } catch (error) {
-     console.error("OTP verification error:", error);
-     throw error;
-   }
- };
+      // Store OTP with expiration time (10 minutes)
+      setPasswordResetOtpStore({
+        [email]: {
+          otp: otp,
+          expires: Date.now() + 10 * 60 * 1000, // 10 minutes from now
+        },
+      });
+
+      const response = await fetch(
+        "http://localhost:5000/api/email/send-password-reset-otp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send OTP");
+      }
+
+      console.log("Password Reset OTP sent successfully");
+      return { success: true };
+    } catch (error) {
+      console.error("Password Reset OTP sending error:", error);
+      throw error;
+    }
+  };
+  const verifyPasswordResetOTP = async (email, otp) => {
+    try {
+      const storedData = passwordResetOtpStore[email];
+
+      if (!storedData) {
+        throw new Error("OTP not found or expired");
+      }
+
+      // Check if OTP is expired
+      if (Date.now() > storedData.expires) {
+        // Clean up expired OTP
+        setPasswordResetOtpStore((prev) => {
+          const updated = { ...prev };
+          delete updated[email];
+          return updated;
+        });
+        throw new Error("OTP has expired. Please request a new one.");
+      }
+
+      if (storedData.otp === otp) {
+        return { success: true };
+      } else {
+        throw new Error("Invalid OTP");
+      }
+    } catch (error) {
+      console.error("Password Reset OTP verification error:", error);
+      throw error;
+    }
+  };
+
+  const resetPasswordWithFirebase = async (email, otp) => {
+    try {
+      // Verify OTP first
+      const otpVerification = await verifyPasswordResetOTP(email, otp);
+      if (!otpVerification.success) {
+        throw new Error("Invalid OTP");
+      }
+
+      // Send Firebase password reset email
+      await sendPasswordResetEmail(auth, email);
+
+      // Clear OTP after successful verification
+      setPasswordResetOtpStore((prev) => {
+        const updated = { ...prev };
+        delete updated[email];
+        return updated;
+      });
+
+      return {
+        success: true,
+        message:
+          "Password reset email sent to your inbox. Please check your email and follow the instructions to reset your password.",
+      };
+    } catch (error) {
+      console.error("Password reset error:", error);
+      throw error;
+    }
+  };
+
+  // Alternative method: Reset password for logged-in users
+  const updateUserPassword = async (email, otp, newPassword) => {
+    try {
+      // Verify OTP first
+      const otpVerification = await verifyPasswordResetOTP(email, otp);
+      if (!otpVerification.success) {
+        throw new Error("Invalid OTP");
+      }
+
+      // Since we can't update password without current authentication,
+      // we'll use Firebase's built-in password reset email instead
+      await sendPasswordResetEmail(auth, email);
+
+      // Clear OTP after successful verification
+      setPasswordResetOtpStore((prev) => {
+        const updated = { ...prev };
+        delete updated[email];
+        return updated;
+      });
+
+      return {
+        success: true,
+        message:
+          "Password reset email sent! Please check your email to complete the password reset.",
+      };
+    } catch (error) {
+      console.error("Password update error:", error);
+      throw error;
+    }
+  };
+
+  const sendApprovalNotification = async (email, firstName, isApproved) => {
+    try {
+      await fetch("http://localhost:5000/api/email/send-approval", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, firstName, isApproved }),
+      });
+
+      console.log(
+        `${isApproved ? "Approval" : "Rejection"} notification sent to:`,
+        email
+      );
+      return { success: true };
+    } catch (error) {
+      console.error("Email notification error:", error);
+      throw error;
+    }
+  };
+
+  const verifyOTP = async (email, otp) => {
+    try {
+      if (otpStore[email] && otpStore[email] === otp) {
+        if (currentUser && userProfile) {
+          // Add userProfile check
+          // Use custom user ID instead of Firebase UID
+          await updateDoc(doc(db, "Users", userProfile.User_ID), {
+            emailVerified: true,
+          });
+
+          setUserProfile((prev) => ({
+            ...prev,
+            emailVerified: true,
+          }));
+        }
+
+        // Clear OTP after successful verification
+        setOtpStore((prev) => {
+          const updated = { ...prev };
+          delete updated[email];
+          return updated;
+        });
+
+        return { success: true };
+      } else {
+        throw new Error("Invalid or expired OTP");
+      }
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      throw error;
+    }
+  };
+
   const approveDermatologist = async (userId) => {
     try {
       // Get user data first for email notification
@@ -138,7 +294,7 @@ export const AuthProvider = ({ children }) => {
         });
       }
 
-      // 👉 Send approval notification email
+      // Send approval notification email
       if (userData?.User_Email && userData?.User_FName) {
         await sendApprovalNotification(
           userData.User_Email,
@@ -153,6 +309,7 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+
   const rejectDermatologist = async (userId) => {
     try {
       // Get user data first for email notification
@@ -163,7 +320,7 @@ export const AuthProvider = ({ children }) => {
         User_ValidDermatologist_ID: false,
       });
 
-      // 👉 Send rejection notification email
+      // Send rejection notification email
       if (userData?.User_Email && userData?.User_FName) {
         await sendApprovalNotification(
           userData.User_Email,
@@ -178,6 +335,7 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+
   // ---------- Registration ----------
   const registerDermatologist = async (
     personalInfo,
@@ -185,6 +343,7 @@ export const AuthProvider = ({ children }) => {
     password
   ) => {
     try {
+      // First create Firebase user
       const { user } = await createUserWithEmailAndPassword(
         auth,
         personalInfo.emailAddress,
@@ -195,13 +354,35 @@ export const AuthProvider = ({ children }) => {
         displayName: `${personalInfo.firstName} ${personalInfo.lastName}`,
       });
 
-      // Generate IDs
+      // Generate unique custom ID
+      const customUserId = await generateUniqueCustomId();
+
+      // Handle image uploads
+      let licenseImageUrl = "";
+      let validIdImageUrl = "";
+
+      if (verificationInfo.licenseImage) {
+        const licenseUpload = await uploadImageToSupabase(
+          verificationInfo.licenseImage
+        );
+        if (licenseUpload.success) licenseImageUrl = licenseUpload.url;
+      }
+
+      if (verificationInfo.validIdImage) {
+        const idUpload = await uploadImageToSupabase(
+          verificationInfo.validIdImage
+        );
+        if (idUpload.success) validIdImageUrl = idUpload.url;
+      }
+
+      // Generate other IDs
       const clinicId = generateClinicId();
       const locationId = generateLocationId();
 
-      // Save user to Firestore (unverified initially)
+      // Save user to Firestore with CUSTOM ID as document ID
       const userData = {
-        User_ID: user.uid,
+        User_ID: customUserId, // Custom ID
+        Firebase_UID: user.uid, // Keep Firebase UID for auth reference
         User_FName: personalInfo.firstName,
         User_LName: personalInfo.lastName,
         User_MName: personalInfo.middleName || "",
@@ -211,12 +392,22 @@ export const AuthProvider = ({ children }) => {
         User_Gender: personalInfo.gender,
         User_PhoneNumber: personalInfo.phoneNumber,
         User_HomeAddress: personalInfo.address,
+        User_LicenseImageURL: licenseImageUrl,
+        User_ValidIdImageURL: validIdImageUrl,
         User_ValidDermatologist_ID: false,
         emailVerified: false,
       };
-      await setDoc(doc(db, "Users", user.uid), userData);
 
-      // Location
+      // Save with custom ID as document ID
+      await setDoc(doc(db, "Users", customUserId), userData);
+
+      // Create mapping for Firebase UID -> Custom ID lookup
+      await setDoc(doc(db, "UserMapping", user.uid), {
+        customUserId: customUserId,
+        role: "dermatologist",
+      });
+
+      // Location data
       const locationData = {
         Location_ID: locationId,
         Location_City: verificationInfo.city,
@@ -225,7 +416,7 @@ export const AuthProvider = ({ children }) => {
       };
       await setDoc(doc(db, "Location", locationId), locationData);
 
-      // Clinic
+      // Clinic data
       const timeSchedule =
         verificationInfo.clinicTimeSchedule || "08:00 AM - 05:00 PM";
       const [startTime, endTime] = timeSchedule.split(" - ");
@@ -240,43 +431,86 @@ export const AuthProvider = ({ children }) => {
       };
       await setDoc(doc(db, "Clinic", clinicId), clinicData);
 
-      // Clinic-Dermatologist relationship
+      // Clinic-Dermatologist relationship (use custom ID)
       const clinicDermatologistData = {
-        ClinicDermatologist_ID: `${clinicId}_${user.uid}`,
+        ClinicDermatologist_ID: `${clinicId}_${customUserId}`,
         Clinic_ID: clinicId,
-        Dermatologist_ID: user.uid,
+        Dermatologist_ID: customUserId, // Use custom ID instead of Firebase UID
         ClinicDermatologist_ApprovalDate: null,
       };
       await setDoc(
-        doc(db, "ClinicDermatologist", `${clinicId}_${user.uid}`),
+        doc(db, "ClinicDermatologist", `${clinicId}_${customUserId}`),
         clinicDermatologistData
       );
 
-      // 👉 After saving user, send OTP
+      // Send OTP
       await sendOTP(personalInfo.emailAddress);
 
-      return user;
+      return { user, customUserId };
     } catch (error) {
       console.error("Registration error:", error);
       throw error;
     }
   };
+  const uploadImageToSupabase = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "verification-documents");
 
+      const response = await fetch(API_ENDPOINTS.UPLOAD_VERIFICATION_IMAGE, {
+        method: "POST",
+        body: formData,
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Image upload error:", error);
+      return { success: false };
+    }
+  };
   // ---------- Auth ----------
   const login = async (email, password) => {
     try {
       const { user } = await signInWithEmailAndPassword(auth, email, password);
-      const userDoc = await getDoc(doc(db, "Users", user.uid));
 
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setUserProfile(userData);
+      // Get custom user ID from mapping
+      const mappingDoc = await getDoc(doc(db, "UserMapping", user.uid));
 
-        // Only send OTP if email is NOT verified
-        if (!userData.emailVerified) {
-          await sendOTP(email);
+      if (mappingDoc.exists()) {
+        const { customUserId } = mappingDoc.data();
+
+        // Get user profile using custom ID
+        const userDoc = await getDoc(doc(db, "Users", customUserId));
+
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setUserProfile(userData);
+
+          // Only send OTP if email is NOT verified
+          if (!userData.emailVerified) {
+            await sendOTP(email);
+          }
+        }
+      } else {
+        // FALLBACK: Handle old users (before custom ID system)
+        const oldUserDoc = await getDoc(doc(db, "Users", user.uid));
+
+        if (oldUserDoc.exists()) {
+          const userData = oldUserDoc.data();
+          setUserProfile(userData);
+
+          // For old users, you might want to:
+          // Option 1: Always assume verified (since they existed before)
+          // (No OTP will be sent)
+
+          // Option 2: Still check emailVerified flag
+          if (!userData.emailVerified) {
+            await sendOTP(email);
+          }
         }
       }
+
       return user;
     } catch (error) {
       throw error;
@@ -298,23 +532,99 @@ export const AuthProvider = ({ children }) => {
       "location_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9)
     );
   };
+  const generateCustomUserId = () => {
+    const now = new Date();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setCurrentUser(user);
-        const userDoc = await getDoc(doc(db, "Users", user.uid));
-        if (userDoc.exists()) {
-          setUserProfile(userDoc.data());
-        }
-      } else {
-        setCurrentUser(null);
-        setUserProfile(null);
+    // Get month (01-12)
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+
+    // Get day (01-31)
+    const day = String(now.getDate()).padStart(2, "0");
+
+    // Get year (last 2 digits)
+    const year = String(now.getFullYear()).slice(-2);
+
+    // Generate random 2-digit number (01-99)
+    const randomNumber = String(Math.floor(1 + Math.random() * 99)).padStart(
+      2,
+      "0"
+    );
+
+    // Format: MMDDYYRR (8 digits total)
+    return `${month}${day}${year}${randomNumber}`;
+  };
+  const checkCustomIdExists = async (customId) => {
+    try {
+      const userDoc = await getDoc(doc(db, "Users", customId));
+      return userDoc.exists();
+    } catch (error) {
+      console.error("Error checking custom ID:", error);
+      return false;
+    }
+  };
+  const generateUniqueCustomId = async (maxRetries = 10) => {
+    for (let i = 0; i < maxRetries; i++) {
+      const customId = generateCustomUserId();
+      const exists = await checkCustomIdExists(customId);
+
+      if (!exists) {
+        return customId;
       }
-      setLoading(false);
-    });
-    return unsubscribe;
-  }, []);
+    }
+
+    // Fallback: add extra random digits if all retries failed
+    const baseId = generateCustomUserId();
+    const extraRandom = String(Math.floor(Math.random() * 100)).padStart(
+      2,
+      "0"
+    );
+    return `${baseId}${extraRandom}`; // Will be 10 digits if fallback is used
+  };
+  const getCustomUserIdFromFirebaseUID = async (firebaseUID) => {
+    try {
+      const mappingDoc = await getDoc(doc(db, "UserMapping", firebaseUID));
+      if (mappingDoc.exists()) {
+        return mappingDoc.data().customUserId;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error getting custom user ID:", error);
+      return null;
+    }
+  };
+ useEffect(() => {
+   const unsubscribe = onAuthStateChanged(auth, async (user) => {
+     if (user) {
+       setCurrentUser(user);
+
+       // Get custom user ID from mapping first
+       const mappingDoc = await getDoc(doc(db, "UserMapping", user.uid));
+
+       if (mappingDoc.exists()) {
+         const { customUserId } = mappingDoc.data();
+
+         // Use custom ID to get user profile
+         const userDoc = await getDoc(doc(db, "Users", customUserId));
+         if (userDoc.exists()) {
+           setUserProfile(userDoc.data());
+         }
+       } else {
+         // FALLBACK: Handle old users (same as login function)
+         const oldUserDoc = await getDoc(doc(db, "Users", user.uid));
+
+         if (oldUserDoc.exists()) {
+           const userData = oldUserDoc.data();
+           setUserProfile(userData);
+         }
+       }
+     } else {
+       setCurrentUser(null);
+       setUserProfile(null);
+     }
+     setLoading(false);
+   });
+   return unsubscribe;
+ }, []);
 
   const value = {
     currentUser,
@@ -324,9 +634,14 @@ export const AuthProvider = ({ children }) => {
     logout,
     sendOTP,
     verifyOTP,
-    checkEmailAvailability, // Add this to the context
-    approveDermatologist, // Add this
-    rejectDermatologist, // Add this
+    checkEmailAvailability,
+    checkEmailExists,
+    sendPasswordResetOTP,
+    verifyPasswordResetOTP,
+    resetPasswordWithFirebase,
+    updateUserPassword,
+    approveDermatologist,
+    rejectDermatologist,
     loading,
   };
 

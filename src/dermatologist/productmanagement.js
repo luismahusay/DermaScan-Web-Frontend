@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Row,
@@ -6,14 +6,31 @@ import {
   Table,
   Form,
   Button,
-  Modal
+  Modal,
+  Alert
 } from "react-bootstrap";
 import { Layout } from "./Layout";
 import "../styles/derma_product_management.css";
+import { useProduct } from "../contexts/ProductContext";
+import { useAuth } from "../contexts/AuthContext";
+import { useImageUpload } from "../hooks/useImageUpload";
 
 const DermaProductManagement = () => {
+  const { currentUser, loading: authLoading } = useAuth();
+  const {
+    products,
+    loading: productLoading,
+    addProduct,
+    getProducts,
+    updateProduct,
+    deleteProduct,
+  } = useProduct();
+  const { uploadImages, uploading, uploadError } = useImageUpload();
+
+  // State management
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -22,171 +39,411 @@ const DermaProductManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
-  // Sample products data matching your image
-  const productsData = [
-    {
-      id: "#20462",
-      product: "ClearGlow Facial Gel",
-      category: "Serum / Treatment",
-      skinType: "Oily",
-      description: "A lightweight gel that...",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#18533",
-      product: "HydraMask Pro",
-      category: "Mask",
-      skinType: "Dry",
-      description: "Dr. Emily Santos",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#40169",
-      product: "DermaClean Wash",
-      category: "Cleanser",
-      skinType: "Combination",
-      description: "Dr. Sofia Lim",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#34304",
-      product: "SPF 50+ Shield",
-      category: "Sunscreen",
-      skinType: "All",
-      description: "Dr. Ana Reyes",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#17168",
-      product: "AcneAway Gel",
-      category: "Treatment",
-      skinType: "Oily",
-      description: "Pending Review",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#73003",
-      product: "PureTone",
-      category: "Toner",
-      skinType: "Normal",
-      description: "Dr. Michael Cruz",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#58626",
-      product: "SoftSkin Lotion",
-      category: "Moisturizer",
-      skinType: "Dry",
-      description: "Dr. Emily Santos",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#40122",
-      product: "PoreFix Strips",
-      category: "Treatment",
-      skinType: "Oily",
-      description: "Dr. Sofia Lim",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#89044",
-      product: "Vitaboost Cream",
-      category: "Cream",
-      skinType: "Combination",
-      description: "Pending Review",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#85252",
-      product: "MatteTone Pads",
-      category: "Toner",
-      skinType: "Oily",
-      description: "Dr. Emily Santos",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#85252",
-      product: "MatteTone Pads",
-      category: "Toner",
-      skinType: "Oily",
-      description: "Dr. Emily Santos",
-      ingredients: "Water, Salicylic Acid...",
-    },
-    {
-      id: "#85252",
-      product: "MatteTone Pads",
-      category: "Toner",
-      skinType: "Oily",
-      description: "Dr. Emily Santos",
-      ingredients: "Water, Salicylic Acid...",
-    },
-  ];
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [editUploadedFiles, setEditUploadedFiles] = useState([]);
+  const [error, setError] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [editSelectedFiles, setEditSelectedFiles] = useState([]);
+  const [alert, setAlert] = useState({ show: false, type: "", message: "" });
 
-  // Notification data
-  const notifications = [
-    {
-      name: "Sarah Johnson",
-      time: "July 15, 2025 at 2:00 PM",
-      ago: "5 minutes ago",
-    },
-    {
-      name: "Michael Chen",
-      time: "July 18, 2025 at 9:00 AM",
-      ago: "12 minutes ago",
-    },
-    {
-      name: "Emma Rodriguez",
-      time: "August 5, 2025 at 11:30 AM",
-      ago: "28 minutes ago",
-    },
-    {
-      name: "David Park",
-      time: "July 22, 2025 at 3:15 PM",
-      ago: "30 minutes ago",
-    },
-  ];
+  // Form data state
+  const [formData, setFormData] = useState({
+    productName: "",
+    category: "",
+    skinCondition: "",
+    description: "",
+    ingredients: "",
+  });
 
-  // Filter products based on search term
-  const handleEdit = (product) => {
-    setEditingProduct(product);
-    setShowEditModal(true);
-  };
-  const handleView = (product) => {
-    setViewingProduct(product);
-    setShowViewModal(true);
-  };
-  const handleDelete = (product) => {
-    setProductToDelete(product);
-    setShowDeleteModal(true);
-  };
-  const confirmDelete = () => {
-    // Remove the product from your products array/state
-    // Example: setProducts(products.filter(p => p.id !== productToDelete.id))
-    setShowDeleteModal(false);
-    setProductToDelete(null);
-  };
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setProductToDelete(null);
-  };
+  const [editFormData, setEditFormData] = useState({
+    productName: "",
+    category: "",
+    skinCondition: "",
+    description: "",
+    ingredients: "",
+  });
+
+  // Filters state
   const [filters, setFilters] = useState({
     category: "",
     skinType: "",
     dateRange: "",
+    status: "",
   });
-  const filteredProducts = productsData.filter((product) => {
+
+  // Load products on component mount - only for current dermatologist
+  useEffect(() => {
+    let isMounted = true; // Prevent state updates if component unmounts
+
+    const loadProductsWhenReady = async () => {
+      // Wait for authentication to be ready
+      if (authLoading) {
+        console.log("Auth still loading, waiting...");
+        return;
+      }
+
+      if (!currentUser?.uid) {
+        console.log("No authenticated user found");
+        return;
+      }
+
+      try {
+        console.log("Loading products for user:", currentUser.uid);
+        await getProducts({
+          dermatologistId: currentUser.uid,
+        });
+        console.log("Products loaded successfully");
+      } catch (error) {
+        console.error("Failed to load products:", error);
+        if (isMounted) {
+          showAlert("error", "Failed to load products: " + error.message);
+        }
+      }
+    };
+
+    loadProductsWhenReady();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUser?.uid, authLoading]);
+
+  const loadProducts = async () => {
+    try {
+      console.log("=== LOADING PRODUCTS ===");
+
+      if (!currentUser?.uid) {
+        console.warn("No current user UID available");
+        return;
+      }
+
+      console.log("Loading products for dermatologist:", currentUser.uid);
+
+      const productsData = await getProducts({
+        dermatologistId: currentUser.uid,
+      });
+
+      console.log("Products loaded:", productsData?.length || 0, "products");
+      console.log("First product sample:", productsData?.[0]);
+
+      // Verify the products have images
+      if (productsData?.length > 0) {
+        productsData.forEach((product, index) => {
+          console.log(
+            `Product ${index + 1} images:`,
+            product.Product_AllImageURLs
+          );
+        });
+      }
+    } catch (error) {
+      console.error("=== LOAD PRODUCTS ERROR ===");
+      console.error("Full error:", error);
+      console.error("Error message:", error.message);
+
+      const errorMessage = error?.message || "Failed to load products";
+      showAlert("error", errorMessage);
+      setError(errorMessage);
+    }
+  };
+
+  const showAlert = (type, message) => {
+    setAlert({ show: true, type, message });
+    setTimeout(() => setAlert({ show: false, type: "", message: "" }), 5000);
+  };
+
+  // Form handlers
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleEditFormChange = (field, value) => {
+    setEditFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Image handlers
+  const handleFileSelect = (files) => {
+    const validFiles = Array.from(files).filter((file) => {
+      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      const isValidType = validTypes.includes(file.type);
+      const isValidSize = file.size <= 5 * 1024 * 1024;
+
+      if (!isValidType) {
+        showAlert(
+          "error",
+          `Invalid file type: ${file.name}. Only JPEG, PNG, and JPG files are allowed.`
+        );
+        return false;
+      }
+
+      if (!isValidSize) {
+        showAlert(
+          "error",
+          `File too large: ${file.name}. Maximum size is 5MB.`
+        );
+        return false;
+      }
+
+      return true;
+    });
+
+    setSelectedFiles(validFiles);
+    setUploadedFiles(validFiles);
+  };
+
+  const handleEditFileSelect = (files) => {
+    const validFiles = Array.from(files).filter((file) => {
+      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      return validTypes.includes(file.type) && file.size <= 5 * 1024 * 1024;
+    });
+
+    setEditSelectedFiles(validFiles);
+    setEditUploadedFiles(validFiles);
+  };
+
+  const removeFile = (indexToRemove) => {
+    setUploadedFiles((prev) =>
+      prev.filter((_, index) => index !== indexToRemove)
+    );
+    setSelectedFiles((prev) =>
+      prev.filter((_, index) => index !== indexToRemove)
+    );
+  };
+
+  const removeEditFile = (index) => {
+    setEditUploadedFiles(editUploadedFiles.filter((_, i) => i !== index));
+    setEditSelectedFiles(editSelectedFiles.filter((_, i) => i !== index));
+  };
+
+  // Drag and drop handlers
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = e.dataTransfer.files;
+    handleFileSelect(files);
+  };
+
+  const handleEditDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files);
+    handleEditFileSelect(files);
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      productName: "",
+      category: "",
+      skinCondition: "",
+      description: "",
+      ingredients: "",
+    });
+    setEditFormData({
+      productName: "",
+      category: "",
+      skinCondition: "",
+      description: "",
+      ingredients: "",
+    });
+    setUploadedFiles([]);
+    setSelectedFiles([]);
+    setEditSelectedFiles([]);
+    setEditUploadedFiles([]);
+  };
+
+  // CRUD Operations
+  const handleSubmit = async () => {
+    try {
+      setError("");
+      console.log("=== STARTING PRODUCT SUBMISSION ===");
+
+      // Validate authentication
+      if (!currentUser || !currentUser.uid) {
+        showAlert("error", "You must be logged in to add products");
+        return;
+      }
+
+      // Validate required fields
+      if (!formData.productName.trim()) {
+        showAlert("error", "Product name is required");
+        return;
+      }
+
+      console.log("Form data:", formData);
+      console.log("Selected files:", selectedFiles);
+      console.log("Current user ID:", currentUser.uid);
+
+      // Upload images first if any
+      let imageUrls = [];
+      if (selectedFiles.length > 0) {
+        console.log("Uploading images...");
+        try {
+          imageUrls = await uploadImages(currentUser.uid, selectedFiles);
+          console.log("Images uploaded successfully:", imageUrls);
+        } catch (uploadError) {
+          console.error("Image upload failed:", uploadError);
+          showAlert("error", "Failed to upload images: " + uploadError.message);
+          return;
+        }
+      }
+
+      // Prepare product data
+      const productData = {
+        productName: formData.productName.trim(),
+        category: formData.category.trim(),
+        skinCondition: formData.skinCondition.trim(),
+        description: formData.description.trim(),
+        ingredients: formData.ingredients.trim(),
+        dermatologistId: currentUser.uid,
+      };
+
+      console.log("Adding product with data:", productData);
+      console.log("With images:", imageUrls);
+
+      // Add product to database
+      const result = await addProduct(productData, imageUrls);
+      console.log("Product added successfully:", result);
+
+      // Success actions
+      setShowAddModal(false);
+      resetForm();
+      showAlert("success", "Product added successfully!");
+
+      // Reload products after a short delay to ensure database consistency
+      setTimeout(async () => {
+        try {
+          await getProducts({
+            dermatologistId: currentUser.uid,
+          });
+          console.log("Products reloaded after adding new product");
+        } catch (reloadError) {
+          console.error("Failed to reload products:", reloadError);
+        }
+      }, 1500);
+    } catch (error) {
+      console.error("=== PRODUCT SUBMISSION ERROR ===");
+      console.error("Full error:", error);
+      console.error("Error message:", error.message);
+      console.error("Error code:", error.code);
+
+      const errorMessage =
+        error?.message || "Failed to add product. Please try again.";
+      showAlert("error", errorMessage);
+      setError(errorMessage);
+    }
+  };
+
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setEditFormData({
+      productName: product.Product_Name,
+      category: product.Product_Category,
+      skinCondition: product.Product_SkinCondition,
+      description: product.Product_Desc,
+      ingredients: product.Product_Ingredients,
+    });
+    setEditSelectedFiles([]);
+    setEditUploadedFiles([]);
+    setShowEditModal(true);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      setError("");
+
+      if (!editFormData.productName.trim()) {
+        showAlert("error", "Product name is required");
+        return;
+      }
+
+      let newImageUrls = [];
+      if (editSelectedFiles.length > 0) {
+        newImageUrls = await uploadImages(
+          editingProduct.Product_ID,
+          editSelectedFiles
+        );
+      }
+
+      await updateProduct(
+        editingProduct.Product_ID,
+        editFormData,
+        newImageUrls
+      );
+      setShowEditModal(false);
+      resetForm();
+      loadProducts();
+      showAlert("success", "Product updated successfully");
+    } catch (error) {
+      console.error("Error updating product:", error);
+      showAlert("error", "Failed to update product. Please try again.");
+    }
+  };
+
+  const handleView = (product) => {
+    setViewingProduct(product);
+    setShowViewModal(true);
+  };
+
+  const handleDelete = (product) => {
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      if (!productToDelete?.Product_ID) return;
+
+      await deleteProduct(productToDelete.Product_ID);
+      setShowDeleteModal(false);
+      setProductToDelete(null);
+      loadProducts();
+      showAlert("success", "Product deleted successfully");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      showAlert("error", "Failed to delete product");
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setProductToDelete(null);
+  };
+
+  // Filter logic
+  const filteredProducts = products.filter((product) => {
     const matchesSearch =
-      product.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.skinType.toLowerCase().includes(searchTerm.toLowerCase());
+      product.Product_Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.Product_Category?.toLowerCase().includes(
+        searchTerm.toLowerCase()
+      ) ||
+      product.Product_SkinCondition?.toLowerCase().includes(
+        searchTerm.toLowerCase()
+      );
 
     const matchesCategory =
-      !filters.category || product.category === filters.category;
+      !filters.category || product.Product_Category === filters.category;
     const matchesSkinType =
-      !filters.skinType || product.skinType === filters.skinType;
+      !filters.skinType || product.Product_SkinCondition === filters.skinType;
+    const matchesStatus =
+      !filters.status || product.Product_Status === filters.status;
 
-    return matchesSearch && matchesCategory && matchesSkinType;
+    return matchesSearch && matchesCategory && matchesSkinType && matchesStatus;
   });
+
   const handleFilterChange = (filterType, value) => {
     setFilters((prev) => ({
       ...prev,
@@ -199,16 +456,66 @@ const DermaProductManagement = () => {
       category: "",
       skinType: "",
       dateRange: "",
+      status: "",
     });
   };
 
   const applyFilters = () => {
     setShowFilterModal(false);
-    // Filters are applied automatically through the filteredProducts logic
+    setCurrentPage(1);
   };
+
+  // Pagination
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filters]);
+
+  const totalPages = Math.ceil(filteredProducts.length / entriesPerPage);
+
   return (
     <Layout currentPage="products">
-      {/* Modals */}
+      {authLoading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div className="text-center">
+            <div className="spinner-border text-primary mb-2" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <div>Initializing...</div>
+          </div>
+        </div>
+      )}
+      {error && (
+        <Alert variant="danger" dismissible onClose={() => setError("")}>
+          {error}
+        </Alert>
+      )}
+
+      {/* Alert */}
+      {alert.show && (
+        <Alert
+          variant={alert.type === "error" ? "danger" : "success"}
+          className="mb-3"
+          dismissible
+          onClose={() => setAlert({ show: false, type: "", message: "" })}
+        >
+          {alert.message}
+        </Alert>
+      )}
+
+      {/* Add Product Modal */}
       <Modal
         show={showAddModal}
         onHide={() => setShowAddModal(false)}
@@ -249,6 +556,10 @@ const DermaProductManagement = () => {
                   <Form.Control
                     type="text"
                     placeholder="Type here"
+                    value={formData.productName}
+                    onChange={(e) =>
+                      handleInputChange("productName", e.target.value)
+                    }
                     style={{
                       padding: "12px",
                       borderRadius: "6px",
@@ -266,6 +577,10 @@ const DermaProductManagement = () => {
                   </Form.Label>
                   <Form.Control
                     type="text"
+                    value={formData.category}
+                    onChange={(e) =>
+                      handleInputChange("category", e.target.value)
+                    }
                     placeholder="Type here"
                     style={{
                       padding: "12px",
@@ -287,6 +602,10 @@ const DermaProductManagement = () => {
                   </Form.Label>
                   <Form.Control
                     type="text"
+                    value={formData.skinCondition}
+                    onChange={(e) =>
+                      handleInputChange("skinCondition", e.target.value)
+                    }
                     placeholder="Type here"
                     style={{
                       padding: "12px",
@@ -307,6 +626,10 @@ const DermaProductManagement = () => {
                     as="textarea"
                     rows={6}
                     placeholder="Type here"
+                    value={formData.description}
+                    onChange={(e) =>
+                      handleInputChange("description", e.target.value)
+                    }
                     style={{
                       padding: "15px",
                       borderRadius: "6px",
@@ -330,6 +653,10 @@ const DermaProductManagement = () => {
                     as="textarea"
                     rows={6}
                     placeholder="Type here"
+                    value={formData.ingredients}
+                    onChange={(e) =>
+                      handleInputChange("ingredients", e.target.value)
+                    }
                     style={{
                       padding: "15px",
                       borderRadius: "6px",
@@ -349,19 +676,37 @@ const DermaProductManagement = () => {
                   >
                     Upload Image
                   </Form.Label>
+
+                  {/* Hidden file input */}
+                  <input
+                    type="file"
+                    id="fileInput"
+                    multiple
+                    accept="image/jpeg,image/png,image/jpg"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleFileSelect(e.target.files)}
+                  />
+
+                  {/* Drop zone */}
                   <div
                     style={{
-                      border: "2px dashed #ccc",
+                      border: `2px dashed ${isDragging ? "#4285F4" : "#ccc"}`,
                       padding: "20px",
                       textAlign: "center",
                       borderRadius: "6px",
                       marginBottom: "12px",
-                      backgroundColor: "white",
+                      backgroundColor: isDragging ? "#f8f9ff" : "white",
                       minHeight: "120px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
                     }}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => document.getElementById("fileInput").click()}
                   >
                     <div>
                       <div style={{ marginBottom: "4px" }}>
@@ -389,63 +734,50 @@ const DermaProductManagement = () => {
                         </span>
                       </p>
                       <small style={{ color: "#666", fontSize: "10px" }}>
-                        Supported formats: JPG, PNG, PDF
+                        Supported formats: JPG, PNG • Max size: 5MB
                       </small>
                     </div>
                   </div>
 
-                  {/* Uploaded files - make responsive */}
-                  <div style={{ marginBottom: "8px" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        padding: "8px 12px",
-                        backgroundColor: "#e8f5e8",
-                        border: "1px solid #4caf50",
-                        borderRadius: "4px",
-                        fontSize: "14px",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      <span style={{ flexGrow: 1, wordBreak: "break-all" }}>
-                        sampleimage.jpg
-                      </span>
-                      <span
-                        style={{
-                          color: "#4caf50",
-                          cursor: "pointer",
-                          marginLeft: "8px",
-                        }}
-                      >
-                        ✕
-                      </span>
+                  {/* Display uploaded files */}
+                  {uploadedFiles.length > 0 && (
+                    <div style={{ marginBottom: "8px" }}>
+                      {uploadedFiles.map((file, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "8px 12px",
+                            backgroundColor: "#e8f5e8",
+                            border: "1px solid #4caf50",
+                            borderRadius: "4px",
+                            fontSize: "14px",
+                            marginBottom: "4px",
+                          }}
+                        >
+                          <span style={{ flexGrow: 1, wordBreak: "break-all" }}>
+                            {file.name} ({(file.size / 1024 / 1024).toFixed(2)}{" "}
+                            MB)
+                          </span>
+                          <span
+                            style={{
+                              color: "#4caf50",
+                              cursor: "pointer",
+                              marginLeft: "8px",
+                              fontWeight: "bold",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeFile(index);
+                            }}
+                          >
+                            ✕
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        padding: "8px 12px",
-                        backgroundColor: "#e8f5e8",
-                        border: "1px solid #4caf50",
-                        borderRadius: "4px",
-                        fontSize: "14px",
-                      }}
-                    >
-                      <span style={{ flexGrow: 1, wordBreak: "break-all" }}>
-                        sampleimage.jpg
-                      </span>
-                      <span
-                        style={{
-                          color: "#4caf50",
-                          cursor: "pointer",
-                          marginLeft: "8px",
-                        }}
-                      >
-                        ✕
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </Form.Group>
               </Col>
             </Row>
@@ -467,6 +799,8 @@ const DermaProductManagement = () => {
                 Cancel
               </Button>
               <Button
+                onClick={handleSubmit}
+                disabled={uploading || productLoading}
                 style={{
                   backgroundColor: "#2857CC",
                   border: "none",
@@ -475,12 +809,14 @@ const DermaProductManagement = () => {
                   borderRadius: "6px",
                 }}
               >
-                Submit
+                {uploading || productLoading ? "Saving..." : "Submit"}
               </Button>
             </div>
           </Form>
         </Modal.Body>
       </Modal>
+
+      {/* Edit Product Modal */}
       <Modal
         show={showEditModal}
         onHide={() => setShowEditModal(false)}
@@ -522,7 +858,10 @@ const DermaProductManagement = () => {
                   <Form.Control
                     type="text"
                     placeholder="Type here"
-                    defaultValue={editingProduct?.product || ""}
+                    value={editFormData.productName}
+                    onChange={(e) =>
+                      handleEditFormChange("productName", e.target.value)
+                    }
                     style={{
                       padding: "12px",
                       borderRadius: "6px",
@@ -541,7 +880,10 @@ const DermaProductManagement = () => {
                   <Form.Control
                     type="text"
                     placeholder="Type here"
-                    defaultValue={editingProduct?.category || ""}
+                    value={editFormData.category}
+                    onChange={(e) =>
+                      handleEditFormChange("category", e.target.value)
+                    }
                     style={{
                       padding: "12px",
                       borderRadius: "6px",
@@ -563,7 +905,10 @@ const DermaProductManagement = () => {
                   <Form.Control
                     type="text"
                     placeholder="Type here"
-                    defaultValue={editingProduct?.skinType || ""}
+                    value={editFormData.skinCondition}
+                    onChange={(e) =>
+                      handleEditFormChange("skinCondition", e.target.value)
+                    }
                     style={{
                       padding: "12px",
                       borderRadius: "6px",
@@ -583,7 +928,10 @@ const DermaProductManagement = () => {
                     as="textarea"
                     rows={6}
                     placeholder="Type here"
-                    defaultValue={editingProduct?.description || ""}
+                    value={editFormData.description}
+                    onChange={(e) =>
+                      handleEditFormChange("description", e.target.value)
+                    }
                     style={{
                       padding: "15px",
                       borderRadius: "6px",
@@ -607,7 +955,10 @@ const DermaProductManagement = () => {
                     as="textarea"
                     rows={6}
                     placeholder="Type here"
-                    defaultValue={editingProduct?.ingredients || ""}
+                    value={editFormData.ingredients}
+                    onChange={(e) =>
+                      handleEditFormChange("ingredients", e.target.value)
+                    }
                     style={{
                       padding: "15px",
                       borderRadius: "6px",
@@ -627,33 +978,46 @@ const DermaProductManagement = () => {
                   >
                     Upload Image
                   </Form.Label>
+
+                  <input
+                    type="file"
+                    id="editFileInput"
+                    multiple
+                    accept="image/jpeg,image/png,image/jpg"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleEditFileSelect(e.target.files)}
+                  />
+
                   <div
                     style={{
-                      border: "2px dashed #ccc",
+                      border: `2px dashed ${isDragging ? "#4285F4" : "#ccc"}`,
                       padding: "20px",
                       textAlign: "center",
                       borderRadius: "6px",
                       marginBottom: "12px",
-                      backgroundColor: "white",
+                      backgroundColor: isDragging ? "#f8f9ff" : "white",
                       height: "80px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
                     }}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleEditDrop}
+                    onClick={() =>
+                      document.getElementById("editFileInput").click()
+                    }
                   >
                     <div>
-                      <div
-                        style={{
-                          marginBottom: "4px",
-                        }}
-                      >
+                      <div style={{ marginBottom: "4px" }}>
                         <img
                           src="/icons/uploadicon.png"
                           alt="Upload icon"
                           style={{
                             width: "29px",
                             height: "24px",
-                            color: "#ddd",
                             filter: "opacity(0.8)",
                           }}
                         />
@@ -677,42 +1041,44 @@ const DermaProductManagement = () => {
                     </div>
                   </div>
 
-                  {/* Uploaded files */}
-                  <div style={{ marginBottom: "8px" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        padding: "8px 12px",
-                        backgroundColor: "#e8f5e8",
-                        border: "1px solid #4caf50",
-                        borderRadius: "4px",
-                        fontSize: "14px",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      <span style={{ flexGrow: 1 }}>sampleimage.jpg</span>
-                      <span style={{ color: "#4caf50", cursor: "pointer" }}>
-                        ✕
-                      </span>
+                  {editUploadedFiles.length > 0 && (
+                    <div style={{ marginBottom: "8px" }}>
+                      {editUploadedFiles.map((file, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "8px 12px",
+                            backgroundColor: "#e8f5e8",
+                            border: "1px solid #4caf50",
+                            borderRadius: "4px",
+                            fontSize: "14px",
+                            marginBottom: "4px",
+                          }}
+                        >
+                          <span style={{ flexGrow: 1, wordBreak: "break-all" }}>
+                            {file.name} ({(file.size / 1024 / 1024).toFixed(2)}{" "}
+                            MB)
+                          </span>
+                          <span
+                            style={{
+                              color: "#4caf50",
+                              cursor: "pointer",
+                              marginLeft: "8px",
+                              fontWeight: "bold",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeEditFile(index);
+                            }}
+                          >
+                            ✕
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        padding: "8px 12px",
-                        backgroundColor: "#e8f5e8",
-                        border: "1px solid #4caf50",
-                        borderRadius: "4px",
-                        fontSize: "14px",
-                      }}
-                    >
-                      <span style={{ flexGrow: 1 }}>sampleimage.jpg</span>
-                      <span style={{ color: "#4caf50", cursor: "pointer" }}>
-                        ✕
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </Form.Group>
               </Col>
             </Row>
@@ -734,6 +1100,8 @@ const DermaProductManagement = () => {
                 Cancel
               </Button>
               <Button
+                onClick={handleUpdate}
+                disabled={uploading || productLoading}
                 style={{
                   backgroundColor: "#2857CC",
                   border: "none",
@@ -742,12 +1110,26 @@ const DermaProductManagement = () => {
                   borderRadius: "6px",
                 }}
               >
-                Save Changes
+                {uploading || productLoading ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </Form>
         </Modal.Body>
       </Modal>
+
+      {/* Alert */}
+      {alert.show && (
+        <Alert
+          variant={alert.type === "error" ? "danger" : "success"}
+          className="mb-3"
+          dismissible
+          onClose={() => setAlert({ show: false, type: "", message: "" })}
+        >
+          {alert.message}
+        </Alert>
+      )}
+
+      {/* View Product Modal */}
       <Modal
         show={showViewModal}
         onHide={() => setShowViewModal(false)}
@@ -807,7 +1189,122 @@ const DermaProductManagement = () => {
 
           {viewingProduct && (
             <>
-              {/* Product ID - Single Line */}
+              {/* Product Images Section - FIXED */}
+              {viewingProduct.Product_AllImageURLs &&
+                viewingProduct.Product_AllImageURLs.length > 0 && (
+                  <div className="row mb-4">
+                    <div className="col-12">
+                      <div className="mb-3">
+                        <strong>Product Images:</strong>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "15px",
+                            marginTop: "15px",
+                            padding: "15px",
+                            backgroundColor: "#ffffff",
+                            borderRadius: "8px",
+                            border: "1px solid #e0e0e0",
+                          }}
+                        >
+                          {viewingProduct.Product_AllImageURLs.map(
+                            (imageUrl, index) => (
+                              <div
+                                key={index}
+                                style={{
+                                  border: "2px solid #205EFA",
+                                  borderRadius: "8px",
+                                  overflow: "hidden",
+                                  width: "200px",
+                                  height: "200px",
+                                  position: "relative",
+                                  cursor: "pointer",
+                                  transition: "transform 0.2s ease",
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.transform =
+                                    "scale(1.05)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = "scale(1)";
+                                }}
+                                onClick={() => window.open(imageUrl, "_blank")}
+                              >
+                                <img
+                                  src={imageUrl}
+                                  alt={`${
+                                    viewingProduct.Product_Name
+                                  } - Image ${index + 1}`}
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                  }}
+                                  onError={(e) => {
+                                    console.error(
+                                      "Failed to load image:",
+                                      imageUrl
+                                    );
+                                    e.target.parentElement.style.display =
+                                      "none";
+                                  }}
+                                  onLoad={() => {
+                                    console.log(
+                                      "Image loaded successfully:",
+                                      imageUrl
+                                    );
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    bottom: "5px",
+                                    right: "5px",
+                                    backgroundColor: "rgba(0, 0, 0, 0.7)",
+                                    color: "white",
+                                    padding: "2px 6px",
+                                    borderRadius: "4px",
+                                    fontSize: "12px",
+                                  }}
+                                >
+                                  {index + 1}
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              {/* Show message if no images */}
+              {(!viewingProduct.Product_AllImageURLs ||
+                viewingProduct.Product_AllImageURLs.length === 0) && (
+                <div className="row mb-4">
+                  <div className="col-12">
+                    <div className="mb-3">
+                      <strong>Product Images:</strong>
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          padding: "20px",
+                          backgroundColor: "#f8f9fa",
+                          border: "1px dashed #ccc",
+                          borderRadius: "8px",
+                          textAlign: "center",
+                          color: "#666",
+                        }}
+                      >
+                        No images uploaded for this product
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Rest of your existing product details... */}
               <div className="row mb-0">
                 <div className="col-12">
                   <div
@@ -816,13 +1313,12 @@ const DermaProductManagement = () => {
                   >
                     <strong style={{ minWidth: "120px" }}>Product ID:</strong>
                     <span style={{ marginLeft: "10px" }}>
-                      {viewingProduct.id}
+                      {viewingProduct.Product_ID}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Product Name - Single Line */}
               <div className="row mb-0">
                 <div className="col-12">
                   <div
@@ -831,13 +1327,12 @@ const DermaProductManagement = () => {
                   >
                     <strong style={{ minWidth: "120px" }}>Product Name:</strong>
                     <span style={{ marginLeft: "10px" }}>
-                      {viewingProduct.product}
+                      {viewingProduct.Product_Name}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Date Created - Single Line */}
               <div className="row mb-4">
                 <div className="col-12">
                   <div
@@ -846,17 +1341,20 @@ const DermaProductManagement = () => {
                   >
                     <strong style={{ minWidth: "120px" }}>Date Created:</strong>
                     <span style={{ marginLeft: "10px" }}>
-                      {new Date().toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                      {viewingProduct.Product_DateCreated
+                        ? new Date(
+                            viewingProduct.Product_DateCreated
+                          ).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
+                        : "N/A"}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Category - Single Line */}
               <div className="row mb-0">
                 <div className="col-12">
                   <div
@@ -865,13 +1363,12 @@ const DermaProductManagement = () => {
                   >
                     <strong style={{ minWidth: "120px" }}>Category:</strong>
                     <span style={{ marginLeft: "10px" }}>
-                      {viewingProduct.category}
+                      {viewingProduct.Product_Category}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Skin Condition - Single Line */}
               <div className="row mb-4">
                 <div className="col-12">
                   <div
@@ -882,13 +1379,12 @@ const DermaProductManagement = () => {
                       Skin Condition:
                     </strong>
                     <span style={{ marginLeft: "10px" }}>
-                      {viewingProduct.skinType}
+                      {viewingProduct.Product_SkinCondition}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Description */}
               <div className="row mb-3">
                 <div className="col-12">
                   <div className="mb-3">
@@ -900,17 +1396,12 @@ const DermaProductManagement = () => {
                         lineHeight: "1.6",
                       }}
                     >
-                      Cetaphil Gentle Skin Cleanser is a mild, non-irritating
-                      formula that soothes and cleanses the skin without
-                      stripping its natural moisture. Ideal for sensitive or dry
-                      skin, it can be used with or without water and is suitable
-                      for daily use on the face and body.
+                      {viewingProduct.Product_Desc}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Ingredients */}
               <div className="row mb-4">
                 <div className="col-12">
                   <div className="mb-1">
@@ -922,99 +1413,12 @@ const DermaProductManagement = () => {
                         lineHeight: "1.6",
                       }}
                     >
-                      {viewingProduct.ingredients}
+                      {viewingProduct.Product_Ingredients}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Product Rating */}
-              <div className="row mb-2">
-                <div className="col-12">
-                  <div className="mb-1">
-                    <strong>Product Rating:</strong>
-                    <div
-                      style={{
-                        marginLeft: "20px",
-                        marginTop: "10px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                      }}
-                    >
-                      <div style={{ display: "flex", gap: "2px" }}>
-                        {[1, 2, 3, 4].map((star) => (
-                          <svg
-                            key={star}
-                            width="20"
-                            height="20"
-                            fill="#FFD700"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                          </svg>
-                        ))}
-                        <svg
-                          width="20"
-                          height="20"
-                          fill="#FFD700"
-                          viewBox="0 0 24 24"
-                          style={{ position: "relative" }}
-                        >
-                          <defs>
-                            <linearGradient id="halfStar">
-                              <stop offset="50%" stopColor="#FFD700" />
-                              <stop offset="50%" stopColor="#E0E0E0" />
-                            </linearGradient>
-                          </defs>
-                          <path
-                            fill="url(#halfStar)"
-                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                          />
-                        </svg>
-                      </div>
-                      <span
-                        style={{
-                          fontSize: "16px",
-                          fontWeight: "500",
-                          color: "#333",
-                        }}
-                      >
-                        4.5 / 5
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Product Image */}
-              <div className="row mb-4">
-                <div className="col-12">
-                  <div className="mb-3">
-                    <strong>Product Image:</strong>
-                    <div style={{ marginLeft: "20px", marginTop: "15px" }}>
-                      <img
-                        src={viewingProduct.image || "/icons/productimage.png"}
-                        alt={viewingProduct.product || "Product Image"}
-                        style={{
-                          width: "120px",
-                          height: "120px",
-                          objectFit: "cover",
-                          borderRadius: "12px",
-                          border: "2px solid #e0e0e0",
-                          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                        }}
-                        onError={(e) => {
-                          e.target.src =
-                            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRjBGMEYwIiByeD0iMTIiLz4KPHN2ZyB4PSIzNSIgeT0iMzUiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjQ0NDQ0NDIj4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDEzdjEwaDEwdi0xMGgtMTB6TTMgM3YxOGgxOHYtMThoLTE4eiIgZmlsbD0iI0NDQ0NDQyIvPgo8Y2lyY2xlIGN4PSIxNSIgY3k9IjEwIiByPSIyIiBmaWxsPSIjQ0NDQ0NDIi8+Cjwvc3ZnPgo8L3N2Zz4KPC9zdmc+";
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Edit Product Button - Bottom Right */}
               <div className="row">
                 <div className="col-12 d-flex justify-content-end">
                   <button
@@ -1040,10 +1444,11 @@ const DermaProductManagement = () => {
           )}
         </Modal.Body>
       </Modal>
+
       {/* Delete Confirmation Modal */}
       <Modal
         show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
+        onHide={cancelDelete}
         centered
         backdrop="static"
         keyboard={false}
@@ -1052,14 +1457,13 @@ const DermaProductManagement = () => {
           style={{
             backgroundColor: "#FFFFFF",
             padding: "30px 30px",
-            borderRadius: "50px", // Increased border radius
+            borderRadius: "50px",
             border: "none",
             boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15)",
             textAlign: "center",
             position: "relative",
           }}
         >
-          {/* Trash Icon */}
           <div style={{ marginBottom: "20px" }}>
             <svg
               width="150"
@@ -1079,10 +1483,9 @@ const DermaProductManagement = () => {
             </svg>
           </div>
 
-          {/* Title */}
           <h4
             style={{
-              color: "#205EFA", // Changed text color
+              color: "#205EFA",
               fontWeight: "bold",
               marginBottom: "12px",
               fontSize: "25px",
@@ -1091,33 +1494,22 @@ const DermaProductManagement = () => {
             Do you wish to delete this product?
           </h4>
 
-          {/* Action Buttons */}
           <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              justifyContent: "center",
-            }}
+            style={{ display: "flex", gap: "12px", justifyContent: "center" }}
           >
             <button
-              onClick={() => setShowDeleteModal(false)}
+              onClick={cancelDelete}
               style={{
-                backgroundColor: "#DC3545", // Red background
+                backgroundColor: "#DC3545",
                 color: "white",
                 border: "none",
-                borderRadius: "15px", // Increased border radius
+                borderRadius: "15px",
                 padding: "12px 24px",
                 fontSize: "14px",
                 fontWeight: "500",
                 cursor: "pointer",
                 transition: "all 0.2s ease",
                 minWidth: "100px",
-              }}
-              onMouseOver={(e) => {
-                e.target.style.backgroundColor = "#C82333";
-              }}
-              onMouseOut={(e) => {
-                e.target.style.backgroundColor = "#DC3545";
               }}
             >
               No
@@ -1126,10 +1518,10 @@ const DermaProductManagement = () => {
             <button
               onClick={confirmDelete}
               style={{
-                backgroundColor: "#205EFA", // Blue background
+                backgroundColor: "#205EFA",
                 color: "white",
                 border: "none",
-                borderRadius: "15px", // Increased border radius
+                borderRadius: "15px",
                 padding: "12px 24px",
                 fontSize: "14px",
                 fontWeight: "500",
@@ -1137,18 +1529,14 @@ const DermaProductManagement = () => {
                 transition: "all 0.2s ease",
                 minWidth: "100px",
               }}
-              onMouseOver={(e) => {
-                e.target.style.backgroundColor = "#1848C7";
-              }}
-              onMouseOut={(e) => {
-                e.target.style.backgroundColor = "#205EFA";
-              }}
             >
               Yes
             </button>
           </div>
         </Modal.Body>
       </Modal>
+
+      {/* Filter Modal */}
       <Modal
         show={showFilterModal}
         onHide={() => setShowFilterModal(false)}
@@ -1179,7 +1567,6 @@ const DermaProductManagement = () => {
 
         <Modal.Body style={{ backgroundColor: "#EDF8F6", padding: "30px" }}>
           <Form>
-            {/* Category Filter */}
             <Form.Group className="mb-3">
               <Form.Label style={{ fontWeight: "500", marginBottom: "8px" }}>
                 Category
@@ -1205,7 +1592,6 @@ const DermaProductManagement = () => {
               </Form.Select>
             </Form.Group>
 
-            {/* Skin Type Filter */}
             <Form.Group className="mb-3">
               <Form.Label style={{ fontWeight: "500", marginBottom: "8px" }}>
                 Skin Type
@@ -1228,7 +1614,6 @@ const DermaProductManagement = () => {
               </Form.Select>
             </Form.Group>
 
-            {/* Date Range Filter */}
             <Form.Group className="mb-4">
               <Form.Label style={{ fontWeight: "500", marginBottom: "8px" }}>
                 Date Range
@@ -1252,63 +1637,6 @@ const DermaProductManagement = () => {
               </Form.Select>
             </Form.Group>
 
-            {/* Active Filters Display */}
-            {(filters.category || filters.skinType || filters.dateRange) && (
-              <div className="mb-3">
-                <small
-                  style={{
-                    color: "#666",
-                    marginBottom: "8px",
-                    display: "block",
-                  }}
-                >
-                  Active Filters:
-                </small>
-                <div className="d-flex flex-wrap gap-2">
-                  {filters.category && (
-                    <span
-                      className="badge"
-                      style={{
-                        backgroundColor: "#205EFA",
-                        color: "white",
-                        padding: "4px 8px",
-                        fontSize: "12px",
-                      }}
-                    >
-                      Category: {filters.category}
-                    </span>
-                  )}
-                  {filters.skinType && (
-                    <span
-                      className="badge"
-                      style={{
-                        backgroundColor: "#28a745",
-                        color: "white",
-                        padding: "4px 8px",
-                        fontSize: "12px",
-                      }}
-                    >
-                      Skin Type: {filters.skinType}
-                    </span>
-                  )}
-                  {filters.dateRange && (
-                    <span
-                      className="badge"
-                      style={{
-                        backgroundColor: "#ffc107",
-                        color: "black",
-                        padding: "4px 8px",
-                        fontSize: "12px",
-                      }}
-                    >
-                      Date: {filters.dateRange}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Action Buttons */}
             <div className="d-flex justify-content-end gap-2">
               <Button
                 variant="outline-secondary"
@@ -1348,6 +1676,8 @@ const DermaProductManagement = () => {
           </Form>
         </Modal.Body>
       </Modal>
+
+      {/* Main Content */}
       <Container fluid className="px-2 px-md-3">
         <Row className="mb-4">
           <Col>
@@ -1400,8 +1730,6 @@ const DermaProductManagement = () => {
                     </div>
                   </div>
                   <div className="ms-auto">
-                    {" "}
-                    {/* This pushes the button to the right */}
                     <button
                       className="add-product-btn"
                       onClick={() => setShowAddModal(true)}
@@ -1430,95 +1758,158 @@ const DermaProductManagement = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredProducts
-                      .slice(0, entriesPerPage)
-                      .map((product, index) => (
-                        <tr key={index}>
-                          <td>{product.id}</td>
-                          <td style={{ fontWeight: 500 }}>{product.product}</td>
-                          <td>{product.category}</td>
-                          <td>{product.skinType}</td>
-                          <td
-                            style={{
-                              maxWidth: "200px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {product.description}
-                          </td>
-                          <td
-                            style={{
-                              maxWidth: "200px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {product.ingredients}
-                          </td>
-                          <td>
-                            <div className="action-buttons">
-                              <button
-                                className="action-btn view-btn"
-                                title="View"
-                                onClick={() => handleView(product)}
-                              >
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  fill="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-                                </svg>
-                              </button>
-                              <button
-                                className="action-btn edit-btn"
-                                title="Edit"
-                                onClick={() => handleEdit(product)}
-                              >
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  fill="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                                </svg>
-                              </button>
-                              <button
-                                className="action-btn delete-btn"
-                                title="Delete"
-                                onClick={() => handleDelete(product)}
-                              >
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  fill="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-                                </svg>
-                              </button>
+                    {productLoading ? (
+                      <tr>
+                        <td colSpan="7" className="text-center py-4">
+                          <div className="d-flex justify-content-center align-items-center">
+                            <div
+                              className="spinner-border text-primary me-2"
+                              role="status"
+                            >
+                              <span className="visually-hidden">
+                                Loading...
+                              </span>
                             </div>
-                          </td>
-                        </tr>
-                      ))}
+                            <span>Loading products...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : filteredProducts.length === 0 ? (
+                      <tr>
+                        <td colSpan="7" className="text-center py-4">
+                          <div className="text-muted">
+                            <svg
+                              width="48"
+                              height="48"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                              className="mb-2"
+                            >
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                            </svg>
+                            <div>No products found</div>
+                            <small>Try adjusting your search or filters</small>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredProducts
+                        .slice(
+                          (currentPage - 1) * entriesPerPage,
+                          currentPage * entriesPerPage
+                        )
+                        .map((product) => (
+                          <tr key={product.Product_ID}>
+                            <td>{product.Product_ID}</td>
+                            <td style={{ fontWeight: 500 }}>
+                              {product.Product_Name}
+                            </td>
+                            <td>{product.Product_Category}</td>
+                            <td>{product.Product_SkinCondition}</td>
+                            <td
+                              style={{
+                                maxWidth: "200px",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {product.Product_Desc}
+                            </td>
+                            <td
+                              style={{
+                                maxWidth: "200px",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {product.Product_Ingredients}
+                            </td>
+                            <td>
+                              <div className="action-buttons">
+                                <button
+                                  className="action-btn view-btn"
+                                  title="View"
+                                  onClick={() => handleView(product)}
+                                >
+                                  <svg
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                                  </svg>
+                                </button>
+                                <button
+                                  className="action-btn edit-btn"
+                                  title="Edit"
+                                  onClick={() => handleEdit(product)}
+                                >
+                                  <svg
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                  </svg>
+                                </button>
+                                <button
+                                  className="action-btn delete-btn"
+                                  title="Delete"
+                                  onClick={() => handleDelete(product)}
+                                >
+                                  <svg
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                    )}
                   </tbody>
                 </Table>
               </div>
 
               {/* Pagination */}
               <div className="pagination-container">
-                <button className="pagination-btn" disabled>
+                <button
+                  className="pagination-btn"
+                  disabled={currentPage === 1}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                >
                   Previous
                 </button>
-                <button className="pagination-btn active">1</button>
-                <button className="pagination-btn">2</button>
-                <button className="pagination-btn">3</button>
-                <button className="pagination-btn">Next</button>
+                {[...Array(totalPages)].map((_, index) => (
+                  <button
+                    key={index + 1}
+                    className={`pagination-btn ${
+                      currentPage === index + 1 ? "active" : ""
+                    }`}
+                    onClick={() => setCurrentPage(index + 1)}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+                <button
+                  className="pagination-btn"
+                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                >
+                  Next
+                </button>
               </div>
             </div>
           </Col>

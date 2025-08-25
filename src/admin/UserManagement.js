@@ -5,6 +5,7 @@ import '../styles/user_management.css';
 import { collection, getDocs, query, where, getDoc } from "firebase/firestore";
 import { db } from '../config/firebase'; // Adjust path as needed
 import { useAuth } from '../contexts/AuthContext'; // Adjust path as needed
+import { useActivityLogger } from "../hooks/useActivityLogger";
 
 const statusBadge = (status) => {
   if (status === "Active") {
@@ -30,7 +31,7 @@ const statusBadge = (status) => {
 
 const UserManagement = () => {
   // Modal state
-  const { approveDermatologist, rejectDermatologist } = useAuth();
+  const { approveDermatologist, rejectDermatologist, userProfile } = useAuth();
   const [realPatients, setRealPatients] = useState([]);
   const [realDermatologists, setRealDermatologists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,6 +41,7 @@ const UserManagement = () => {
   const [search, setSearch] = useState('');
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const searchInputRef = useRef(null);
+  const { logActivity, ACTIVITY_TYPES } = useActivityLogger();
   // Detect if mobile (768px and below)
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   useEffect(() => {
@@ -153,6 +155,7 @@ const UserManagement = () => {
   const data = activeTab === "patient" ? realPatients : realDermatologists;
  const handleApprove = async (userId) => {
    try {
+    const user = realDermatologists.find((d) => d.id === userId);
      await approveDermatologist(userId);
      // Refresh the dermatologist data
      setRealDermatologists((prev) =>
@@ -162,6 +165,15 @@ const UserManagement = () => {
            : derm
        )
      );
+     await logActivity(
+       ACTIVITY_TYPES.APPROVE_DERMATOLOGIST,
+       userProfile?.User_Email || "admin@example.com",
+       {
+         dermatologist_id: userId,
+         dermatologist_name: `${user?.firstName} ${user?.lastName}`,
+         dermatologist_email: user?.email,
+       }
+     );
      alert("Dermatologist approved successfully! Notification email sent."); // 👈 Updated message
    } catch (error) {
      console.error("Error approving dermatologist:", error);
@@ -170,6 +182,7 @@ const UserManagement = () => {
  };
   const handleReject = async (userId) => {
     try {
+      const user = realDermatologists.find((d) => d.id === userId);
       await rejectDermatologist(userId);
       // Refresh the dermatologist data
       setRealDermatologists((prev) =>
@@ -179,6 +192,15 @@ const UserManagement = () => {
             : derm
         )
       );
+       await logActivity(
+         ACTIVITY_TYPES.REJECT_DERMATOLOGIST,
+         userProfile?.User_Email || "admin@example.com",
+         {
+           dermatologist_id: userId,
+           dermatologist_name: `${user?.firstName} ${user?.lastName}`,
+           dermatologist_email: user?.email,
+         }
+       );
       alert("Dermatologist rejected. Notification email sent."); // 👈 Updated message
     } catch (error) {
       console.error("Error rejecting dermatologist:", error);

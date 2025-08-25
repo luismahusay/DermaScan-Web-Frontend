@@ -2,13 +2,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Navbar, Container, InputGroup, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const Header = ({ showSidebar, setShowSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
+  
 
   const notifications = [
     {
@@ -114,10 +118,14 @@ const Header = ({ showSidebar, setShowSidebar }) => {
     setShowProfileDropdown(false);
     window.location.href = "profile"; // Navigate to profile page
   };
-  const handleLogout = () => {
-    // Add your logout logic here
-    console.log("Logout user");
-    setShowProfileDropdown(false);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setShowProfileDropdown(false);
+      navigate("/dermatologist/derma_login"); // Navigate without full reload
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
