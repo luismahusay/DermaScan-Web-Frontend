@@ -2,7 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
 import { Container, Row, Col, Card, Table, Badge, InputGroup, FormControl, Button, Dropdown, DropdownButton, Pagination } from 'react-bootstrap';
 import '../styles/user_management.css';
-import { collection, getDocs, query, where, getDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  getDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from '../config/firebase'; // Adjust path as needed
 import { useAuth } from '../contexts/AuthContext'; // Adjust path as needed
 import { useActivityLogger } from "../hooks/useActivityLogger";
@@ -73,7 +80,7 @@ const UserManagement = () => {
           profilePicture: doc.data().User_ProfilePictureURL,
         }));
 
-        // Fetch dermatologists WITH clinic info
+        // Fetch dermatologists WITH clinic info (FIXED)
         const dermQuery = query(
           collection(db, "Users"),
           where("User_Role", "==", "dermatologist")
@@ -81,8 +88,8 @@ const UserManagement = () => {
         const dermSnapshot = await getDocs(dermQuery);
 
         const dermData = await Promise.all(
-          dermSnapshot.docs.map(async (doc) => {
-            const userData = doc.data();
+          dermSnapshot.docs.map(async (userDoc) => {
+            const userData = userDoc.data();
 
             // Fetch clinic info for this dermatologist
             let clinicInfo = {};
@@ -95,6 +102,7 @@ const UserManagement = () => {
 
               if (!clinicDermSnapshot.empty) {
                 const clinicId = clinicDermSnapshot.docs[0].data().Clinic_ID;
+                // FIXED: Use doc() properly
                 const clinicDoc = await getDoc(doc(db, "Clinic", clinicId));
                 if (clinicDoc.exists()) {
                   const clinic = clinicDoc.data();
@@ -124,6 +132,9 @@ const UserManagement = () => {
               address: userData.User_HomeAddress,
               profilePicture: userData.User_ProfilePictureURL,
               isApproved: userData.User_ValidDermatologist_ID,
+              // FIXED: Include document images
+              licenseIdImg: userData.User_LicenseImageURL,
+              validIdImg: userData.User_ValidIdImageURL,
               ...clinicInfo, // Add clinic info
             };
           })
@@ -721,6 +732,7 @@ return (
                   <b>License Verified:</b> <span>{selectedUser?.license}</span>
                 </div>
               </div>
+              <hr className="user-details-modal-section-hr" />
               {/* Close Button */}
               <button
                 onClick={() => setShowDetails(false)}
@@ -729,42 +741,60 @@ return (
               >
                 <img src="/icons/wrong_icon.png" alt="Close" />
               </button>
+
               {/* Two-column layout for dermatologist modal */}
               <div className="derm-modal-row">
-                {/* Left column: Personal Info, Profile, Deactivate */}
+                {/* Left column: Personal Info, Profile */}
                 <div className="derm-modal-col derm-modal-col-left">
-                  <hr className="user-details-modal-section-hr" />
                   <div className="user-details-modal-section-title">
                     Personal Information
                   </div>
-                  <div>
-                    <b>First Name:</b> <span>{selectedUser?.firstName}</span>
+                  <div style={{ marginTop: "12px" }}>
+                    <div style={{ marginBottom: "6px" }}>
+                      <b>First Name:</b> <span>{selectedUser?.firstName}</span>
+                    </div>
+                    <div style={{ marginBottom: "6px" }}>
+                      <b>Middle Initial:</b>{" "}
+                      <span>{selectedUser?.middleInitial}.</span>
+                    </div>
+                    <div style={{ marginBottom: "6px" }}>
+                      <b>Last Name:</b> <span>{selectedUser?.lastName}</span>
+                    </div>
+                    <div style={{ marginBottom: "6px" }}>
+                      <b>Email Address:</b> <span>{selectedUser?.email}</span>
+                    </div>
                   </div>
-                  <div>
-                    <b>Middle Initial:</b>{" "}
-                    <span>{selectedUser?.middleInitial}.</span>
-                  </div>
-                  <div>
-                    <b>Last Name:</b> <span>{selectedUser?.lastName}</span>
-                  </div>
-                  <div>
-                    <b>Email Address:</b> <span>{selectedUser?.email}</span>
-                  </div>
-                  <div className="user-details-modal-section-title mt-4">
+
+                  <div
+                    className="user-details-modal-section-title"
+                    style={{ marginTop: "24px" }}
+                  >
                     Profile Picture
                   </div>
-                  <div className="user-details-modal-profile-pic-wrapper">
+                  <div
+                    className="user-details-modal-profile-pic-wrapper"
+                    style={{ marginTop: "12px" }}
+                  >
                     <div className="user-details-modal-profile-pic-bg">
                       <img
-                        src="https://randomuser.me/api/portraits/women/44.jpg"
+                        src={
+                          selectedUser?.profilePicture ||
+                          "/icons/default-avatar.png"
+                        }
                         alt="Profile"
                         className="user-details-modal-profile-pic"
+                        onError={(e) => {
+                          e.target.src = "/icons/default-avatar.png";
+                        }}
                       />
                     </div>
                   </div>
                   <div className="user-details-modal-profile-pic-link">
                     <a
-                      href="https://randomuser.me/api/portraits/women/44.jpg"
+                      href={
+                        selectedUser?.profilePicture ||
+                        "/icons/default-avatar.png"
+                      }
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -774,6 +804,7 @@ return (
                       Click to enlarge
                     </a>
                   </div>
+
                   <div className="user-details-modal-footer">
                     <Button
                       variant="danger"
@@ -784,76 +815,126 @@ return (
                     </Button>
                   </div>
                 </div>
+
                 {/* Vertical divider */}
                 <div className="derm-modal-divider"></div>
+
                 {/* Right column: Dermatologist Validation */}
                 <div className="derm-modal-col derm-modal-col-right">
                   <div className="user-details-modal-section-title">
                     Dermatologist Validation
                   </div>
-                  <div>
-                    <b>Clinic Name:</b>{" "}
-                    <span>
-                      {selectedUser?.clinicName || (
-                        <span className="placeholder">(Not set)</span>
-                      )}
-                    </span>
+                  <div style={{ marginTop: "12px" }}>
+                    <div style={{ marginBottom: "6px" }}>
+                      <b>Clinic Name:</b>{" "}
+                      <span>
+                        {selectedUser?.clinicName || (
+                          <span className="placeholder">(Not set)</span>
+                        )}
+                      </span>
+                    </div>
+                    <div style={{ marginBottom: "6px" }}>
+                      <b>Clinic Address:</b>{" "}
+                      <span>
+                        {selectedUser?.clinicAddress || (
+                          <span className="placeholder">(Not set)</span>
+                        )}
+                      </span>
+                    </div>
+                    <div style={{ marginBottom: "6px" }}>
+                      <b>Clinic Schedule:</b>{" "}
+                      <span>
+                        {selectedUser?.clinicSchedule || (
+                          <span className="placeholder">(Not set)</span>
+                        )}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <b>Clinic Address:</b>{" "}
-                    <span>
-                      {selectedUser?.clinicAddress || (
-                        <span className="placeholder">(Not set)</span>
-                      )}
-                    </span>
-                  </div>
-                  <div>
-                    <b>Clinic Schedule:</b>{" "}
-                    <span>
-                      {selectedUser?.clinicSchedule || (
-                        <span className="placeholder">(Not set)</span>
-                      )}
-                    </span>
-                  </div>
-                  <div className="mt-3">
+
+                  <div style={{ marginTop: "20px" }}>
                     <b>License ID:</b>
-                    <div className="derm-info-modal-upload-preview d-flex align-items-center">
-                      <a
-                        href={
-                          selectedUser?.licenseIdImg ||
-                          "/icons/id_placeholder.png"
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="derm-info-modal-enlarge-link mt-4"
-                      >
-                        <span role="img" aria-label="search">
-                          🔍
-                        </span>{" "}
-                        Click to enlarge
-                      </a>
+                    <div
+                      className="derm-info-modal-upload-preview d-flex align-items-center"
+                      style={{ marginTop: "8px" }}
+                    >
+                      {selectedUser?.licenseIdImg ? (
+                        <>
+                          <img
+                            src={selectedUser.licenseIdImg}
+                            alt="License ID"
+                            style={{
+                              width: "80px",
+                              height: "50px",
+                              objectFit: "cover",
+                              borderRadius: "4px",
+                              border: "1px solid #ddd",
+                              marginRight: "12px",
+                            }}
+                          />
+                          <a
+                            href={selectedUser.licenseIdImg}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="derm-info-modal-enlarge-link"
+                          >
+                            <span role="img" aria-label="search">
+                              🔍
+                            </span>{" "}
+                            Click to enlarge
+                          </a>
+                        </>
+                      ) : (
+                        <div style={{ color: "#6c757d", fontStyle: "italic" }}>
+                          No license ID uploaded
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className="mt-3">
+
+                  <div style={{ marginTop: "20px" }}>
                     <b>Valid ID:</b>
-                    <div className="derm-info-modal-upload-preview d-flex align-items-center">
-                      <a
-                        href={
-                          selectedUser?.validIdImg ||
-                          "/icons/id_placeholder.png"
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="derm-info-modal-enlarge-link mt-4"
-                      >
-                        <span role="img" aria-label="search">
-                          🔍
-                        </span>{" "}
-                        Click to enlarge
-                      </a>
+                    <div
+                      className="derm-info-modal-upload-preview d-flex align-items-center"
+                      style={{ marginTop: "8px" }}
+                    >
+                      {selectedUser?.validIdImg ? (
+                        <>
+                          <img
+                            src={selectedUser.validIdImg}
+                            alt="Valid ID"
+                            style={{
+                              width: "80px",
+                              height: "50px",
+                              objectFit: "cover",
+                              borderRadius: "4px",
+                              border: "1px solid #ddd",
+                              marginRight: "12px",
+                            }}
+                          />
+                          <a
+                            href={selectedUser.validIdImg}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="derm-info-modal-enlarge-link"
+                          >
+                            <span role="img" aria-label="search">
+                              🔍
+                            </span>{" "}
+                            Click to enlarge
+                          </a>
+                        </>
+                      ) : (
+                        <div style={{ color: "#6c757d", fontStyle: "italic" }}>
+                          No valid ID uploaded
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className="derm-info-modal-action-btns mt-5">
+
+                  <div
+                    className="derm-info-modal-action-btns"
+                    style={{ marginTop: "32px" }}
+                  >
                     <Button
                       variant="success"
                       className="btn-ReApp"

@@ -14,6 +14,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
+import { API_ENDPOINTS } from "../config/api";
 
 const DermaProfile = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -170,22 +171,17 @@ const DermaProfile = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validate file
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
-      "image/webp",
-      "application/pdf",
-    ];
+    // Validate file - match your API constraints
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+
     if (!allowedTypes.includes(file.type)) {
-      setMessage("Please upload a valid image or PDF file");
+      setMessage("Please upload a valid image file (JPEG, PNG, JPG, WebP)");
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      // 10MB limit for documents
-      setMessage("File size must be less than 10MB");
+    // Match your API's 5MB limit
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage("File size must be less than 5MB");
       return;
     }
 
@@ -196,18 +192,41 @@ const DermaProfile = () => {
       formData.append("file", file);
       formData.append("folder", "verification-documents");
 
-      const response = await fetch("/api/upload/upload-image", {
+      // Use the correct API endpoint from your configuration
+      const apiUrl = API_ENDPOINTS.UPLOAD_VERIFICATION_IMAGE;
+      console.log("Calling API:", apiUrl);
+
+      const response = await fetch(apiUrl, {
         method: "POST",
         body: formData,
       });
 
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        const responseText = await response.text();
+        console.log("Error response body:", responseText);
+
+        try {
+          const errorData = JSON.parse(responseText);
+          throw new Error(
+            errorData.error || `HTTP error! status: ${response.status}`
+          );
+        } catch (parseError) {
+          throw new Error(
+            `Server returned HTML instead of JSON. Status: ${response.status}. Check if your backend server is running on the correct port.`
+          );
+        }
+      }
+
       const result = await response.json();
 
-      if (result.success) {
+      if (result.success && result.url) {
         setFormData((prev) => ({
           ...prev,
           [documentType]: result.url,
         }));
+
         setMessage(
           `${
             documentType === "licenseImageUrl" ? "License ID" : "Valid ID"
@@ -215,11 +234,11 @@ const DermaProfile = () => {
         );
         setTimeout(() => setMessage(""), 3000);
       } else {
-        throw new Error(result.error || "Upload failed");
+        throw new Error(result.error || "Upload failed - no URL returned");
       }
     } catch (error) {
       console.error("Upload error:", error);
-      setMessage("Error uploading document. Please try again.");
+      setMessage(`Error uploading document: ${error.message}`);
     }
   };
   const handleInputChange = (e) => {
@@ -557,17 +576,16 @@ const DermaProfile = () => {
                   <label className="form-label">License ID:</label>
                   <div className="document-upload-section">
                     {formData.licenseImageUrl ? (
-                      <div className="document-preview-image">
+                      <div
+                        className="document-preview-image"
+                        onClick={() =>
+                          openImageModal(formData.licenseImageUrl, "License ID")
+                        }
+                      >
                         <img
                           src={formData.licenseImageUrl}
                           alt="License ID"
                           className="preview-thumbnail"
-                          onClick={() =>
-                            openImageModal(
-                              formData.licenseImageUrl,
-                              "License ID"
-                            )
-                          }
                         />
                         <div className="image-overlay">
                           <i className="fas fa-search-plus"></i>
@@ -605,14 +623,16 @@ const DermaProfile = () => {
                   <label className="form-label">Valid ID:</label>
                   <div className="document-upload-section">
                     {formData.validIdImageUrl ? (
-                      <div className="document-preview-image">
+                      <div
+                        className="document-preview-image"
+                        onClick={() =>
+                          openImageModal(formData.validIdImageUrl, "Valid ID")
+                        }
+                      >
                         <img
                           src={formData.validIdImageUrl}
                           alt="Valid ID"
                           className="preview-thumbnail"
-                          onClick={() =>
-                            openImageModal(formData.validIdImageUrl, "Valid ID")
-                          }
                         />
                         <div className="image-overlay">
                           <i className="fas fa-search-plus"></i>

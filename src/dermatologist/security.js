@@ -18,16 +18,21 @@ function SecurityRegister() {
    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
    const [error, setError] = useState("");
    const [loading, setLoading] = useState(false);
-
+  const [fieldErrors, setFieldErrors] = useState({});
    const handleRegister = async () => {
      // Validation
-     if (password.length < 6) {
-       setError("Password must be at least 6 characters long.");
-       return;
-     }
+     const validationErrors = {};
+
+     const passwordError = validatePassword(password);
+     if (passwordError) validationErrors.password = passwordError;
 
      if (password !== confirmPassword) {
-       setError("Passwords do not match.");
+       validationErrors.confirmPassword = "Passwords do not match";
+     }
+
+     if (Object.keys(validationErrors).length > 0) {
+       setFieldErrors(validationErrors);
+       setError("Please correct the errors below");
        return;
      }
 
@@ -45,7 +50,14 @@ function SecurityRegister() {
        setLoading(false);
      }
    };
-
+   const validatePassword = (password) => {
+     if (!password) return "Password is required";
+     if (password.length < 8) return "Password must be at least 8 characters";
+     if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+       return "Password must contain at least one uppercase letter, one lowercase letter, and one number";
+     }
+     return null;
+   };
   const handleLogin = () => {
     navigate("/dermatologist/derma_login");
   };

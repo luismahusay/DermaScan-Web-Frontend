@@ -303,6 +303,12 @@ user-mgmt-filter-row {
   color: #dc3545 !important;
 }
 /* Dermatologist Modal Two-Column Divider */
+.derm-info-modal-action-btns {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+}
 .derm-modal-row {
   display: flex;
   flex-direction: row;
@@ -317,7 +323,7 @@ user-mgmt-filter-row {
   justify-content: flex-start;
 }
 .derm-modal-col-right {
-  padding-top: 20px;
+  padding-top: 0px;
   padding-left: 40px;
   display: flex;
   flex-direction: column;
@@ -505,13 +511,14 @@ user-mgmt-filter-row {
   margin-top: 18px;
   width: 100%;
 }
-.btn-ReApp{
-  min-width: 100px;
-  max-width: 100px;
-  padding: 10px ;
+.btn-ReApp {
+  min-width: 150px; /* Increase width */
+  max-width: 120px;
+  padding: 10px;
   font-weight: 600;
-  font-size: 16px;
-  margin-right: 20px;
+  font-size: 14px; /* Reduce from 16px to 14px */
+  margin-right: 0px;
+  white-space: nowrap; /* Prevent line breaks */
 }
 .user-details-modal-deactivate-btn {
   border-radius: 24px;

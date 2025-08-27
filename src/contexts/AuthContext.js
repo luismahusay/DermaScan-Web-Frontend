@@ -38,11 +38,34 @@ export const AuthProvider = ({ children }) => {
   // ---------- Email Check Function ----------
   const checkEmailAvailability = async (email) => {
     try {
+      console.log("Checking email availability for:", email); // Debug log
+
+      // Add a small delay to prevent rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+
+      console.log("Sign-in methods found:", signInMethods.length); // Debug log
+
       return signInMethods.length === 0; // true if email is available
     } catch (error) {
       console.error("Error checking email availability:", error);
-      throw new Error("Failed to verify email availability. Please try again.");
+      console.error("Error code:", error.code);
+
+      // Handle specific Firebase errors
+      if (error.code === "auth/invalid-email") {
+        throw new Error("Invalid email format.");
+      } else if (error.code === "auth/network-request-failed") {
+        throw new Error("Network error. Please check your connection.");
+      } else if (error.code === "auth/too-many-requests") {
+        throw new Error(
+          "Too many requests. Please wait a moment and try again."
+        );
+      } else {
+        throw new Error(
+          "Failed to verify email availability. Please try again."
+        );
+      }
     }
   };
 
@@ -239,10 +262,34 @@ export const AuthProvider = ({ children }) => {
   const verifyOTP = async (email, otp) => {
     try {
       if (otpStore[email] && otpStore[email] === otp) {
-        if (currentUser && userProfile) {
-          // Add userProfile check
-          // Use custom user ID instead of Firebase UID
-          await updateDoc(doc(db, "Users", userProfile.User_ID), {
+        // Clear OTP first
+        setOtpStore((prev) => {
+          const updated = { ...prev };
+          delete updated[email];
+          return updated;
+        });
+
+        // Get the correct document ID to update
+        let documentId = null;
+
+        if (userProfile?.User_ID) {
+          // Use custom ID if available
+          documentId = userProfile.User_ID;
+        } else if (currentUser) {
+          // Fallback: try to get custom ID from mapping
+          const mappingDoc = await getDoc(
+            doc(db, "UserMapping", currentUser.uid)
+          );
+          if (mappingDoc.exists()) {
+            documentId = mappingDoc.data().customUserId;
+          } else {
+            // Last resort: use Firebase UID for old users
+            documentId = currentUser.uid;
+          }
+        }
+
+        if (documentId) {
+          await updateDoc(doc(db, "Users", documentId), {
             emailVerified: true,
           });
 
@@ -251,13 +298,6 @@ export const AuthProvider = ({ children }) => {
             emailVerified: true,
           }));
         }
-
-        // Clear OTP after successful verification
-        setOtpStore((prev) => {
-          const updated = { ...prev };
-          delete updated[email];
-          return updated;
-        });
 
         return { success: true };
       } else {
@@ -268,7 +308,23 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+  const shouldSendOTP = (userData) => {
+    // Don't send OTP if email is already verified
+    if (userData.emailVerified) {
+      return false;
+    }
 
+    // Don't send OTP if user was created recently (within last 5 minutes)
+    // This prevents double OTP sending during registration flow
+    const userCreationTime = userData.createdAt || 0;
+    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+
+    if (userCreationTime > fiveMinutesAgo) {
+      return false;
+    }
+
+    return true;
+  };
   const approveDermatologist = async (userId) => {
     try {
       // Get user data first for email notification
@@ -396,11 +452,12 @@ export const AuthProvider = ({ children }) => {
         User_ValidIdImageURL: validIdImageUrl,
         User_ValidDermatologist_ID: false,
         emailVerified: false,
+        createdAt: Date.now(),
       };
 
       // Save with custom ID as document ID
       await setDoc(doc(db, "Users", customUserId), userData);
-
+      setUserProfile(userData);
       // Create mapping for Firebase UID -> Custom ID lookup
       await setDoc(doc(db, "UserMapping", user.uid), {
         customUserId: customUserId,
@@ -479,16 +536,14 @@ export const AuthProvider = ({ children }) => {
 
       if (mappingDoc.exists()) {
         const { customUserId } = mappingDoc.data();
-
-        // Get user profile using custom ID
         const userDoc = await getDoc(doc(db, "Users", customUserId));
 
         if (userDoc.exists()) {
           const userData = userDoc.data();
           setUserProfile(userData);
 
-          // Only send OTP if email is NOT verified
-          if (!userData.emailVerified) {
+          // Only send OTP if conditions are met
+          if (shouldSendOTP(userData)) {
             await sendOTP(email);
           }
         }
