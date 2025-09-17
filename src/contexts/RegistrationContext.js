@@ -1,33 +1,38 @@
 import React, { createContext, useState } from "react";
-import { API_ENDPOINTS } from "../config/api";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useProfilePictureUpload } from "../hooks/useProfilePictureUpload";
 export const RegistrationContext = createContext();
 
 export const RegistrationProvider = ({ children }) => {
   const [personalInfo, setPersonalInfo] = useState({});
   const [verificationInfo, setVerificationInfo] = useState({});
-  const uploadImage = async (file, folder = "verification-documents") => {
+  const uploadImageDirectly = async (file, folder) => {
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", folder);
+      const storage = getStorage();
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}.${fileExt}`;
+      const storageRef = ref(storage, `${folder}/${fileName}`);
 
-      const response = await fetch(API_ENDPOINTS.UPLOAD_VERIFICATION_IMAGE, {
-        method: "POST",
-        body: formData,
+      const snapshot = await uploadBytes(storageRef, file, {
+        contentType: file.type,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Upload failed");
-      }
-
-      const data = await response.json();
-      return { success: true, url: data.url, path: data.path };
+      return await getDownloadURL(snapshot.ref);
     } catch (error) {
       console.error("Upload error:", error);
-      return { success: false, error: error.message };
+      return "";
     }
   };
+const uploadImage = async (file, folder = "verification-documents") => {
+  try {
+    return await uploadImageDirectly(file, folder);
+  } catch (error) {
+    console.error("Upload error:", error);
+    return { success: false, error: error.message };
+  }
+};
   const updatePersonalInfo = (data) => {
     setPersonalInfo(data);
   };
