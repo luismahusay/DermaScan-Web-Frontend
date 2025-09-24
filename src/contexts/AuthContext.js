@@ -63,19 +63,32 @@ export const AuthProvider = ({ children }) => {
   // ---------- Email Check Function ----------
   const checkEmailAvailability = async (email) => {
     try {
-      console.log("Checking email availability for:", email); // Debug log
+      console.log("Checking email availability thoroughly for:", email);
 
-      // Add a small delay to prevent rate limiting
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
+      // First check Firebase Auth
       const signInMethods = await fetchSignInMethodsForEmail(auth, email);
 
-      console.log("Sign-in methods found:", signInMethods.length); // Debug log
+      if (signInMethods.length > 0) {
+        console.log("Email found in Firebase Auth");
+        return false;
+      }
 
-      return signInMethods.length === 0; // true if email is available
+      // Also check your Firestore Users collection
+      const usersQuery = query(
+        collection(db, "Users"),
+        where("User_Email", "==", email)
+      );
+      const userDocs = await getDocs(usersQuery);
+
+      if (!userDocs.empty) {
+        console.log("Email found in Firestore Users collection");
+        return false;
+      }
+
+      console.log("Email is available in both Firebase Auth and Firestore");
+      return true;
     } catch (error) {
       console.error("Error checking email availability:", error);
-      console.error("Error code:", error.code);
 
       // Handle specific Firebase errors
       if (error.code === "auth/invalid-email") {
@@ -115,16 +128,39 @@ export const AuthProvider = ({ children }) => {
     return Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit OTP
   };
 
-  const sendOTP = async (email) => {
+  const sendOTP = async (email, firstName = null) => {
     try {
       const otp = generateOTP();
       setOtpStore({ [email]: otp });
 
-      await fetch("http://localhost:5000/api/email/send-otp", {
+      // Try to get firstName from multiple sources
+      let displayName = firstName;
+
+      if (!displayName && userProfile?.User_FName) {
+        displayName = userProfile.User_FName;
+      }
+
+      if (!displayName && currentUser?.displayName) {
+        displayName = currentUser.displayName.split(" ")[0];
+      }
+
+      if (!displayName) {
+        displayName = "User"; // Fallback
+      }
+
+      console.log("Sending OTP with:", { email, firstName: displayName, otp }); // Debug log
+
+      const response = await fetch("http://localhost:5000/api/email/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify({ email, firstName: displayName, otp }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Server response:", errorData); // Debug log
+        throw new Error(errorData.error || "Failed to send OTP");
+      }
 
       console.log("OTP sent:", otp);
       return { success: true };
@@ -526,7 +562,7 @@ export const AuthProvider = ({ children }) => {
       );
 
       // Send OTP
-      await sendOTP(personalInfo.emailAddress);
+      await sendOTP(personalInfo.emailAddress, personalInfo.firstName);
 
       return { user, customUserId };
     } catch (error) {
@@ -552,7 +588,7 @@ export const AuthProvider = ({ children }) => {
 
           // Only send OTP if conditions are met
           if (shouldSendOTP(userData)) {
-            await sendOTP(email);
+            await sendOTP(email, userData.User_FName);
           }
         }
       } else {
@@ -569,7 +605,7 @@ export const AuthProvider = ({ children }) => {
 
           // Option 2: Still check emailVerified flag
           if (!userData.emailVerified) {
-            await sendOTP(email);
+            await sendOTP(email, userData.User_FName);
           }
         }
       }

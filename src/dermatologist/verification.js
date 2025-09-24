@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { RegistrationContext } from "../contexts/RegistrationContext";
+
 function VerificationForm() {
   const navigate = useNavigate();
 
@@ -19,66 +20,246 @@ function VerificationForm() {
     validIdType: "",
     validIdImage: null,
   });
+
   const { updateVerificationInfo } = useContext(RegistrationContext);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [touchedFields, setTouchedFields] = useState({});
+
+  // Validation functions
+  const validateAddress = (address) => {
+    if (!address.trim()) return "Clinic address is required";
+    if (address.length < 10) return "Please provide a complete address";
+    return null;
+  };
+
+  const validateCity = (city) => {
+    if (!city.trim()) return "City is required";
+    if (city.length < 2) return "City must be at least 2 characters";
+    if (!/^[a-zA-Z\s.-]+$/.test(city))
+      return "City can only contain letters, spaces, periods, and hyphens";
+    return null;
+  };
+
+  const validateRegion = (region) => {
+    if (!region.trim()) return "Region is required";
+    if (region.length < 2) return "Region must be at least 2 characters";
+    if (!/^[a-zA-Z\s.-]+$/.test(region))
+      return "Region can only contain letters, spaces, periods, and hyphens";
+    return null;
+  };
+
+  const validateZipCode = (zipCode) => {
+    if (!zipCode.trim()) return "Zip code is required";
+    if (!/^\d{4}$/.test(zipCode)) return "Zip code must be exactly 4 digits";
+    return null;
+  };
+
+  const validateClinicName = (clinicName) => {
+    if (!clinicName.trim()) return "Clinic name is required";
+    if (clinicName.length < 3)
+      return "Clinic name must be at least 3 characters";
+    if (clinicName.length > 100)
+      return "Clinic name must be less than 100 characters";
+    return null;
+  };
+
+  const validateTimeSchedule = (timeSchedule) => {
+    if (!timeSchedule.trim()) return "Time schedule is required";
+    // Basic format validation for time schedule (e.g., "08:00 AM - 05:00 PM")
+    const timePattern =
+      /^\d{1,2}:\d{2}\s?(AM|PM)\s?-\s?\d{1,2}:\d{2}\s?(AM|PM)$/i;
+    if (!timePattern.test(timeSchedule.trim())) {
+      return "Please use format: 08:00 AM - 05:00 PM";
+    }
+    return null;
+  };
+
+  const validateFileUpload = (file, fieldName) => {
+    if (!file) return `${fieldName} is required`;
+
+    // Check file type
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+    if (!allowedTypes.includes(file.type)) {
+      return `${fieldName} must be an image file (JPG, PNG, or GIF)`;
+    }
+
+    // Check file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      return `${fieldName} must be less than 5MB`;
+    }
+
+    return null;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    // Clear field error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: null,
+      }));
+    }
+
+    // Clear general error when user starts correcting
+    if (error) {
+      setError("");
+    }
   };
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
+    const file = files[0];
+
     setFormData((prev) => ({
       ...prev,
-      [name]: files[0],
+      [name]: file,
     }));
+
+    // Clear field error when user selects a file
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: null,
+      }));
+    }
+
+    // Validate file immediately
+    if (file) {
+      let fieldError = null;
+      if (name === "licenseImage") {
+        fieldError = validateFileUpload(file, "License image");
+      } else if (name === "validIdImage") {
+        fieldError = validateFileUpload(file, "Valid ID image");
+      }
+
+      if (fieldError) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          [name]: fieldError,
+        }));
+      }
+    }
+
+    // Clear general error when user starts correcting
+    if (error) {
+      setError("");
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouchedFields((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+
+    // Validate field on blur and show error immediately
+    let fieldError = null;
+    switch (name) {
+      case "clinicAddress":
+        fieldError = validateAddress(value);
+        break;
+      case "city":
+        fieldError = validateCity(value);
+        break;
+      case "region":
+        fieldError = validateRegion(value);
+        break;
+      case "zipCode":
+        fieldError = validateZipCode(value);
+        break;
+      case "clinicName":
+        fieldError = validateClinicName(value);
+        break;
+      case "clinicTimeSchedule":
+        fieldError = validateTimeSchedule(value);
+        break;
+      case "clinicAvailableDays":
+        if (!value) fieldError = "Please select available days";
+        break;
+      case "validIdType":
+        if (!value) fieldError = "Please select a valid ID type";
+        break;
+      default:
+        break;
+    }
+
+    if (fieldError) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: fieldError,
+      }));
+    } else {
+      // Clear the error if field is now valid
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: null,
+      }));
+    }
   };
 
   const handleNext = async () => {
-    // Validation
-    const requiredFields = [
-      "clinicAddress",
-      "city",
-      "region",
-      "zipCode",
-      "clinicName",
-      "clinicAvailableDays",
-      "clinicTimeSchedule",
-    ];
+    // Comprehensive validation
+    const validationErrors = {};
 
-    const emptyFields = requiredFields.filter(
-      (field) => !formData[field]?.trim()
+    validationErrors.clinicAddress = validateAddress(formData.clinicAddress);
+    validationErrors.city = validateCity(formData.city);
+    validationErrors.region = validateRegion(formData.region);
+    validationErrors.zipCode = validateZipCode(formData.zipCode);
+    validationErrors.clinicName = validateClinicName(formData.clinicName);
+    validationErrors.clinicTimeSchedule = validateTimeSchedule(
+      formData.clinicTimeSchedule
     );
 
-    if (emptyFields.length > 0) {
-      setError("Please fill in all required fields.");
-      return;
+    if (!formData.clinicAvailableDays) {
+      validationErrors.clinicAvailableDays = "Please select available days";
     }
 
-    // File validation
-    if (!formData.licenseImage) {
-      setError("Please upload your license image.");
-      return;
+    if (!formData.validIdType) {
+      validationErrors.validIdType = "Please select a valid ID type";
     }
 
-    if (!formData.validIdType || !formData.validIdImage) {
-      setError("Please select valid ID type and upload image.");
+    // File validations
+    validationErrors.licenseImage = validateFileUpload(
+      formData.licenseImage,
+      "License image"
+    );
+    validationErrors.validIdImage = validateFileUpload(
+      formData.validIdImage,
+      "Valid ID image"
+    );
+
+    // Remove null errors
+    const activeErrors = Object.fromEntries(
+      Object.entries(validationErrors).filter(([_, error]) => error !== null)
+    );
+
+    if (Object.keys(activeErrors).length > 0) {
+      setFieldErrors(activeErrors);
+      setError(""); // Clear general error when showing field-specific errors
       return;
     }
 
     try {
       setLoading(true);
       setError("");
+      setFieldErrors({}); // Clear field errors on successful validation
 
       // Store verification data in context
       updateVerificationInfo(formData);
       navigate("/dermatologist/security");
     } catch (error) {
       setError("Failed to proceed. Please try again.");
+      setFieldErrors({}); // Clear field errors when showing server error
     } finally {
       setLoading(false);
     }
@@ -149,14 +330,25 @@ function VerificationForm() {
                     name="clinicAddress"
                     value={formData.clinicAddress}
                     onChange={handleInputChange}
-                    className="border-0 border-bottom rounded-0 ps-0"
+                    onBlur={handleBlur}
+                    className={`border-0 border-bottom rounded-0 ps-0 ${
+                      fieldErrors.clinicAddress ? "border-danger" : ""
+                    }`}
                     style={{
                       boxShadow: "none",
                       width: "80%",
-                      marginBottom: "25px",
+                      marginBottom: "5px",
                       marginLeft: "50px",
                     }}
                   />
+                  {fieldErrors.clinicAddress && (
+                    <div
+                      className="text-danger small mb-2"
+                      style={{ marginLeft: "50px" }}
+                    >
+                      {fieldErrors.clinicAddress}
+                    </div>
+                  )}
                 </Col>
                 <Col md={6}>
                   <Form.Control
@@ -165,14 +357,25 @@ function VerificationForm() {
                     name="city"
                     value={formData.city}
                     onChange={handleInputChange}
-                    className="border-0 border-bottom rounded-0 ps-0"
+                    onBlur={handleBlur}
+                    className={`border-0 border-bottom rounded-0 ps-0 ${
+                      fieldErrors.city ? "border-danger" : ""
+                    }`}
                     style={{
                       boxShadow: "none",
                       width: "80%",
-                      marginBottom: "25px",
+                      marginBottom: "5px",
                       marginLeft: "50px",
                     }}
                   />
+                  {fieldErrors.city && (
+                    <div
+                      className="text-danger small mb-2"
+                      style={{ marginLeft: "50px" }}
+                    >
+                      {fieldErrors.city}
+                    </div>
+                  )}
                 </Col>
               </Row>
 
@@ -184,14 +387,25 @@ function VerificationForm() {
                     name="region"
                     value={formData.region}
                     onChange={handleInputChange}
-                    className="border-0 border-bottom rounded-0 ps-0"
+                    onBlur={handleBlur}
+                    className={`border-0 border-bottom rounded-0 ps-0 ${
+                      fieldErrors.region ? "border-danger" : ""
+                    }`}
                     style={{
                       boxShadow: "none",
                       width: "80%",
-                      marginBottom: "25px",
+                      marginBottom: "5px",
                       marginLeft: "50px",
                     }}
                   />
+                  {fieldErrors.region && (
+                    <div
+                      className="text-danger small mb-2"
+                      style={{ marginLeft: "50px" }}
+                    >
+                      {fieldErrors.region}
+                    </div>
+                  )}
                 </Col>
                 <Col md={6}>
                   <Form.Control
@@ -200,14 +414,25 @@ function VerificationForm() {
                     name="zipCode"
                     value={formData.zipCode}
                     onChange={handleInputChange}
-                    className="border-0 border-bottom rounded-0 ps-0"
+                    onBlur={handleBlur}
+                    className={`border-0 border-bottom rounded-0 ps-0 ${
+                      fieldErrors.zipCode ? "border-danger" : ""
+                    }`}
                     style={{
                       boxShadow: "none",
                       width: "80%",
-                      marginBottom: "25px",
+                      marginBottom: "5px",
                       marginLeft: "50px",
                     }}
                   />
+                  {fieldErrors.zipCode && (
+                    <div
+                      className="text-danger small mb-2"
+                      style={{ marginLeft: "50px" }}
+                    >
+                      {fieldErrors.zipCode}
+                    </div>
+                  )}
                 </Col>
               </Row>
 
@@ -219,27 +444,41 @@ function VerificationForm() {
                     name="clinicName"
                     value={formData.clinicName}
                     onChange={handleInputChange}
-                    className="border-0 border-bottom rounded-0 ps-0"
+                    onBlur={handleBlur}
+                    className={`border-0 border-bottom rounded-0 ps-0 ${
+                      fieldErrors.clinicName ? "border-danger" : ""
+                    }`}
                     style={{
                       boxShadow: "none",
                       width: "80%",
-                      marginBottom: "25px",
+                      marginBottom: "5px",
                       marginLeft: "50px",
                     }}
                   />
+                  {fieldErrors.clinicName && (
+                    <div
+                      className="text-danger small mb-2"
+                      style={{ marginLeft: "50px" }}
+                    >
+                      {fieldErrors.clinicName}
+                    </div>
+                  )}
                 </Col>
                 <Col md={6}>
                   <Form.Select
                     name="clinicAvailableDays"
                     value={formData.clinicAvailableDays}
                     onChange={handleInputChange}
-                    className="border-0 border-bottom rounded-0 ps-0"
+                    onBlur={handleBlur}
+                    className={`border-0 border-bottom rounded-0 ps-0 ${
+                      fieldErrors.clinicAvailableDays ? "border-danger" : ""
+                    }`}
                     style={{
                       boxShadow: "none",
                       backgroundColor: "transparent",
                       color: formData.clinicAvailableDays ? "#000" : "#6c757d",
                       width: "80%",
-                      marginBottom: "25px",
+                      marginBottom: "5px",
                       marginLeft: "50px",
                     }}
                   >
@@ -249,6 +488,14 @@ function VerificationForm() {
                     <option value="everyday">Everyday</option>
                     <option value="weekends">Weekends Only</option>
                   </Form.Select>
+                  {fieldErrors.clinicAvailableDays && (
+                    <div
+                      className="text-danger small mb-2"
+                      style={{ marginLeft: "50px" }}
+                    >
+                      {fieldErrors.clinicAvailableDays}
+                    </div>
+                  )}
                 </Col>
               </Row>
 
@@ -259,12 +506,14 @@ function VerificationForm() {
                   </h5>
                   <div
                     className="d-flex align-items-center"
-                    style={{ marginBottom: "25px", marginLeft: "50px" }}
+                    style={{ marginBottom: "5px", marginLeft: "50px" }}
                   >
                     <span className="me-3">Upload Image:</span>
                     <label
                       htmlFor="licenseImage"
-                      className="btn btn-primary btn-sm"
+                      className={`btn btn-sm ${
+                        fieldErrors.licenseImage ? "btn-danger" : "btn-primary"
+                      }`}
                     >
                       + Choose File
                     </label>
@@ -282,6 +531,14 @@ function VerificationForm() {
                       </span>
                     )}
                   </div>
+                  {fieldErrors.licenseImage && (
+                    <div
+                      className="text-danger small mb-2"
+                      style={{ marginLeft: "50px" }}
+                    >
+                      {fieldErrors.licenseImage}
+                    </div>
+                  )}
                 </Col>
                 <Col md={6} className="order-1 order-md-1">
                   <Form.Label
@@ -293,7 +550,7 @@ function VerificationForm() {
                   <div
                     className="position-relative"
                     style={{
-                      marginBottom: "25px",
+                      marginBottom: "5px",
                       marginLeft: "50px",
                       width: "80%",
                     }}
@@ -303,8 +560,11 @@ function VerificationForm() {
                       name="clinicTimeSchedule"
                       value={formData.clinicTimeSchedule}
                       onChange={handleInputChange}
+                      onBlur={handleBlur}
                       placeholder="e.g. 08:00 AM - 05:00 PM"
-                      className="border-0 border-bottom rounded-0 ps-0"
+                      className={`border-0 border-bottom rounded-0 ps-0 ${
+                        fieldErrors.clinicTimeSchedule ? "border-danger" : ""
+                      }`}
                       style={{
                         boxShadow: "none",
                         paddingRight: "30px",
@@ -321,6 +581,14 @@ function VerificationForm() {
                       }}
                     ></i>
                   </div>
+                  {fieldErrors.clinicTimeSchedule && (
+                    <div
+                      className="text-danger small mb-2"
+                      style={{ marginLeft: "50px" }}
+                    >
+                      {fieldErrors.clinicTimeSchedule}
+                    </div>
+                  )}
                 </Col>
               </Row>
 
@@ -331,13 +599,16 @@ function VerificationForm() {
                   </h5>
                   <div
                     className="d-flex align-items-center flex-wrap"
-                    style={{ marginLeft: "50px", marginBottom: "25px" }}
+                    style={{ marginLeft: "50px", marginBottom: "5px" }}
                   >
                     <Form.Select
                       name="validIdType"
                       value={formData.validIdType}
                       onChange={handleInputChange}
-                      className="border-0 border-bottom rounded-0 ps-0 me-3"
+                      onBlur={handleBlur}
+                      className={`border-0 border-bottom rounded-0 ps-0 me-3 ${
+                        fieldErrors.validIdType ? "border-danger" : ""
+                      }`}
                       style={{
                         boxShadow: "none",
                         width: "150px",
@@ -360,7 +631,9 @@ function VerificationForm() {
                     </span>
                     <label
                       htmlFor="validIdImage"
-                      className="btn btn-primary btn-sm"
+                      className={`btn btn-sm ${
+                        fieldErrors.validIdImage ? "btn-danger" : "btn-primary"
+                      }`}
                       style={{ whiteSpace: "nowrap" }}
                     >
                       + Choose File
@@ -374,11 +647,34 @@ function VerificationForm() {
                       style={{ display: "none" }}
                     />
                   </div>
+
+                  {/* Show validation errors */}
+                  {(fieldErrors.validIdType || fieldErrors.validIdImage) && (
+                    <div
+                      style={{
+                        marginLeft: "50px",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      {fieldErrors.validIdType && (
+                        <div className="text-danger small">
+                          {fieldErrors.validIdType}
+                        </div>
+                      )}
+                      {fieldErrors.validIdImage && (
+                        <div className="text-danger small">
+                          {fieldErrors.validIdImage}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Show filename if uploaded */}
                   {formData.validIdImage && (
                     <div
                       style={{
                         marginLeft: "50px",
-                        marginTop: "-15px",
+                        marginTop: "-5px",
                         marginBottom: "10px",
                       }}
                     >
@@ -395,6 +691,7 @@ function VerificationForm() {
               <Button
                 onClick={handleNext}
                 className="fw-bold text-uppercase"
+                disabled={loading}
                 style={{
                   backgroundColor: "#205EFA",
                   border: "none",
@@ -405,7 +702,7 @@ function VerificationForm() {
                   fontSize: "16px",
                 }}
               >
-                Next
+                {loading ? "Processing..." : "Next"}
               </Button>
             </div>
           </Form>
@@ -428,4 +725,5 @@ function VerificationForm() {
     </Container>
   );
 }
+
 export default VerificationForm;
