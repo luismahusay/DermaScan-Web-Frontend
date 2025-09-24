@@ -25,32 +25,6 @@ import "../styles/derma_subscription.css"; // Assuming you have a CSS file for s
 
 const DermaSubscription = () => {
 
-  // Sample data for the chart
-  const chartData = [
-    { month: "Jan", value: 4 },
-    { month: "Feb", value: 6 },
-    { month: "Mar", value: 3 },
-    { month: "Apr", value: 7 },
-    { month: "May", value: 5 },
-    { month: "Jun", value: 2 },
-  ];
-
-  // Sample booking data
-  const bookingData = [
-    { patient: "Test", type: "Online", time: "9:00 AM", status: "Accepted" },
-    { patient: "Test", type: "Walk-In", time: "1:00 PM", status: "Accepted" },
-    { patient: "Test", type: "Walk-In", time: "4:30 PM", status: "Accepted" },
-    { patient: "Test", type: "Online", time: "6:00 PM", status: "Accepted" },
-    { patient: "Test", type: "Online", time: "7:00 PM", status: "Accepted" },
-  ];
-
-  const productData = [
-    { patient: "Test", type: "Online", time: "9:00 AM", status: "Accepted" },
-    { patient: "Test", type: "Walk-In", time: "1:00 PM", status: "Accepted" },
-    { patient: "Test", type: "Walk-In", time: "4:30 PM", status: "Accepted" },
-    { patient: "Test", type: "Online", time: "6:00 PM", status: "Accepted" },
-    { patient: "Test", type: "Online", time: "7:00 PM", status: "Accepted" },
-  ];
   return (
     <Layout currentPage="subscription">
 

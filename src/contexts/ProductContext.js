@@ -12,12 +12,44 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
+import { useImageUpload } from "../hooks/useImageUpload";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 const ProductContext = createContext();
 
 export const useProduct = () => {
   return useContext(ProductContext);
 };
+const deleteImagesDirectly = async (imageUrls) => {
+  try {
+    const storage = getStorage();
 
+    const deletePromises = imageUrls.map(async (url) => {
+      try {
+        const urlParts = new URL(url);
+        const path = decodeURIComponent(
+          urlParts.pathname.split("/o/")[1].split("?")[0]
+        );
+        const fileRef = ref(storage, path);
+        await deleteObject(fileRef);
+        return true;
+      } catch (error) {
+        console.error(`Failed to delete ${url}:`, error);
+        return false;
+      }
+    });
+
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error("Delete error:", error);
+    throw error;
+  }
+};
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -60,29 +92,6 @@ export const ProductProvider = ({ children }) => {
       throw error;
     } finally {
       setLoading(false);
-    }
-  };
-  const deleteProductImages = async (imageUrls) => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/product-images/delete",
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ imageUrls }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete images");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error deleting images:", error);
-      throw error;
     }
   };
   // Get Products (with filters)
@@ -167,35 +176,35 @@ export const ProductProvider = ({ children }) => {
   };
 
   // Delete Product
-  const deleteProduct = async (productId) => {
-    try {
-      setLoading(true);
+ const deleteProduct = async (productId) => {
+   try {
+     setLoading(true);
 
-      // Get product data to access image URLs
-      const productToDelete = products.find((p) => p.Product_ID === productId);
+     // Get product data to access image URLs
+     const productToDelete = products.find((p) => p.Product_ID === productId);
 
-      // Delete images from Supabase Storage
-      if (productToDelete?.Product_AllImageURLs?.length > 0) {
-        await deleteProductImages(productToDelete.Product_AllImageURLs);
-      }
+     // Delete images from Firebase Storage directly
+     if (productToDelete?.Product_AllImageURLs?.length > 0) {
+       await deleteImagesDirectly(productToDelete.Product_AllImageURLs);
+     }
 
-      // Delete from Firestore
-      if (!productToDelete) throw new Error("Product not found");
-      await deleteDoc(doc(db, "Product", productToDelete.id));
+     // Delete from Firestore
+     if (!productToDelete) throw new Error("Product not found");
+     await deleteDoc(doc(db, "Product", productToDelete.id));
 
-      // Remove from local state
-      setProducts((prev) =>
-        prev.filter((product) => product.Product_ID !== productId)
-      );
+     // Remove from local state
+     setProducts((prev) =>
+       prev.filter((product) => product.Product_ID !== productId)
+     );
 
-      return { success: true };
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+     return { success: true };
+   } catch (error) {
+     console.error("Error deleting product:", error);
+     throw error;
+   } finally {
+     setLoading(false);
+   }
+ };
   // Approve/Reject Product (Admin only)
   const updateProductStatus = async (productId, status, reviewerId) => {
     try {

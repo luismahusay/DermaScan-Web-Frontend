@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { API_ENDPOINTS } from "../config/api";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export const useProfilePictureUpload = () => {
   const [uploading, setUploading] = useState(false);
@@ -10,22 +10,43 @@ export const useProfilePictureUpload = () => {
     setUploadError(null);
 
     try {
-      const formData = new FormData();
-      formData.append("profilePicture", file);
-      formData.append("userId", userId);
+      // Validate file
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+      ];
+      const maxSize = 5 * 1024 * 1024; // 5MB
 
-      const response = await fetch(API_ENDPOINTS.UPLOAD_PROFILE_PICTURE, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Upload failed");
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error(
+          "Invalid file type. Only JPEG, PNG, and WebP are allowed."
+        );
+      }
+      if (file.size > maxSize) {
+        throw new Error("File too large. Maximum size is 5MB.");
       }
 
-      const result = await response.json();
+      const storage = getStorage();
+
+      // Generate filename
+      const fileExt = file.name.split(".").pop();
+      const fileName = `profile_${userId}_${Date.now()}.${fileExt}`;
+
+      // Create storage reference
+      const storageRef = ref(storage, `profile-pictures/${fileName}`);
+
+      // Upload file
+      const snapshot = await uploadBytes(storageRef, file, {
+        contentType: file.type,
+      });
+
+      // Get download URL
+      const imageUrl = await getDownloadURL(snapshot.ref);
+
       setUploading(false);
-      return result.imageUrl; // Note: changed from result.url to result.imageUrl
+      return imageUrl;
     } catch (error) {
       setUploadError(error.message);
       setUploading(false);
@@ -33,5 +54,64 @@ export const useProfilePictureUpload = () => {
     }
   };
 
-  return { uploadProfilePicture, uploading, uploadError };
+  const uploadVerificationImage = async (
+    file,
+    folder = "verification-documents"
+  ) => {
+    setUploading(true);
+    setUploadError(null);
+
+    try {
+      // Validate file
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+      ];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error(
+          "Invalid file type. Only JPEG, PNG, and WebP are allowed."
+        );
+      }
+      if (file.size > maxSize) {
+        throw new Error("File too large. Maximum size is 5MB.");
+      }
+
+      const storage = getStorage();
+
+      // Generate filename
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}.${fileExt}`;
+
+      // Create storage reference
+      const storageRef = ref(storage, `${folder}/${fileName}`);
+
+      // Upload file
+      const snapshot = await uploadBytes(storageRef, file, {
+        contentType: file.type,
+      });
+
+      // Get download URL
+      const url = await getDownloadURL(snapshot.ref);
+
+      setUploading(false);
+      return { url, path: `${folder}/${fileName}` };
+    } catch (error) {
+      setUploadError(error.message);
+      setUploading(false);
+      throw error;
+    }
+  };
+
+  return {
+    uploadProfilePicture,
+    uploadVerificationImage,
+    uploading,
+    uploadError,
+  };
 };

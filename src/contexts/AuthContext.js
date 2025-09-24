@@ -20,6 +20,13 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "../config/firebase";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import { API_ENDPOINTS } from "../config/api";
 
 const AuthContext = createContext();
@@ -27,7 +34,25 @@ const AuthContext = createContext();
 export const useAuth = () => {
   return useContext(AuthContext);
 };
+const uploadImageDirectly = async (file, folder) => {
+  try {
+    const storage = getStorage();
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}.${fileExt}`;
+    const storageRef = ref(storage, `${folder}/${fileName}`);
 
+    const snapshot = await uploadBytes(storageRef, file, {
+      contentType: file.type,
+    });
+
+    return await getDownloadURL(snapshot.ref);
+  } catch (error) {
+    console.error("Upload error:", error);
+    return "";
+  }
+};
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -413,22 +438,22 @@ export const AuthProvider = ({ children }) => {
       // Generate unique custom ID
       const customUserId = await generateUniqueCustomId();
 
-      // Handle image uploads
+      // Handle image uploads - call upload functions directly
       let licenseImageUrl = "";
       let validIdImageUrl = "";
 
       if (verificationInfo.licenseImage) {
-        const licenseUpload = await uploadImageToSupabase(
-          verificationInfo.licenseImage
+        licenseImageUrl = await uploadImageDirectly(
+          verificationInfo.licenseImage,
+          "license-documents"
         );
-        if (licenseUpload.success) licenseImageUrl = licenseUpload.url;
       }
 
       if (verificationInfo.validIdImage) {
-        const idUpload = await uploadImageToSupabase(
-          verificationInfo.validIdImage
+        validIdImageUrl = await uploadImageDirectly(
+          verificationInfo.validIdImage,
+          "id-documents"
         );
-        if (idUpload.success) validIdImageUrl = idUpload.url;
       }
 
       // Generate other IDs
@@ -507,23 +532,6 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Registration error:", error);
       throw error;
-    }
-  };
-  const uploadImageToSupabase = async (file) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", "verification-documents");
-
-      const response = await fetch(API_ENDPOINTS.UPLOAD_VERIFICATION_IMAGE, {
-        method: "POST",
-        body: formData,
-      });
-
-      return await response.json();
-    } catch (error) {
-      console.error("Image upload error:", error);
-      return { success: false };
     }
   };
   // ---------- Auth ----------

@@ -14,9 +14,9 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
-import { API_ENDPOINTS } from "../config/api";
 
 const DermaProfile = () => {
+  const { uploadVerificationImage } = useProfilePictureUpload();
   const [showSidebar, setShowSidebar] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -94,9 +94,22 @@ const DermaProfile = () => {
             );
             if (clinicDoc.exists()) {
               clinicData = clinicDoc.data();
+
+              // NEW: Load location data
+              if (clinicData.Location_ID) {
+                const locationDoc = await getDoc(
+                  doc(db, "Location", clinicData.Location_ID)
+                );
+                if (locationDoc.exists()) {
+                  const locationData = locationDoc.data();
+                  clinicData.city = locationData.Location_City;
+                  clinicData.region = locationData.Location_Region;
+                  clinicData.zipCode = locationData.Location_ZipCode;
+                }
+              }
             }
           }
-
+          
           // Populate form with existing data
           setFormData({
             firstName: userData.User_FName || "",
@@ -111,6 +124,9 @@ const DermaProfile = () => {
             clinicSchedule: `${clinicData.Clinic_StartTime || ""} - ${
               clinicData.Clinic_EndTime || ""
             }`,
+            city: clinicData.city || "",
+            region: clinicData.region || "",
+            zipCode: clinicData.zipCode || "",
             // Keep password fields empty for security
             currentPassword: "",
             newPassword: "",
@@ -171,7 +187,7 @@ const DermaProfile = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validate file - match your API constraints
+    // Validate file - same validation as before
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
 
     if (!allowedTypes.includes(file.type)) {
@@ -179,7 +195,6 @@ const DermaProfile = () => {
       return;
     }
 
-    // Match your API's 5MB limit
     if (file.size > 5 * 1024 * 1024) {
       setMessage("File size must be less than 5MB");
       return;
@@ -188,40 +203,15 @@ const DermaProfile = () => {
     try {
       setMessage("Uploading document...");
 
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", "verification-documents");
+      // Use the Firebase hook instead of API call
+      const folder =
+        documentType === "licenseImageUrl"
+          ? "license-documents"
+          : "id-documents";
 
-      // Use the correct API endpoint from your configuration
-      const apiUrl = API_ENDPOINTS.UPLOAD_VERIFICATION_IMAGE;
-      console.log("Calling API:", apiUrl);
+      const result = await uploadVerificationImage(file, folder);
 
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        body: formData,
-      });
-
-      console.log("Response status:", response.status);
-
-      if (!response.ok) {
-        const responseText = await response.text();
-        console.log("Error response body:", responseText);
-
-        try {
-          const errorData = JSON.parse(responseText);
-          throw new Error(
-            errorData.error || `HTTP error! status: ${response.status}`
-          );
-        } catch (parseError) {
-          throw new Error(
-            `Server returned HTML instead of JSON. Status: ${response.status}. Check if your backend server is running on the correct port.`
-          );
-        }
-      }
-
-      const result = await response.json();
-
-      if (result.success && result.url) {
+      if (result.url) {
         setFormData((prev) => ({
           ...prev,
           [documentType]: result.url,
@@ -234,7 +224,7 @@ const DermaProfile = () => {
         );
         setTimeout(() => setMessage(""), 3000);
       } else {
-        throw new Error(result.error || "Upload failed - no URL returned");
+        throw new Error("Upload failed - no URL returned");
       }
     } catch (error) {
       console.error("Upload error:", error);
@@ -261,6 +251,18 @@ const DermaProfile = () => {
     try {
       const customUserId = userProfile.User_ID;
 
+      // ✅ Split clinicTimeSchedule into start and end times
+      let startTime = "08:00 AM";
+      let endTime = "05:00 PM";
+
+      if (formData.clinicTimeSchedule) {
+        const parts = formData.clinicTimeSchedule.split("-");
+        if (parts.length === 2) {
+          startTime = parts[0].trim();
+          endTime = parts[1].trim();
+        }
+      }
+
       // Update user data in Users collection
       const userUpdates = {
         User_FName: formData.firstName,
@@ -286,19 +288,34 @@ const DermaProfile = () => {
 
       if (!clinicSnapshot.empty) {
         const clinicRelation = clinicSnapshot.docs[0].data();
-        const [startTime, endTime] = formData.clinicSchedule.split(" - ");
 
         const clinicUpdates = {
           Clinic_Name: formData.clinicName,
           Clinic_Address: formData.clinicAddress,
-          Clinic_StartTime: startTime?.trim() || "08:00 AM",
-          Clinic_EndTime: endTime?.trim() || "05:00 PM",
+          Clinic_StartTime: startTime,
+          Clinic_EndTime: endTime,
         };
 
         await updateDoc(
           doc(db, "Clinic", clinicRelation.Clinic_ID),
           clinicUpdates
         );
+
+        // NEW: Update location data
+        const clinicDoc = await getDoc(
+          doc(db, "Clinic", clinicRelation.Clinic_ID)
+        );
+        if (clinicDoc.exists() && clinicDoc.data().Location_ID) {
+          const locationUpdates = {
+            Location_City: formData.city,
+            Location_Region: formData.region,
+            Location_ZipCode: formData.zipCode,
+          };
+          await updateDoc(
+            doc(db, "Location", clinicDoc.data().Location_ID),
+            locationUpdates
+          );
+        }
       }
 
       setMessage("Profile updated successfully!");
@@ -310,6 +327,7 @@ const DermaProfile = () => {
       setSaving(false);
     }
   };
+
 
   const handleBackClick = () => {
     window.location.href = "/dermatologist/dashboard"; // Navigate to dermatologist dashboard
@@ -484,8 +502,17 @@ const DermaProfile = () => {
               </div>
 
               {/* Security Settings */}
+              {/* Security Settings */}
               <div className="profile-section">
                 <h5 className="section-title">Security Settings</h5>
+
+                <div className="security-info-banner">
+                  <i className="fas fa-info-circle"></i>
+                  <span>
+                    Leave password fields empty if you don't want to change your
+                    current password
+                  </span>
+                </div>
 
                 <div className="form-group">
                   <label className="form-label">Current Password:</label>
@@ -495,8 +522,12 @@ const DermaProfile = () => {
                     className="form-control"
                     value={formData.currentPassword}
                     onChange={handleInputChange}
-                    placeholder="Enter current password"
+                    placeholder="Enter your current password to make changes"
                   />
+                  <small className="form-text muted-info">
+                    <i className="fas fa-info-circle"></i>
+                    Required only if you want to update your password
+                  </small>
                 </div>
 
                 <div className="form-group">
@@ -507,8 +538,13 @@ const DermaProfile = () => {
                     className="form-control"
                     value={formData.newPassword}
                     onChange={handleInputChange}
-                    placeholder="Enter new password"
+                    placeholder="Enter new password (minimum 6 characters)"
                   />
+                  {formData.newPassword && formData.newPassword.length < 6 && (
+                    <small className="text-danger">
+                      Password must be at least 6 characters long
+                    </small>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -519,8 +555,15 @@ const DermaProfile = () => {
                     className="form-control"
                     value={formData.confirmNewPassword}
                     onChange={handleInputChange}
-                    placeholder="Confirm new password"
+                    placeholder="Confirm your new password"
                   />
+                  {formData.newPassword &&
+                    formData.confirmNewPassword &&
+                    formData.newPassword !== formData.confirmNewPassword && (
+                      <small className="text-danger">
+                        Passwords do not match
+                      </small>
+                    )}
                 </div>
 
                 <div className="form-group">
@@ -530,13 +573,19 @@ const DermaProfile = () => {
                         className="fas fa-shield-alt"
                         style={{ color: "#6c757d" }}
                       ></i>
-                      <span>Two-Factor Authentication (2FA)</span>
+                      <div>
+                        <span>Two-Factor Authentication (2FA)</span>
+                        <small className="d-block text-muted">
+                          Add an extra layer of security to your account
+                        </small>
+                      </div>
                       <span
                         style={{
                           color: formData.twoFactorEnabled
                             ? "#28a745"
                             : "#dc3545",
                           fontSize: "0.8rem",
+                          fontWeight: "bold",
                         }}
                       >
                         {formData.twoFactorEnabled ? "Enabled" : "Disabled"}
@@ -556,10 +605,10 @@ const DermaProfile = () => {
                   </div>
                   {formData.twoFactorEnabled && (
                     <div className="two-factor-info">
-                      <div className="info-icon">i</div>
-                      <span style={{ fontSize: "0.85rem", color: "#6c757d" }}>
-                        When enabled, you'll need to enter a code from your
-                        email when logging in.
+                      <div className="info-icon">✓</div>
+                      <span style={{ fontSize: "0.85rem", color: "#28a745" }}>
+                        Two-factor authentication is active. You'll receive a
+                        verification code via email when logging in.
                       </span>
                     </div>
                   )}

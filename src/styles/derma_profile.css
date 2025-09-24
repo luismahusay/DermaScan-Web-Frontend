@@ -476,6 +476,72 @@
   object-fit: contain;
   border-radius: 8px;
 }
+.security-info-banner {
+  background-color: #e3f2fd;
+  border: 1px solid #bbdefb;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.security-info-banner i {
+  color: #1976d2;
+  font-size: 1.1rem;
+}
+
+.security-info-banner span {
+  color: #1565c0;
+  font-size: 0.9rem;
+}
+
+.notification-text > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.two-factor-info {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.info-icon {
+  background-color: #28a745;
+  color: white;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.muted-info {
+  color: #9aa0a6; /* softer muted gray */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem; /* slightly smaller text */
+  margin-top: 3px;
+  opacity: 0.8; /* make it visually lighter */
+}
+
+.muted-info i {
+  color: #b0b7bc; /* lighter gray than text */
+  font-size: 0.7rem; /* smaller icon */
+  line-height: 1;
+}
 /* Responsive breakpoints */
 @media (max-width: 1200px) {
   .profile-container {

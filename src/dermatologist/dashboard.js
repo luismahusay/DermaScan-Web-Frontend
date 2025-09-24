@@ -3,11 +3,15 @@ import { Container, Row, Col, Table } from "react-bootstrap";
 import { ResponsiveContainer, Area, AreaChart, XAxis, YAxis } from "recharts";
 import { Layout } from "./Layout";
 import "../styles/derma_dashboard.css"; // Import your CSS styles
-
+import { useNavigate } from "react-router-dom";
+import { useProduct } from "../contexts/ProductContext";
+import { useAuth } from "../contexts/AuthContext";
 const DermaDashboard = () => {
   const [timeFilter, setTimeFilter] = useState("6months");
   const [screenSize, setScreenSize] = useState("desktop");
-
+  const { currentUser, loading: authLoading } = useAuth();
+  const { products, loading: productLoading, getProducts } = useProduct();
+  const navigate = useNavigate();
   // Monitor screen size changes for chart responsiveness
   useEffect(() => {
     const updateScreenSize = () => {
@@ -23,7 +27,21 @@ const DermaDashboard = () => {
     window.addEventListener("resize", updateScreenSize);
     return () => window.removeEventListener("resize", updateScreenSize);
   }, []);
+  useEffect(() => {
+    const loadProductsWhenReady = async () => {
+      if (authLoading || !currentUser?.uid) return;
 
+      try {
+        await getProducts({
+          dermatologistId: currentUser.uid,
+        });
+      } catch (error) {
+        console.error("Failed to load products:", error);
+      }
+    };
+
+    loadProductsWhenReady();
+  }, [currentUser?.uid, authLoading]);
   // Dynamic chart configuration based on screen size
   const getChartConfig = () => {
     const configs = {
@@ -97,13 +115,7 @@ const DermaDashboard = () => {
     { patient: "Test", type: "Online", time: "7:00 PM", status: "Accepted" },
   ];
 
-  const productData = [
-    { patient: "Test", type: "Online", time: "9:00 AM", status: "Accepted" },
-    { patient: "Test", type: "Walk-In", time: "1:00 PM", status: "Accepted" },
-    { patient: "Test", type: "Walk-In", time: "4:30 PM", status: "Accepted" },
-    { patient: "Test", type: "Online", time: "6:00 PM", status: "Accepted" },
-    { patient: "Test", type: "Online", time: "7:00 PM", status: "Accepted" },
-  ];
+  const recentProducts = products.slice(0, 5);
 
   return (
     <Layout currentPage="dashboard">
@@ -426,65 +438,81 @@ const DermaDashboard = () => {
                         color: "#6c757d",
                       }}
                     >
-                      <th>Patient Name</th>
-                      <th>Booking Type</th>
-                      <th>Time</th>
+                      <th>Product Name</th>
+                      <th>Category</th>
+                      <th>Date Created</th>
                       <th>Status</th>
                       <th></th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {productData.map((product, index) => (
-                      <tr
-                        key={index}
-                        style={{
-                          fontSize:
-                            screenSize === "mobile" ? "0.75rem" : "0.85rem",
-                        }}
-                      >
-                        <td>{product.patient}</td>
-                        <td>
-                          <span
-                            className={`booking-type ${
-                              product.type === "Online"
-                                ? "booking-online"
-                                : "booking-walkin"
-                            }`}
-                            style={{
-                              fontSize:
-                                screenSize === "mobile" ? "0.7rem" : "0.8rem",
-                            }}
-                          >
-                            {product.type}
-                          </span>
-                        </td>
-                        <td>{product.time}</td>
-                        <td>
-                          <span
-                            className="status-badge"
-                            style={{
-                              fontSize:
-                                screenSize === "mobile" ? "0.7rem" : "0.8rem",
-                            }}
-                          >
-                            {product.status}
-                          </span>
-                        </td>
-                        <td>
-                          <a
-                            href="#"
-                            className="view-link"
-                            style={{
-                              fontSize:
-                                screenSize === "mobile" ? "0.75rem" : "0.85rem",
-                            }}
-                          >
-                            View Product...
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
+                 <tbody>
+  {productLoading ? (
+    <tr>
+      <td colSpan="5" className="text-center">
+        <div className="spinner-border spinner-border-sm" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </td>
+    </tr>
+  ) : recentProducts.length === 0 ? (
+    <tr>
+      <td colSpan="5" className="text-center text-muted">
+        No products found
+      </td>
+    </tr>
+  ) : (
+    recentProducts.map((product, index) => (
+      <tr
+        key={product.Product_ID}
+        style={{
+          fontSize: screenSize === "mobile" ? "0.75rem" : "0.85rem",
+        }}
+      >
+        <td>{product.Product_Name}</td>
+        <td>
+          <span
+            className="booking-type booking-online"
+            style={{
+              fontSize: screenSize === "mobile" ? "0.7rem" : "0.8rem",
+            }}
+          >
+            {product.Product_Category}
+          </span>
+        </td>
+        <td>
+          {product.Product_DateCreated
+            ? new Date(product.Product_DateCreated).toLocaleDateString()
+            : "N/A"}
+        </td>
+        <td>
+          <span
+            className="status-badge"
+            style={{
+              fontSize: screenSize === "mobile" ? "0.7rem" : "0.8rem",
+            }}
+          >
+            Active
+          </span>
+        </td>
+        <td>
+          <a
+            href="#"
+            className="view-link"
+            style={{
+              fontSize: screenSize === "mobile" ? "0.75rem" : "0.85rem",
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/dermatologist/productmanagement');
+            }}
+          >
+            View Product...
+          </a>
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
                 </Table>
               </div>
             </div>
