@@ -36,6 +36,12 @@ export const useAuth = () => {
 };
 const uploadImageDirectly = async (file, folder) => {
   try {
+    console.log(`Starting image upload for ${folder}:`, {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+    });
+
     const storage = getStorage();
     const fileExt = file.name.split(".").pop();
     const fileName = `${Date.now()}_${Math.random()
@@ -43,14 +49,36 @@ const uploadImageDirectly = async (file, folder) => {
       .substr(2, 9)}.${fileExt}`;
     const storageRef = ref(storage, `${folder}/${fileName}`);
 
+    console.log(`Uploading to path: ${folder}/${fileName}`);
+
     const snapshot = await uploadBytes(storageRef, file, {
       contentType: file.type,
     });
 
-    return await getDownloadURL(snapshot.ref);
+    console.log("Upload completed, getting download URL...");
+    const downloadURL = await getDownloadURL(snapshot.ref);
+
+    console.log(`Upload successful for ${folder}:`, downloadURL);
+    return downloadURL;
   } catch (error) {
-    console.error("Upload error:", error);
-    return "";
+    console.error(`Upload error for ${folder}:`, error);
+
+    // Provide more specific error messages
+    if (error.code === "storage/unauthorized") {
+      throw new Error(
+        `Failed to upload ${folder} - permission denied. Check Firebase storage rules.`
+      );
+    } else if (error.code === "storage/canceled") {
+      throw new Error(`Upload of ${folder} was canceled`);
+    } else if (error.code === "storage/unknown") {
+      throw new Error(`Unknown error occurred while uploading ${folder}`);
+    } else if (error.code === "storage/retry-limit-exceeded") {
+      throw new Error(`Upload of ${folder} failed - retry limit exceeded`);
+    } else if (error.code === "storage/invalid-checksum") {
+      throw new Error(`Upload of ${folder} failed - file may be corrupted`);
+    } else {
+      throw new Error(`Failed to upload ${folder}: ${error.message}`);
+    }
   }
 };
 export const AuthProvider = ({ children }) => {
@@ -63,19 +91,32 @@ export const AuthProvider = ({ children }) => {
   // ---------- Email Check Function ----------
   const checkEmailAvailability = async (email) => {
     try {
-      console.log("Checking email availability for:", email); // Debug log
+      console.log("Checking email availability thoroughly for:", email);
 
-      // Add a small delay to prevent rate limiting
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
+      // First check Firebase Auth
       const signInMethods = await fetchSignInMethodsForEmail(auth, email);
 
-      console.log("Sign-in methods found:", signInMethods.length); // Debug log
+      if (signInMethods.length > 0) {
+        console.log("Email found in Firebase Auth");
+        return false;
+      }
 
-      return signInMethods.length === 0; // true if email is available
+      // Also check your Firestore Users collection
+      const usersQuery = query(
+        collection(db, "Users"),
+        where("User_Email", "==", email)
+      );
+      const userDocs = await getDocs(usersQuery);
+
+      if (!userDocs.empty) {
+        console.log("Email found in Firestore Users collection");
+        return false;
+      }
+
+      console.log("Email is available in both Firebase Auth and Firestore");
+      return true;
     } catch (error) {
       console.error("Error checking email availability:", error);
-      console.error("Error code:", error.code);
 
       // Handle specific Firebase errors
       if (error.code === "auth/invalid-email") {
@@ -115,22 +156,144 @@ export const AuthProvider = ({ children }) => {
     return Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit OTP
   };
 
-  const sendOTP = async (email) => {
+  const sendOTP = async (email, firstName = null) => {
     try {
-      const otp = generateOTP();
-      setOtpStore({ [email]: otp });
+      console.log("🔍 Starting sendOTP function...");
+      console.log("📧 Email:", email);
+      console.log("👤 First Name:", firstName);
 
-      await fetch("http://localhost:5000/api/email/send-otp", {
+      const otp = generateOTP();
+      console.log("🔢 Generated OTP:", otp);
+
+      // Store OTP locally first
+      setOtpStore({ [email]: otp });
+      console.log("💾 OTP stored locally");
+
+      // Try to get firstName from multiple sources
+      let displayName = firstName;
+
+      if (!displayName && userProfile?.User_FName) {
+        displayName = userProfile.User_FName;
+        console.log("📝 Using firstName from userProfile:", displayName);
+      }
+
+      if (!displayName && currentUser?.displayName) {
+        displayName = currentUser.displayName.split(" ")[0];
+        console.log("📝 Using firstName from currentUser:", displayName);
+      }
+
+      if (!displayName) {
+        displayName = "User"; // Fallback
+        console.log("📝 Using fallback firstName:", displayName);
+      }
+
+      const requestBody = {
+        email,
+        firstName: displayName,
+        otp,
+      };
+
+      console.log("📤 Request body:", requestBody);
+      console.log("🌐 Making fetch request to server...");
+
+      // Add timeout and better error handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+      const response = await fetch("http://localhost:5000/api/email/send-otp", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
       });
 
-      console.log("OTP sent:", otp);
-      return { success: true };
+      clearTimeout(timeoutId);
+
+      // Log response details
+      console.log("📥 Response status:", response.status);
+      console.log("📥 Response ok:", response.ok);
+      console.log(
+        "📥 Response headers:",
+        Object.fromEntries(response.headers.entries())
+      );
+
+      // Try to get response text first
+      const responseText = await response.text();
+      console.log("📄 Raw response text:", responseText);
+
+      // Check if response is ok (status 200-299)
+      if (!response.ok) {
+        console.error("❌ Response not ok:", response.status);
+
+        let errorMessage = "Failed to send OTP";
+
+        if (responseText) {
+          try {
+            const errorData = JSON.parse(responseText);
+            console.error("❌ Server error response:", errorData);
+            errorMessage = errorData.error || errorData.message || errorMessage;
+          } catch (parseError) {
+            console.error("❌ Could not parse error response as JSON");
+            errorMessage = responseText || errorMessage;
+          }
+        }
+
+        throw new Error(`${errorMessage} (Status: ${response.status})`);
+      }
+
+      // Parse successful response
+      let result;
+      try {
+        result = JSON.parse(responseText);
+        console.log("✅ Parsed response:", result);
+      } catch (parseError) {
+        console.error(
+          "❌ Could not parse success response as JSON:",
+          parseError
+        );
+        console.error("Raw text was:", responseText);
+        throw new Error("Server returned invalid JSON response");
+      }
+
+      if (result.success) {
+        console.log("🎉 OTP sent successfully!");
+        return { success: true };
+      } else {
+        console.error("❌ Server reported failure:", result);
+        throw new Error(result.error || "OTP sending failed");
+      }
     } catch (error) {
-      console.error("OTP sending error:", error);
-      throw error;
+      console.error("💥 sendOTP Error:", error);
+      console.error("💥 Error name:", error.name);
+      console.error("💥 Error message:", error.message);
+      console.error("💥 Error stack:", error.stack);
+
+      // Provide more specific error messages
+      if (error.name === "AbortError") {
+        throw new Error(
+          "Request timed out. Please check your internet connection and try again."
+        );
+      } else if (
+        error.name === "TypeError" &&
+        error.message.includes("fetch")
+      ) {
+        console.error("🚨 Fetch error - likely server connection issue");
+        throw new Error(
+          "Cannot connect to email service. Please check if the server is running on http://localhost:5000"
+        );
+      } else if (
+        error.message.includes("NetworkError") ||
+        error.message.includes("net::ERR")
+      ) {
+        throw new Error(
+          "Network error. Please check your internet connection."
+        );
+      } else {
+        throw error;
+      }
     }
   };
 
@@ -526,7 +689,7 @@ export const AuthProvider = ({ children }) => {
       );
 
       // Send OTP
-      await sendOTP(personalInfo.emailAddress);
+      await sendOTP(personalInfo.emailAddress, personalInfo.firstName);
 
       return { user, customUserId };
     } catch (error) {
@@ -552,7 +715,7 @@ export const AuthProvider = ({ children }) => {
 
           // Only send OTP if conditions are met
           if (shouldSendOTP(userData)) {
-            await sendOTP(email);
+            await sendOTP(email, userData.User_FName);
           }
         }
       } else {
@@ -569,7 +732,7 @@ export const AuthProvider = ({ children }) => {
 
           // Option 2: Still check emailVerified flag
           if (!userData.emailVerified) {
-            await sendOTP(email);
+            await sendOTP(email, userData.User_FName);
           }
         }
       }

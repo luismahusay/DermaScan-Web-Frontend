@@ -7,59 +7,79 @@ import { RegistrationContext } from "../contexts/RegistrationContext";
 import "../styles/derma_security.css";
 
 function SecurityRegister() {
-   const navigate = useNavigate();
-   const { registerDermatologist } = useAuth();
-   const { personalInfo, verificationInfo } = useContext(RegistrationContext);
+  const navigate = useNavigate();
+  const { registerDermatologist } = useAuth();
+  const { personalInfo, verificationInfo } = useContext(RegistrationContext);
 
-   const [password, setPassword] = useState("");
-   const [confirmPassword, setConfirmPassword] = useState("");
-   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-   const [showPassword, setShowPassword] = useState(false);
-   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-   const [error, setError] = useState("");
-   const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
-   const handleRegister = async () => {
-     // Validation
-     const validationErrors = {};
 
-     const passwordError = validatePassword(password);
-     if (passwordError) validationErrors.password = passwordError;
+  const handleRegister = async () => {
+    // Validation
+    const validationErrors = {};
 
-     if (password !== confirmPassword) {
-       validationErrors.confirmPassword = "Passwords do not match";
-     }
+    const passwordError = validatePassword(password);
+    if (passwordError) validationErrors.password = passwordError;
 
-     if (Object.keys(validationErrors).length > 0) {
-       setFieldErrors(validationErrors);
-       setError("Please correct the errors below");
-       return;
-     }
+    if (password !== confirmPassword) {
+      validationErrors.confirmPassword = "Passwords do not match";
+    }
 
-     try {
-       setLoading(true);
-       setError("");
+    if (Object.keys(validationErrors).length > 0) {
+      setFieldErrors(validationErrors);
+      setError(""); // Clear general error when showing field-specific errors
+      return;
+    }
 
-       await registerDermatologist(personalInfo, verificationInfo, password);
+    try {
+      setLoading(true);
+      setError("");
+      setFieldErrors({}); // Clear field errors on successful validation
 
-       navigate("/dermatologist/emailverification");
-     } catch (error) {
-       console.error("Registration error:", error);
-       setError(error.message || "Registration failed. Please try again.");
-     } finally {
-       setLoading(false);
-     }
-   };
-   const validatePassword = (password) => {
-     if (!password) return "Password is required";
-     if (password.length < 8) return "Password must be at least 8 characters";
-     if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-       return "Password must contain at least one uppercase letter, one lowercase letter, and one number";
-     }
-     return null;
-   };
+      await registerDermatologist(personalInfo, verificationInfo, password);
+
+      navigate("/dermatologist/emailverification");
+    } catch (error) {
+      console.error("Registration error:", error);
+      setError(error.message || "Registration failed. Please try again.");
+      setFieldErrors({}); // Clear field errors when showing server error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const validatePassword = (password) => {
+    if (!password) return "Password is required";
+    if (password.length < 8) return "Password must be at least 8 characters";
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      return "Password must contain at least one uppercase letter, one lowercase letter, and one number";
+    }
+    return null;
+  };
+
   const handleLogin = () => {
     navigate("/dermatologist/derma_login");
+  };
+
+  // Clear field errors when user starts typing
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    if (fieldErrors.password) {
+      setFieldErrors((prev) => ({ ...prev, password: null }));
+    }
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+    if (fieldErrors.confirmPassword) {
+      setFieldErrors((prev) => ({ ...prev, confirmPassword: null }));
+    }
   };
 
   return (
@@ -98,8 +118,10 @@ function SecurityRegister() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input-field pe-5"
+                  onChange={handlePasswordChange}
+                  className={`input-field pe-5 ${
+                    fieldErrors.password ? "is-invalid" : ""
+                  }`}
                 />
                 {showPassword ? (
                   <FaEyeSlash
@@ -112,6 +134,11 @@ function SecurityRegister() {
                     className="eye-icon"
                   />
                 )}
+                {fieldErrors.password && (
+                  <div className="invalid-feedback d-block">
+                    {fieldErrors.password}
+                  </div>
+                )}
               </Form.Group>
 
               {/* Confirm Password Field */}
@@ -120,8 +147,10 @@ function SecurityRegister() {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm Password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="input-field pe-5"
+                  onChange={handleConfirmPasswordChange}
+                  className={`input-field pe-5 ${
+                    fieldErrors.confirmPassword ? "is-invalid" : ""
+                  }`}
                 />
                 {showConfirmPassword ? (
                   <FaEyeSlash
@@ -133,6 +162,11 @@ function SecurityRegister() {
                     onClick={() => setShowConfirmPassword(true)}
                     className="eye-icon"
                   />
+                )}
+                {fieldErrors.confirmPassword && (
+                  <div className="invalid-feedback d-block">
+                    {fieldErrors.confirmPassword}
+                  </div>
                 )}
               </Form.Group>
 
